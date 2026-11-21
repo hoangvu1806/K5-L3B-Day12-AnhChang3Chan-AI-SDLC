@@ -25,6 +25,7 @@ var live_fish: Dictionary = {}      # id -> Node3D (đàn cá theo logic)
 var live_monsters: Dictionary = {}  # id -> Node3D
 var _decor_hidden := false
 var fish_nodes: Array = []
+var ambient_fish_nodes: Array = []
 var ray_nodes: Array = []
 var bubble_nodes: Array = []
 var loaded_models := 0
@@ -303,38 +304,105 @@ func _play_loop_anim(node: Node3D, preferred: String) -> void:
 			player.play(player.get_animation_list()[0])
 
 
+func _spawn_bong_sung_cluster(pos_x: float, pos_z: float, sc: float, show_stems := true) -> void:
+	_asset("aquatic", "lily_pads_blossom", Vector3(pos_x, 0.08, pos_z), Vector3.ONE * (2.4 * sc), Vector3(0.0, rng.randf_range(-180.0, 180.0), 0.0))
+	_asset("aquatic", "lotus_clump", Vector3(pos_x + 0.5 * sc, 0.10, pos_z - 0.35 * sc), Vector3.ONE * (2.1 * sc), Vector3(0.0, rng.randf_range(-180.0, 180.0), 0.0))
+	# Bright blooming pink-magenta water-lily flower & golden center so bong_sung pops unmistakably!
+	var petal_mat := StandardMaterial3D.new()
+	petal_mat.albedo_color = Color("#ff5fa2")
+	petal_mat.emission_enabled = true
+	petal_mat.emission = Color("#d9387e")
+	petal_mat.emission_energy_multiplier = 0.35
+	petal_mat.roughness = 0.45
+	var center_mat := _make_mat("#ffd93d", 0.4)
+	var stem_mat := _make_mat("#3b7a38", 0.85)
+	for b_off in [Vector3(-0.35 * sc, 0.24, 0.15 * sc), Vector3(0.45 * sc, 0.26, -0.15 * sc), Vector3(0.0, 0.28, 0.35 * sc)]:
+		var flower := Node3D.new()
+		flower.position = Vector3(pos_x, 0.0, pos_z) + b_off
+		for p_i in range(6):
+			var petal := MeshInstance3D.new()
+			var pm := SphereMesh.new()
+			pm.radius = 0.16 * sc
+			pm.height = 0.34 * sc
+			pm.material = petal_mat
+			petal.mesh = pm
+			var ang := p_i * (TAU / 6.0)
+			petal.position = Vector3(cos(ang) * 0.14 * sc, 0.0, sin(ang) * 0.14 * sc)
+			petal.rotation_degrees = Vector3(38.0 * sin(ang), 0.0, -38.0 * cos(ang))
+			flower.add_child(petal)
+		var core := MeshInstance3D.new()
+		var cm := SphereMesh.new()
+		cm.radius = 0.11 * sc
+		cm.height = 0.18 * sc
+		cm.material = center_mat
+		core.mesh = cm
+		core.position = Vector3(0.0, 0.06 * sc, 0.0)
+		flower.add_child(core)
+		add_child(flower)
+		if show_stems:
+			var stem := MeshInstance3D.new()
+			var stm := CylinderMesh.new()
+			stm.top_radius = 0.035 * sc
+			stm.bottom_radius = 0.05 * sc
+			stm.height = 2.2 * sc
+			stm.material = stem_mat
+			stem.mesh = stm
+			stem.position = Vector3(pos_x + b_off.x, -1.05 * sc, pos_z + b_off.z)
+			stem.rotation_degrees = Vector3(rng.randf_range(-8.0, 8.0), 0.0, rng.randf_range(-8.0, 8.0))
+			add_child(stem)
+
+
+func _add_node_tag(text: String, at: Vector3, col: Color) -> void:
+	var tag := Label3D.new()
+	tag.text = text
+	tag.position = at
+	tag.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+	tag.font_size = 38
+	tag.outline_size = 10
+	tag.modulate = col
+	add_child(tag)
+
+
 func _build_prd_nodes_and_fish() -> void:
 	# 6 PRD Phase 2 surface harvest nodes (N1-N2 bong_dien_dien, N3-N4 bong_sung, N5-N6 keo_neo)
 	for n in PRD_NODES:
 		var p: Vector2 = n["pos"]
 		if n["kind"] == "bong_dien_dien":
-			_asset("aquatic", "flower_yellow", Vector3(p.x, 0.05, 0.0), Vector3.ONE * 1.6, Vector3(0.0, 20.0, 0.0))
-			_asset("aquatic", "lily_pads_swamp", Vector3(p.x, 0.02, -0.4), Vector3.ONE * 1.1, Vector3(0.0, 0.0, 0.0))
+			_asset("aquatic", "flower_yellow", Vector3(p.x, 0.08, 0.0), Vector3.ONE * 2.2, Vector3(0.0, 20.0, 0.0))
+			_asset("aquatic", "lily_pads_swamp", Vector3(p.x, 0.03, -0.4), Vector3.ONE * 1.4, Vector3(0.0, 0.0, 0.0))
+			_add_node_tag("Điên điển", Vector3(p.x, 1.35, 0.0), Color("#ffe45e"))
 		elif n["kind"] == "bong_sung":
-			_asset("aquatic", "lily_pads_blossom", Vector3(p.x, 0.04, 0.0), Vector3.ONE * 1.5, Vector3(0.0, 0.0, 0.0))
-			_asset("aquatic", "lotus_clump", Vector3(p.x + 0.6, 0.04, -0.5), Vector3.ONE * 1.2, Vector3(0.0, 45.0, 0.0))
+			_spawn_bong_sung_cluster(p.x, 0.0, 1.25, true)
+			_add_node_tag("Bông súng", Vector3(p.x, 1.55, 0.0), Color("#ff8ec4"))
 		else:
-			_asset("aquatic", "keo_neo", Vector3(p.x, -0.05, 0.0), Vector3.ONE * 1.6, Vector3(0.0, 15.0, 0.0))
+			_asset("aquatic", "keo_neo", Vector3(p.x, -0.02, 0.0), Vector3.ONE * 2.2, Vector3(0.0, 15.0, 0.0))
+			_add_node_tag("Kèo nèo", Vector3(p.x, 1.35, 0.0), Color("#8cf59b"))
+
+	# Lush decorative bong_sung patches scattered across the Mekong river surface
+	for i in range(18):
+		var bx := 6.0 + i * 5.2 + rng.randf_range(-1.4, 1.4)
+		var bz := rng.randf_range(-7.5, -2.4)
+		_spawn_bong_sung_cluster(bx, bz, rng.randf_range(0.85, 1.2), i % 2 == 0)
 
 	# PRD Phase 2 fish schools (ca_linh, ca_loc, ca_keo, ca_ho)
 	for f in PRD_FISH:
 		var p: Vector2 = f["pos"]
 		var kind: String = f["kind"]
-		var count := 1 if kind == "ca_ho" else (2 if kind in ["ca_loc", "ca_keo"] else 4)
+		var count := 1 if kind == "ca_ho" else (3 if kind in ["ca_loc", "ca_keo"] else 6)
 		for k in range(count):
-			var offset := Vector3.ZERO if kind == "ca_ho" else Vector3(rng.randf_range(-1.4, 1.4), rng.randf_range(-0.7, 0.7), rng.randf_range(-1.2, 0.8))
+			var offset := Vector3.ZERO if kind == "ca_ho" else Vector3(rng.randf_range(-1.8, 1.8), rng.randf_range(-0.9, 0.9), rng.randf_range(-1.4, 0.8))
 			var base_pos := Vector3(p.x, -p.y, 0.0) + offset
 			var f_id := "fish_perch"
-			var sc := rng.randf_range(0.85, 1.1)
+			var sc := rng.randf_range(0.95, 1.25)
 			if kind == "ca_loc":
 				f_id = "fish_carp"
-				sc = rng.randf_range(1.15, 1.45)
+				sc = rng.randf_range(1.25, 1.55)
 			elif kind == "ca_keo":
 				f_id = "fish_ca_keo"
-				sc = rng.randf_range(0.24, 0.30)
+				sc = rng.randf_range(0.28, 0.35)
 			elif kind == "ca_ho":
 				f_id = "ca_ho"
-				sc = 0.52
+				sc = 0.58
 			var inst := _asset("aquatic", f_id, base_pos, Vector3.ONE * sc, Vector3(0.0, 90.0 if k % 2 == 0 else -90.0, 0.0))
 			if inst != null:
 				if kind in ["ca_keo", "ca_ho"]:
@@ -343,9 +411,25 @@ func _build_prd_nodes_and_fish() -> void:
 					"node": inst,
 					"origin": base_pos,
 					"phase": rng.randf_range(0.0, TAU),
-					"amp": rng.randf_range(0.7, 1.8) if kind != "ca_ho" else 3.0,
-					"speed": rng.randf_range(1.0, 1.6) if kind != "ca_ho" else 0.7,
+					"amp": rng.randf_range(0.9, 2.2) if kind != "ca_ho" else 3.2,
+					"speed": rng.randf_range(1.0, 1.7) if kind != "ca_ho" else 0.7,
 				})
+
+	# Rich ambient background fish schools (always visible in both live & preview modes for lively river!)
+	var bg_models := [["fish_perch", 0.95], ["fish_carp", 1.25], ["fish_ca_keo", 0.28]]
+	for i in range(28):
+		var spec: Array = bg_models[i % bg_models.size()]
+		var base_pos := Vector3(rng.randf_range(4.0, 96.0), rng.randf_range(-26.0, -2.5), rng.randf_range(-10.5, -4.2))
+		var inst := _asset("aquatic", str(spec[0]), base_pos, Vector3.ONE * float(spec[1]), Vector3(0.0, 90.0, 0.0))
+		if inst != null:
+			_play_loop_anim(inst, "Swimming_Normal")
+			ambient_fish_nodes.append({
+				"node": inst,
+				"origin": base_pos,
+				"phase": rng.randf_range(0.0, TAU),
+				"amp": rng.randf_range(2.2, 5.5),
+				"speed": rng.randf_range(0.6, 1.3),
+			})
 
 	# Phase 2 Monsters: Ca Sau Nam Cheo (M1 [60,24]..[64,24]) & Ran Ho May (M3 [72,14]..[76,14])
 	var croc := _asset("monsters", "ca_sau", Vector3(62.0, -24.0, 0.0), Vector3.ONE * 1.4, Vector3(0.0, 90.0, 0.0))
@@ -585,17 +669,18 @@ func _after_move(delta: float) -> void:
 	cam.position = cam.position.lerp(cam_target, minf(1.0, delta * 5.0))
 	cam.look_at(Vector3(clampf(diver_pos.x, 8.0, 92.0), clampf(-diver_pos.y, -26.0, 1.5), -3.0), Vector3.UP)
 
-	# Animate fish schools
-	for entry in fish_nodes:
-		var fn: Node3D = entry["node"]
-		var orig: Vector3 = entry["origin"]
-		var ph: float = entry["phase"]
-		var amp: float = entry["amp"]
-		var sp: float = entry["speed"]
-		var dx := sin(time_acc * sp + ph) * amp
-		var dy := cos(time_acc * sp * 0.7 + ph) * 0.25
-		fn.position = orig + Vector3(dx, dy, 0.0)
-		fn.rotation.y = (PI * 0.5) if cos(time_acc * sp + ph) >= 0.0 else (-PI * 0.5)
+	# Animate fish schools (both preview & always-on ambient background fish)
+	for list in [fish_nodes, ambient_fish_nodes]:
+		for entry in list:
+			var fn: Node3D = entry["node"]
+			var orig: Vector3 = entry["origin"]
+			var ph: float = entry["phase"]
+			var amp: float = entry["amp"]
+			var sp: float = entry["speed"]
+			var dx := sin(time_acc * sp + ph) * amp
+			var dy := cos(time_acc * sp * 0.7 + ph) * 0.25
+			fn.position = orig + Vector3(dx, dy, 0.0)
+			fn.rotation.y = (PI * 0.5) if cos(time_acc * sp + ph) >= 0.0 else (-PI * 0.5)
 
 	# Animate light shafts & rising bubbles
 	for r in ray_nodes:
@@ -647,12 +732,25 @@ func _sync_pool(pool: Dictionary, items: Array, family: String, models: Dictiona
 		var pos: Array = it.get("pos", [0.0, 0.0])
 		var at := Vector3(float(pos[0]), -float(pos[1]), 0.0)
 		if not pool.has(id):
-			var spec: Array = models.get(str(it.get("kind", "")), models.values()[0])
-			var node := _asset(family, spec[0], at, Vector3.ONE * float(spec[1]), Vector3(0.0, 90.0, 0.0))
-			if node == null:
-				continue
-			_play_loop_anim(node, "Swimming_Normal")
-			pool[id] = node
+			var kind_str := str(it.get("kind", ""))
+			var spec: Array = models.get(kind_str, models.values()[0])
+			if family == "aquatic" and kind_str != "ca_ho":
+				# Render each logical fish school as a lively 4-fish visual formation!
+				var school := Node3D.new()
+				school.position = at
+				add_child(school)
+				var offsets := [Vector3.ZERO, Vector3(-0.7, 0.35, -0.35), Vector3(0.65, -0.3, -0.4), Vector3(-0.35, -0.45, 0.35)]
+				for off in offsets:
+					var fnode := _asset(family, str(spec[0]), off, Vector3.ONE * float(spec[1]), Vector3.ZERO, school)
+					if fnode != null:
+						_play_loop_anim(fnode, "Swimming_Normal")
+				pool[id] = school
+			else:
+				var node := _asset(family, str(spec[0]), at, Vector3.ONE * float(spec[1]), Vector3(0.0, 90.0, 0.0))
+				if node == null:
+					continue
+				_play_loop_anim(node, "Swimming_Normal")
+				pool[id] = node
 		var n: Node3D = pool[id]
 		n.position = n.position.lerp(at, minf(1.0, delta * 12.0))
 		var heading := deg_to_rad(float(it.get("heading_deg", 0.0)))
