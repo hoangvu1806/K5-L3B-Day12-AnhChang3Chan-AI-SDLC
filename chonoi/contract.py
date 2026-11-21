@@ -134,8 +134,9 @@ def validate_tuning(t):
         raise BadInput("quan.tip_min_patience_ratio phải thuộc (0, 1]")
     if not (_num(q.get("tip_reputation")) and q["tip_reputation"] > 0):
         raise BadInput("quan.tip_reputation phải > 0")
-    if q.get("burn_s") is not None:
-        raise BadInput("burn_s phải là null ở Phase 1")
+    burn = q.get("burn_s")  # null ở lõi; hữu hạn > 0 khi bật mở rộng `burn` (Ticket-02 mục 3)
+    if burn is not None and not (_num(burn) and burn > 0):
+        raise BadInput("quan.burn_s phải là null hoặc số > 0")
     # TODO(nhóm): bổ sung kiểm các khóa còn lại nếu muốn chặt hơn (bếp/bàn, uy tín, ...).
     for dish_id, d in menu.items():
         price, cook = d.get("price"), d.get("cook_s")

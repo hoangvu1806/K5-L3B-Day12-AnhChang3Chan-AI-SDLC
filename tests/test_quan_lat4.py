@@ -153,7 +153,9 @@ class Lat4(unittest.TestCase):
                 with open(out, "rb") as f:
                     outs.append(f.read())
             self.assertEqual(outs[0], outs[1])
-            names = [e["name"] for e in events(read_jsonl(out))]
+            lat4 = {"cook_started", "dish_ready", "dish_picked", "served", "paid", "dish_burnt"}
+            # chỉ so sự kiện Lát 4: từ khi gộp Lát 3, khách theo lịch sinh thêm customer_arrived/no_dish
+            names = [e["name"] for e in events(read_jsonl(out)) if e["name"] in lat4]
             self.assertEqual(names, ["cook_started", "dish_ready", "dish_picked"])
 
     def test_bad_scenario_exit_2(self):
