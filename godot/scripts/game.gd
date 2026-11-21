@@ -73,6 +73,8 @@ var blink_t := 0.0
 var active_alert_monster := false
 var active_alert_oxy := false
 var active_alert_angry := false
+# Ngưỡng cảnh báo từ meta.alerts (chonoi.live, Hà Anh); thiếu khóa thì dùng mặc định cũ
+var alert_cfg: Dictionary = {}
 var last_state: Dictionary = {}
 
 
@@ -402,6 +404,10 @@ func _process(delta: float) -> void:
 			left_vbox.add_child(_mk_label("Đang xem trước cảnh 3D.\nBật server logic để bắt đầu chơi.", 13, Color("#cfe4f0")))
 
 
+func _al(key: String, fallback: float) -> float:
+	return float(alert_cfg.get(key, fallback))
+
+
 func _on_state(s: Dictionary) -> void:
 	last_state = s
 	var ph := str(s.get("phase", s.get("mode", "gather")))
@@ -417,7 +423,9 @@ func _on_state(s: Dictionary) -> void:
 	var ph_vi := "Sông" if ph == "gather" else ("Quán" if ph == "quan" else "Cửa hàng")
 	phase_badge.text = ("Ngày %d · %s" % [day_num, ph_vi]) if s.has("day") else ph_vi
 
-	var low_time := secs <= 30 and ph != "shop"
+	# Ngưỡng cảnh báo lấy từ dữ liệu (meta.alerts do chonoi.live gửi, Hà Anh); thiếu thì dùng mặc định cũ
+	alert_cfg = s.get("meta", {}).get("alerts", {})
+	var low_time := secs <= int(_al("time_low_s", 30)) and ph != "shop"
 	time_label.text = "%d:%02d" % [secs / 60, secs % 60]
 	time_label.add_theme_color_override("font_color", Color("#ff6b6b") if low_time else Color("#ffffff"))
 	stats_label.text = "%dk  ·  Uy tín %.1f  ·  %d điểm" % [money_i, rep_f, score_i]
@@ -486,12 +494,12 @@ func _build_gather_card(s: Dictionary, alerts: Array[String]) -> void:
 
 	# Slim Oxygen bar
 	var oxy_pct := int(round(oxy * 100.0))
-	var oxy_col := Color("#36d6e8") if oxy >= 0.5 else (Color("#f5c242") if oxy >= 0.25 else Color("#ff4757"))
+	var oxy_col := Color("#36d6e8") if oxy >= 0.5 else (Color("#f5c242") if oxy >= _al("oxygen_low_ratio", 0.25) else Color("#ff4757"))
 	var oxy_lbl := _mk_label("Oxy: %d%%" % oxy_pct, 13, oxy_col)
 	left_vbox.add_child(oxy_lbl)
 	left_vbox.add_child(_mk_progress_bar(oxy, oxy_col, 6, 210))
 
-	if oxy < 0.25:
+	if oxy < _al("oxygen_low_ratio", 0.25):
 		active_alert_oxy = true
 		alerts.append("⚠ HẾT HƠI!" if oxy <= 0.0 else "⚠ OXY SẮP HẾT (%d%%)!" % oxy_pct)
 
@@ -512,7 +520,9 @@ func _build_gather_card(s: Dictionary, alerts: Array[String]) -> void:
 					break
 	for m in s.get("monsters", []):
 		var mp: Array = m.get("pos", [999, 999])
-		if pvec.distance_to(Vector2(float(mp[0]), float(mp[1]))) <= 10.0 or str(m.get("state", "")) == "chase":
+		var near_m: Dictionary = alert_cfg.get("monster_near_m", {})
+		var near_r := float(near_m.get(str(m.get("kind", "ca_sau")), 10.0))
+		if pvec.distance_to(Vector2(float(mp[0]), float(mp[1]))) <= near_r or str(m.get("state", "")) == "chase":
 			active_alert_monster = true
 			break
 	if active_alert_monster:
@@ -602,10 +612,10 @@ func _build_quan_card(s: Dictionary, alerts: Array[String]) -> void:
 			var did := str(c.get("dish_id", ""))
 			var cstate := str(c.get("state", "waiting"))
 			var ratio := float(c.get("patience_ticks_left", 0)) / maxf(1.0, patience_max)
-			var is_angry := ratio < 0.25 and cstate == "waiting"
+			var is_angry: bool = ratio < _al("patience_low_ratio", 0.25) and cstate == "waiting"
 			if is_angry:
 				active_alert_angry = true
-			var bar_col := Color("#2ed573") if ratio >= 0.5 else (Color("#ffa502") if ratio >= 0.25 else Color("#ff4757"))
+			var bar_col := Color("#2ed573") if ratio >= 0.5 else (Color("#ffa502") if ratio >= _al("patience_low_ratio", 0.25) else Color("#ff4757"))
 			if cstate == "eating":
 				bar_col = Color("#70a1ff")
 			var line := "%s · %s" % [tid, str(DISH_VI.get(did, did))]

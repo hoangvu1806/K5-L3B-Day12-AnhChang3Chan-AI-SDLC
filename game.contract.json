@@ -148,6 +148,7 @@
         "hp": [{"level": 1, "price": 250, "hp_max": 4}, {"level": 2, "price": 500, "hp_max": 5}]
       }
     },
+    "hud_alerts": {"oxygen_low_ratio": 0.25, "patience_low_ratio": 0.25, "monster_near_uses": "detect_radius", "time_low_s": 30},
     "score": {"reputation_multiplier": 100}
   }
 }

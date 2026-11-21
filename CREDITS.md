@@ -39,6 +39,11 @@ Liệt kê asset ngoài (nguồn, giấy phép) và công cụ hỗ trợ đã d
 - Danh sách file (đã dequantize cho Godot 4.5.1):
   - `kelp_forest.glb`, `kelp_cluster.glb`, `seaweed_rock.glb`, `cliff_basalt.glb`, `cliff_block.glb`, `boulder_large.glb`, `boulder_mossy.glb`, `driftwood_rootball.glb`, `driftwood_log.glb`
 
+### 3d. Cây đước đỏ (`godot/assets/external/swamp/`) — CC0 1.0 Universal
+- Nguồn: [Swamp and Mangrove — 3DAssets.dev](https://3dassets.dev/packs/swamp-and-mangrove)
+- Giấy phép: **CC0 1.0 Universal**
+- Danh sách file: `mangrove_red.glb`, `mangrove_red_painted.webp`
+
 ### 4. Nhân vật 3D (`godot/assets/external/characters/`) — CC0 1.0 Universal
 - Nguồn: [Quaternius Animated Women Pack](https://quaternius.com/packs/animatedwoman.html) (via `codepawl/quaternius-glb`) & [3DAssets.dev](https://3dassets.dev/)
 - Giấy phép: **CC0 1.0 Universal**
@@ -83,3 +88,9 @@ Liệt kê asset ngoài (nguồn, giấy phép) và công cụ hỗ trợ đã d
 | Gobkit Characters Vol. 1 | Nhân vật mẫu | CC0 | [Gobkit](https://gobkit.itch.io/gobkit-free-character-pack-vol-1) |
 
 Các bộ CC0 có thể tải bằng `python3 godot/tools/download_full_assets.py --core`. Script `godot/tools/dequantize_glb.py` chuyển đổi các model dùng `KHR_mesh_quantization` để Godot import được.
+
+## Mã nguồn và giấy phép
+
+- Mã nguồn của nhóm (`chonoi/`, `tests/`, `tools/`, `godot/scripts/`, `godot/shaders/`) phát hành theo **MIT License** — xem `LICENSE`.
+- Khung Python ban đầu (`chonoi/{headless,inputs,scenario,contract,rng,ids,jsonl,inventory,runner,live}.py`) do giảng viên lab cung cấp.
+- Asset bên thứ ba ở trên **không** thuộc MIT; mỗi mục theo giấy phép ghi tại mục đó.
