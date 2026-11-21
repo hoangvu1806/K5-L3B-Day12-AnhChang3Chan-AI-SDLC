@@ -700,7 +700,8 @@ func _process(delta: float) -> void:
         player_world = player_world.lerp(target, minf(1.0, delta * 15.0))
         var move_len := Vector2(moved.x, moved.z).length()
         if player_node != null:
-            player_node.position = player_world
+            # Luật (Ticket-02 1.3) cho đi xuyên nội thất; chỉ HIỂN THỊ được đẩy ra mép bàn/ghế/bếp.
+            player_node.position = _avoid_furniture(player_world, s)
             if move_len > 0.015:
                 var target_yaw := atan2(moved.x, moved.z)
                 player_node.rotation.y = lerp_angle(player_node.rotation.y, target_yaw, minf(1.0, delta * 12.0))
@@ -710,7 +711,36 @@ func _process(delta: float) -> void:
                     player_anim.play(want_anim, 0.15)
         # góc nhìn thứ 3: camera sau lưng, hơi cao, nhìn về phía bếp
         if is_instance_valid(cam):
-            var want := player_world + Vector3(0.0, 5.5, 7.5)
+            var shown: Vector3 = player_node.position if player_node != null else player_world
+            var want := shown + Vector3(0.0, 5.5, 7.5)
             cam.position = cam.position.lerp(want, minf(1.0, delta * 5.0))
-            cam.look_at(player_world + Vector3(0.0, 1.0, -1.5))
+            cam.look_at(shown + Vector3(0.0, 1.0, -1.5))
     _quan_cues(s)
+
+
+# Vật cản hiển thị trong quán: (tâm theo _q2w, bán kính m). Bàn tròn, ghế đẩu cạnh bàn, bếp.
+const TABLE_CLEAR := 1.05
+const STOOL_OFFSET := Vector3(-1.85, 0, 0)
+const STOOL_CLEAR := 0.45
+const STOVE_CLEAR := 0.95
+
+func _avoid_furniture(p: Vector3, s: Dictionary) -> Vector3:
+    var circles: Array = []
+    for tb in s.get("tables", []):
+        var at := _q2w(tb.get("pos", [9, 2]))
+        circles.append([at, TABLE_CLEAR])
+        circles.append([at + STOOL_OFFSET, STOOL_CLEAR])
+    for st in s.get("stoves", []):
+        circles.append([_q2w(st.get("pos", [2, 8])), STOVE_CLEAR])
+    var out := p
+    for _i in range(2):  # 2 lượt để thoát chỗ hai vật cản sát nhau
+        for c in circles:
+            var center: Vector3 = c[0]
+            var r: float = c[1]
+            var d := Vector2(out.x - center.x, out.z - center.z)
+            var dist := d.length()
+            if dist < r:
+                var dir := d / dist if dist > 0.001 else Vector2(0, 1)  # trùng tâm: đẩy về phía camera
+                out.x = center.x + dir.x * r
+                out.z = center.z + dir.y * r
+    return out
