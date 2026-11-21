@@ -17,13 +17,17 @@ const KIND_VI := {
 	"ca_loc": "Cá lóc", "ca_linh": "Cá linh", "ca_keo": "Cá kèo",
 	"bong_dien_dien": "Bông điên điển", "bong_sung": "Bông súng", "keo_neo": "Kèo nèo",
 }
+const KIND_SHORT := {
+	"ca_loc": "Cá lóc", "ca_linh": "Cá linh", "ca_keo": "Cá kèo",
+	"bong_dien_dien": "Điên điển", "bong_sung": "Bông súng", "keo_neo": "Kèo nèo",
+}
 const DISH_VI := {
-	"ca_loc_nuong_trui": "Cá lóc nướng trui",
+	"ca_loc_nuong_trui": "Cá lóc nướng",
 	"goi_bong_sung": "Gỏi bông súng",
-	"lau_ca_linh_dien_dien": "Lẩu cá linh điên điển",
+	"lau_ca_linh_dien_dien": "Lẩu cá linh",
 	"canh_chua_ca_loc": "Canh chua cá lóc",
-	"ca_keo_nuong": "Cá kèo nướng muối ớt",
-	"lau_mam": "Lẩu mắm miền Tây",
+	"ca_keo_nuong": "Cá kèo nướng",
+	"lau_mam": "Lẩu mắm",
 }
 const STOVE_VI := {
 	"idle": "Rảnh",
@@ -178,7 +182,7 @@ func _build_ui() -> void:
 	dim.visible = false
 	canvas.add_child(dim)
 
-	# 1. TOP STATUS BAR
+	# 1. COMPACT TOP STATUS BAR
 	top_panel = PanelContainer.new()
 	top_panel.anchor_left = 0.0; top_panel.anchor_right = 1.0
 	top_panel.offset_left = 14; top_panel.offset_right = -14
@@ -186,7 +190,7 @@ func _build_ui() -> void:
 	canvas.add_child(top_panel)
 
 	var top_hbox := HBoxContainer.new()
-	top_hbox.add_theme_constant_override("separation", 16)
+	top_hbox.add_theme_constant_override("separation", 10)
 	top_panel.add_child(top_hbox)
 
 	phase_badge = _mk_label("Ngày 1 · Sông", 14, Color("#f2faf5"))
@@ -214,7 +218,7 @@ func _build_ui() -> void:
 	contrast_btn.pressed.connect(_toggle_high_contrast)
 	top_hbox.add_child(contrast_btn)
 
-	# 2. LEFT INFO CARD (compact, auto-sized)
+	# 2. MINIMALIST LEFT INFO CARD
 	left_panel = PanelContainer.new()
 	left_panel.position = Vector2(14, 60)
 	left_panel.custom_minimum_size = Vector2(238, 0)
@@ -224,7 +228,7 @@ func _build_ui() -> void:
 	left_vbox.add_theme_constant_override("separation", 5)
 	left_panel.add_child(left_vbox)
 
-	# 3. TOP-CENTER WARNING PILL
+	# 3. COMPACT TOP-CENTER WARNING PILL
 	alert_panel = PanelContainer.new()
 	alert_panel.anchor_left = 0.5; alert_panel.anchor_right = 0.5
 	alert_panel.offset_left = -220; alert_panel.offset_right = 220
@@ -237,7 +241,7 @@ func _build_ui() -> void:
 	alert_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	alert_panel.add_child(alert_label)
 
-	# 4. BOTTOM KEYBIND BAR
+	# 4. SLIM BOTTOM KEYBIND BAR
 	bottom_panel = PanelContainer.new()
 	bottom_panel.anchor_left = 0.5; bottom_panel.anchor_right = 0.5
 	bottom_panel.anchor_top = 1.0; bottom_panel.anchor_bottom = 1.0
@@ -246,7 +250,7 @@ func _build_ui() -> void:
 	bottom_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	canvas.add_child(bottom_panel)
 
-	bottom_label = _mk_label("WASD Di chuyển  ·  E Tương tác  ·  Esc Tạm dừng", 12, Color("#d4e5df"))
+	bottom_label = _mk_label("WASD Di chuyển  ·  E Tương tác  ·  Space Bắt cá  ·  Esc/P Tạm dừng  ·  H Tương phản", 12, Color("#d4e5df"))
 	bottom_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	bottom_panel.add_child(bottom_label)
 
@@ -262,7 +266,7 @@ func _build_ui() -> void:
 	center_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	center_panel.add_child(center_label)
 
-	# 6. SHOP MODAL CARD
+	# 6. COMPACT SHOP MODAL CARD
 	shop_panel = PanelContainer.new()
 	shop_panel.set_anchors_preset(Control.PRESET_CENTER)
 	shop_panel.grow_horizontal = Control.GROW_DIRECTION_BOTH
@@ -271,12 +275,12 @@ func _build_ui() -> void:
 	canvas.add_child(shop_panel)
 
 	var sbox := VBoxContainer.new()
-	sbox.add_theme_constant_override("separation", 10)
+	sbox.add_theme_constant_override("separation", 6)
 	shop_panel.add_child(sbox)
 	shop_label = _mk_label("CỬA HÀNG NÂNG CẤP", 17, Color("#ffe394"))
 	shop_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	sbox.add_child(shop_label)
-	for spec in [["1 · Mua Bình oxy (+thời gian lặn)", "oxygen"], ["2 · Mua Áo phao (+1 Máu)", "hp"]]:
+	for spec in [["1 · Bình oxy (+lặn lâu)", "oxygen"], ["2 · Áo phao (+1 Máu)", "hp"]]:
 		var b := Button.new()
 		b.text = spec[0]
 		b.add_theme_font_override("font", HUD_FONT)
@@ -328,11 +332,11 @@ func _apply_contrast_theme() -> void:
 	for panel in glass_cards:
 		glass_cards[panel].visible = panel.visible and not high_contrast
 	if high_contrast:
-		top_panel.add_theme_stylebox_override("panel", _card_style(Color(0, 0, 0, 0.96), Color("#ffff00"), 10, 14, 8, 3))
-		left_panel.add_theme_stylebox_override("panel", _card_style(Color(0, 0, 0, 0.95), Color("#ffff00"), 10, 14, 10, 3))
-		bottom_panel.add_theme_stylebox_override("panel", _card_style(Color(0, 0, 0, 0.95), Color("#ffffff"), 8, 12, 6, 2))
-		center_panel.add_theme_stylebox_override("panel", _card_style(Color(0, 0, 0, 0.98), Color("#ffff00"), 14, 28, 22, 3))
-		shop_panel.add_theme_stylebox_override("panel", _card_style(Color(0, 0, 0, 0.98), Color("#ffff00"), 14, 24, 18, 3))
+		top_panel.add_theme_stylebox_override("panel", _card_style(Color(0, 0, 0, 0.96), Color("#ffff00"), 8, 10, 4, 2))
+		left_panel.add_theme_stylebox_override("panel", _card_style(Color(0, 0, 0, 0.95), Color("#ffff00"), 8, 8, 6, 2))
+		bottom_panel.add_theme_stylebox_override("panel", _card_style(Color(0, 0, 0, 0.95), Color("#ffffff"), 6, 10, 3, 1))
+		center_panel.add_theme_stylebox_override("panel", _card_style(Color(0, 0, 0, 0.98), Color("#ffff00"), 10, 20, 14, 2))
+		shop_panel.add_theme_stylebox_override("panel", _card_style(Color(0, 0, 0, 0.98), Color("#ffff00"), 10, 16, 12, 2))
 		phase_badge.add_theme_color_override("font_color", Color("#ffff00"))
 		time_label.add_theme_color_override("font_color", Color("#ffffff"))
 		stats_label.add_theme_color_override("font_color", Color("#ffff00"))
@@ -359,8 +363,16 @@ func _unhandled_input(ev: InputEvent) -> void:
 			link.buy("oxygen")
 		elif ev.keycode == KEY_2 and link.phase() == "shop":
 			link.buy("hp")
-		elif ev.keycode == KEY_R and bool(link.state.get("finished", false)):
+		elif ev.keycode == KEY_R and _can_restart():
 			link.restart()
+
+
+func _can_restart() -> bool:
+	# Chơi lại: khi đã kết thúc, hoặc đang tạm dừng (Esc/P rồi R) để tránh bấm nhầm giữa lượt.
+	if not link.connected:
+		return false
+	var s: Dictionary = link.state
+	return bool(s.get("finished", false)) or str(s.get("state", "")) == "paused"
 
 
 func _clear_left_card() -> void:
@@ -447,7 +459,7 @@ func _on_state(s: Dictionary) -> void:
 			str(s.get("reason", "")), score_i, money_i]
 		center_panel.visible = true
 	elif paused:
-		center_label.text = "TẠM DỪNG\nEsc / P: Tiếp tục   ·   H: Tương phản cao"
+		center_label.text = "TẠM DỪNG\nEsc / P: Tiếp tục   ·   R: Chơi lại từ đầu   ·   H: Tương phản cao"
 		center_panel.visible = true
 	else:
 		center_panel.visible = false
@@ -460,10 +472,10 @@ func _build_gather_card(s: Dictionary, alerts: Array[String]) -> void:
 	var oxy := float(p.get("oxygen_ticks", 0)) / maxf(1.0, float(p.get("oxygen_max_ticks", 1)))
 	var pos: Array = p.get("pos", [0, 0])
 
-	# HP hearts + Depth row
+	# Compact HP hearts + Depth row
 	var hearts := ""
 	for i in range(hp_max):
-		hearts += "♥ " if i < hp else "♡ "
+		hearts += "♥" if i < hp else "♡"
 	var top_row := HBoxContainer.new()
 	top_row.add_child(_mk_label(hearts.strip_edges(), 17, Color("#ff5c6c")))
 	var sp := Control.new()
@@ -472,7 +484,7 @@ func _build_gather_card(s: Dictionary, alerts: Array[String]) -> void:
 	top_row.add_child(_mk_label("Độ sâu: %.1f m" % float(pos[1]), 13, Color("#9ee8ff")))
 	left_vbox.add_child(top_row)
 
-	# Oxygen bar
+	# Slim Oxygen bar
 	var oxy_pct := int(round(oxy * 100.0))
 	var oxy_col := Color("#36d6e8") if oxy >= 0.5 else (Color("#f5c242") if oxy >= 0.25 else Color("#ff4757"))
 	var oxy_lbl := _mk_label("Oxy: %d%%" % oxy_pct, 13, oxy_col)
@@ -493,9 +505,7 @@ func _build_gather_card(s: Dictionary, alerts: Array[String]) -> void:
 	if active_alert_monster:
 		alerts.append("⚠ THỦY QUÁI GẦN!")
 
-	left_vbox.add_child(HSeparator.new())
-
-	# Hold / Target checklist with freshness
+	# Compact 2-column ingredient grid (half the height!)
 	var hold_c := int(round(float(s.get("hold_count", 0))))
 	var hold_cap := int(round(float(s.get("hold_capacity", 12))))
 	left_vbox.add_child(_mk_label("Giỏ đồ: %d / %d ô" % [hold_c, hold_cap], 13, Color("#ffe394")))
@@ -514,13 +524,13 @@ func _build_gather_card(s: Dictionary, alerts: Array[String]) -> void:
 
 
 func _build_quan_card(s: Dictionary, alerts: Array[String]) -> void:
-	# Carrying pill
+	# Compact carrying row
 	var hand = s.get("hand")
 	var hand_id := str(hand.get("dish_id", "")) if typeof(hand) == TYPE_DICTIONARY else (str(hand) if hand != null else "")
 	var hand_txt: String = str(DISH_VI.get(hand_id, hand_id)) if not hand_id.is_empty() else "Tay trống"
 	left_vbox.add_child(_mk_label("🍽 Đang cầm: " + hand_txt, 14, Color("#7bed9f") if not hand_id.is_empty() else Color("#b8cad6")))
 
-	# Stock summary
+	# Compact stock summary
 	var stats := _summarize_items(s.get("stock", {}))
 	var parts := []
 	for k in stats.keys():
@@ -532,11 +542,9 @@ func _build_quan_card(s: Dictionary, alerts: Array[String]) -> void:
 	stock_lbl.custom_minimum_size = Vector2(210, 0)
 	left_vbox.add_child(stock_lbl)
 
-	left_vbox.add_child(HSeparator.new())
-
-	# Stoves compact row
+	# Stoves row
 	var stove_row := HBoxContainer.new()
-	stove_row.add_theme_constant_override("separation", 12)
+	stove_row.add_theme_constant_override("separation", 8)
 	for st in s.get("stoves", []):
 		var sid := str(st.get("id", "B1"))
 		var st_state := str(st.get("state", "idle"))
@@ -544,9 +552,7 @@ func _build_quan_card(s: Dictionary, alerts: Array[String]) -> void:
 		stove_row.add_child(_mk_label("🔥 %s: %s" % [sid, STOVE_VI.get(st_state, st_state)], 13, st_col))
 	left_vbox.add_child(stove_row)
 
-	left_vbox.add_child(HSeparator.new())
-
-	# Customers with real colored Patience ProgressBars
+	# Compact customers with slim 6px patience bars
 	var customers: Array = s.get("customers", [])
 	if customers.is_empty():
 		left_vbox.add_child(_mk_label("Chưa có khách ngồi bàn...", 13, Color("#9aaeb8")))
@@ -563,7 +569,7 @@ func _build_quan_card(s: Dictionary, alerts: Array[String]) -> void:
 			var bar_col := Color("#2ed573") if ratio >= 0.5 else (Color("#ffa502") if ratio >= 0.25 else Color("#ff4757"))
 			if cstate == "eating":
 				bar_col = Color("#70a1ff")
-			var line := "%s · %s (%s)" % [tid, DISH_VI.get(did, did), CUST_VI.get(cstate, cstate)]
+			var line := "%s · %s" % [tid, str(DISH_VI.get(did, did))]
 			if is_angry:
 				line = "⚠ " + line
 			left_vbox.add_child(_mk_label(line, 13, Color("#ff6b6b") if is_angry else Color("#f5f7fa")))
