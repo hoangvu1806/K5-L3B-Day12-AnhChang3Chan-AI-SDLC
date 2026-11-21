@@ -145,7 +145,7 @@ class DaySim:
             lvl = self.active_upgrades.get(kind, 0)
             if lvl > 0:
                 t["gather"][field] = shop[kind][lvl - 1][field]
-        sim = GatherSim(t, self.gather_tpl, self.rng, self.ids)
+        sim = GatherSim(t, self.gather_tpl, self.rng, self.ids, day=self.day)
         sim.money, sim.earned, sim.reputation = self.money, self.earned, self.reputation
         self._set_phase("gather", sim, out)
 
