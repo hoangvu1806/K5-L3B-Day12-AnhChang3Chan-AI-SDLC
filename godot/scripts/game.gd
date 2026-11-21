@@ -466,7 +466,7 @@ func _build_quan_card(s: Dictionary, alerts: Array[String]) -> void:
 	# Carrying pill
 	var hand = s.get("hand")
 	var hand_id := str(hand.get("dish_id", "")) if typeof(hand) == TYPE_DICTIONARY else (str(hand) if hand != null else "")
-	var hand_txt := DISH_VI.get(hand_id, hand_id) if not hand_id.is_empty() else "Tay trống"
+	var hand_txt: String = str(DISH_VI.get(hand_id, hand_id)) if not hand_id.is_empty() else "Tay trống"
 	left_vbox.add_child(_mk_label("🍽 Đang cầm: " + hand_txt, 17, Color("#7bed9f") if not hand_id.is_empty() else Color("#b8cad6")))
 
 	# Stock summary
