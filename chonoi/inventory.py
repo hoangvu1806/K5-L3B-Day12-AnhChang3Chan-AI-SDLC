@@ -1,4 +1,4 @@
-"""File kho v1.0 (Contract G): {"items": {id: số nguyên >= 0}}.
+"""File kho v1.0 & v1.1 (Contract G): {"items": {id: số nguyên >= 0}}.
 
 Đọc: từ chối sai schema / id lạ / số âm (BadInput -> mã 2).
 Ghi: bỏ mục bằng 0, qua file tạm cùng thư mục rồi thay thế, byte-ổn-định.
@@ -10,7 +10,8 @@ import tempfile
 
 from .errors import BadInput
 
-KINDS_P1 = ("ca_loc", "ca_linh", "bong_dien_dien", "bong_sung")
+KINDS_P1 = ("ca_loc", "ca_linh", "ca_keo", "bong_dien_dien", "bong_sung", "keo_neo")
+KINDS_V11 = KINDS_P1
 
 
 def validate_items(items, kinds=KINDS_P1):
@@ -42,7 +43,8 @@ def hold_to_items(hold: list) -> dict:
     """Khoang (mảng id theo thứ tự nhặt) -> object đếm, sắp theo id nguyên liệu."""
     counts = {}
     for k in hold:
-        counts[k] = counts.get(k, 0) + 1
+        kind = k["kind"] if isinstance(k, dict) else k
+        counts[kind] = counts.get(kind, 0) + 1
     return {k: counts[k] for k in sorted(counts)}
 
 
