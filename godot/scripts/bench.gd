@@ -40,8 +40,8 @@ func _ready() -> void:
 	add_child(world)
 	if world.get("rng") is RandomNumberGenerator:
 		world.rng.seed = seed_val
-	# Keep Ut Sen stationary at dock [2, 0] for deterministic benchmark framing
-	world.set_physics_process(false)
+	# Út Sen tự đứng yên ở bến [2, 0] khi không có phím; KHÔNG tắt _physics_process của cảnh lặn
+	# vì nó còn chạy đàn cá, tia nắng, bọt khí và hoạt ảnh bơi -> tắt đi sẽ đo FPS trên cảnh đóng băng.
 	if world.get("diver_root") is Node3D:
 		world.diver_root.position = Vector3(2.0, 0.0, 0.0)
 	if world.get("cam") is Camera3D:
