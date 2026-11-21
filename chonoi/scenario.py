@@ -336,8 +336,13 @@ def _validate_quan_lat4(b, tuning):
     """Lát 4: món trên tay, bếp, khách đang ăn phải nhất quán (mâu thuẫn -> mã 2)."""
     menu = tuning["menu"]
     hand = b.get("hand")
-    if hand is not None and (not isinstance(hand, str) or hand not in menu):
-        raise BadInput("hand phải là null hoặc id món có trong menu")
+    if isinstance(hand, dict):  # P3: món giữ cấu trúc, base_price là giá đã chốt theo fresh
+        if set(hand) - {"dish_id", "base_price"} or hand.get("dish_id") not in menu:
+            raise BadInput("hand object phải là {dish_id, base_price} với dish_id có trong menu")
+        if "base_price" in hand:
+            _nonneg_int("hand.base_price", hand["base_price"])
+    elif hand is not None and (not isinstance(hand, str) or hand not in menu):
+        raise BadInput("hand phải là null, id món có trong menu hoặc {dish_id, base_price}")
     known_stoves = {s["id"] for s in tuning["quan"]["stoves"]}
     burn_s = tuning["quan"].get("burn_s")
     burn_ticks = int(round(burn_s * 60)) if burn_s is not None else None
@@ -347,7 +352,7 @@ def _validate_quan_lat4(b, tuning):
         st, dish = s.get("state", "idle"), s.get("dish")
         if st not in STOVE_STATES:
             raise BadInput(f"stoves.{s['id']}.state phải là một trong {STOVE_STATES}")
-        for key in ("cook_ticks_left", "ready_ticks"):
+        for key in ("cook_ticks_left", "ready_ticks", "base_price"):
             if key in s:
                 _nonneg_int(f"stoves.{s['id']}.{key}", s[key])
         if st == "idle" and (dish is not None or s.get("cook_ticks_left", 0) or s.get("ready_ticks", 0)):

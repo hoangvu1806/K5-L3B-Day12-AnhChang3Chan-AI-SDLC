@@ -43,7 +43,13 @@ class QuanSim:
         self.item_mode = isinstance(src, list)
         self.stock = [dict(it) for it in src] if self.item_mode else dict(src)
         self.spoiled_below = tuning.get("freshness", {}).get("spoiled_below", 30)
-        self._fresh_decay = Fraction(str(tuning.get("freshness", {}).get("quan_decay_per_s", 0))) / 60
+        # P3 (Hà Anh): hao tươi kho quán tính chính xác bằng Fraction (như gather), float chỉ để ghi snapshot
+        fr = tuning.get("freshness")
+        self._fresh_on = bool(fr) and self.item_mode
+        if self._fresh_on:
+            # mặc định theo Ticket-03 (0.25/s, ngưỡng 30) nếu manifest chưa khai đủ khóa
+            self._q_decay = Fraction(str(fr.get("quan_decay_per_s", 0.25))) / int(TICK)
+            self._spoil_at = Fraction(str(fr.get("spoiled_below", 30)))
         self._fresh_by_id = {}
         if self.item_mode:
             for it in self.stock:
@@ -68,7 +74,11 @@ class QuanSim:
         self.next_customer_tick = int(t["first_customer_tick"])
         self.customer_interval_ticks = max(1, int(round(t["customer_interval_s"] * 60)))
         self._hand_order = None  # lát 4: đơn của món đang cầm (nội bộ)
-        self._hand_price = None
+        # P3: giá đã chốt của món đang cầm; scenario có thể dựng hand {dish_id, base_price}
+        h = self.hand
+        self._hand_base = h.get("base_price") if isinstance(h, dict) else None
+        if isinstance(h, dict):
+            self.hand = h.get("dish_id")
         self.money = 0
         self.earned = 0
         self.shift_earned = 0
@@ -209,20 +219,6 @@ class QuanSim:
         for c in sorted(hit, key=self._order_key):
             c["order_status"] = "reserved" if self._reserve(c) else "unfulfillable"
 
-    def _age_stock(self, events):
-        if not self.item_mode:
-            return
-        fresh = {}
-        threshold = Fraction(str(self.spoiled_below))
-        for item in sort_by_id(self.stock):
-            before = self._fresh_by_id.get(item["id"], Fraction(str(item["fresh"])))
-            after = max(Fraction(0), before - self._fresh_decay)
-            fresh[item["id"]] = after
-            item["fresh"] = float(after)
-            if before >= threshold > after:
-                events.append(("spoiled", {"item_id": item["id"], "kind": item["kind"], "location": "stock"}))
-        self._fresh_by_id = fresh
-
     def _free_table(self):
         taken = {c["table_id"] for c in self.customers}
         for tb in self.tables:  # đã sắp theo id
@@ -290,7 +286,7 @@ class QuanSim:
         events = []
         self.time_left_ticks = max(0, self.time_left_ticks - 1)
         self.elapsed += 1
-        self._age_stock(events)
+        self._tick_freshness(events)  # P3 (Hà Anh): hao tươi kho thô + spoiled theo id
         self.recheck_spoiled(events)  # P3 (Vũ): nhả và giữ lại theo id khi phần giữ vừa ươn
         self._tick_stoves(events)     # lát 4: nấu -> chín (dish_ready)
         self._tick_eating(events)
@@ -314,6 +310,34 @@ class QuanSim:
     # ------------------------------------------------------------------ lát 4 (Ticket-02 mục 1.3 + burn)
     # Đơn = khách (order_id = id khách). Bếp/tay nhớ đơn đang nấu: stove["order_id"], self._hand_order
     # (nội bộ, không ghi ra snapshot). Bếp chỉ nhận đơn "reserved": khách chờ có phần giữ đủ công thức.
+    # ---- P3 (Hà Anh): độ tươi kho quán + giá theo tươi ----
+    def _exact_fresh(self, it):
+        f = self._fresh_by_id.get(it["id"])
+        return f if f is not None else Fraction(str(it["fresh"]))
+
+    def _tick_freshness(self, events):
+        """Kho quán (kể cả hàng đang giữ chỗ) giảm quan_decay_per_s, kẹp đáy 0. Món chín không hao.
+        spoiled phát đúng một lần khi đi từ >= ngưỡng xuống < ngưỡng, theo id, location "stock"."""
+        if not self._fresh_on:
+            return
+        exact = {}
+        for it in sorted(self.stock, key=lambda x: id_key(x["id"])):
+            before = self._exact_fresh(it)
+            after = max(Fraction(0), before - self._q_decay)
+            exact[it["id"]] = after
+            it["fresh"] = float(after)
+            if before >= self._spoil_at > after:
+                events.append(("spoiled", {"item_id": it["id"], "kind": it["kind"], "location": "stock"}))
+        self._fresh_by_id = exact
+
+    def _base_price(self, dish, used):
+        """floor(giá niêm yết × trung bình fresh của các cá thể dùng / 100); kho đếm -> giá niêm yết."""
+        price = self.menu[dish]["price"]
+        if not used:
+            return price
+        avg = sum((self._exact_fresh(it) for it in used), Fraction(0)) / len(used)
+        return math.floor(price * avg / 100)
+
     @staticmethod
     def _ticks(seconds):
         return int(round(seconds * TICK))
@@ -388,8 +412,9 @@ class QuanSim:
             events.append(("customer_left", {"customer_id": c["id"], "table_id": c["table_id"],
                                              "dish_id": c.get("dish_id"), "reputation": self.reputation}))
         for s in self.stoves:
-            s.update(state="idle", dish=None, cook_ticks_left=0, ready_ticks=0, order_id=None)
-        self.hand, self._hand_order, self._hand_price = None, None, None
+            s.update(state="idle", dish=None, cook_ticks_left=0, ready_ticks=0, order_id=None,
+                     base_price=None, used_items=None)
+        self.hand, self._hand_order, self._hand_base = None, None, None
 
     @staticmethod
     def _order_key(c):
@@ -442,19 +467,16 @@ class QuanSim:
     def _use_stove(self, s, events):
         if s["state"] == "ready":
             self.hand, self._hand_order, dish = s["dish"], s.get("order_id"), s["dish"]
-            self._hand_price = s.get("base_price")
-            s.update(state="idle", dish=None, cook_ticks_left=0, ready_ticks=0, order_id=None)
+            self._hand_base = s.get("base_price")  # P3: giá chốt đi theo món lên tay
+            s.update(state="idle", dish=None, cook_ticks_left=0, ready_ticks=0, order_id=None,
+                     base_price=None, used_items=None)
             events.append(("dish_picked", {"stove_id": s["id"], "dish_id": dish}))
             return
         c = self._next_order()
         dish = c["dish_id"]
         used = self._consume(c)  # phần giữ thành món đang nấu (P3: tiêu đúng các id đang giữ)
-        base_price = self.menu[dish]["price"]
-        if self.item_mode and used:
-            total = sum((self._fresh_by_id.get(it["id"], Fraction(str(it["fresh"]))) for it in used), Fraction(0))
-            base_price = math.floor(Fraction(base_price) * total / (100 * len(used)))
         s.update(state="cooking", dish=dish, cook_ticks_left=self._ticks(self.menu[dish]["cook_s"]),
-                 ready_ticks=0, order_id=c["id"], used_items=used, base_price=base_price)
+                 ready_ticks=0, order_id=c["id"], used_items=used, base_price=self._base_price(dish, used))
         data = {"stove_id": s["id"], "dish_id": dish, "cook_ticks": s["cook_ticks_left"]}
         if self.item_mode:
             data["items"] = [dict(it) for it in used]  # Hà Anh: chốt base_price theo fresh từ used_items
@@ -471,11 +493,11 @@ class QuanSim:
             owner["reserved"], c["reserved"] = c.get("reserved") or empty, ([] if self.item_mode else {})
         else:
             self.release(c)
-        price = self._hand_price if self._hand_price is not None else self.menu[dish]["price"]
+        price = self._hand_base if self._hand_base is not None else self.menu[dish]["price"]  # P3: giá đã chốt
         pmax = self._ticks(q["patience_s"])
         ratio = c.get("patience_ticks_left", pmax) / pmax
         tip = math.floor(round(price * q["tip_rate"], 9)) if ratio >= q["tip_min_patience_ratio"] else 0
-        self.hand, self._hand_order, self._hand_price = None, None, None
+        self.hand, self._hand_order, self._hand_base = None, None, None
         c.update(state="eating", price=price, tip=tip, eat_ticks_left=self._ticks(q["eat_s"]))
         events.append(("served", {"customer_id": c["id"], "table_id": tb["id"], "dish_id": dish,
                                   "price": price, "tip": tip}))
