@@ -205,8 +205,7 @@ class GatherSim:
             events.append(("surface" if at_surface else "dive", {"pos": self.pos.copy()}))
         self._update_oxygen(at_surface, events)
         if self.hp == 0:
-            lost = list(reversed(self.hold))
-            self.hold.clear()
+            lost = self._lose_lifo(len(self.hold))
             events.append(("faint", {"pos": self.pos.copy(), "lost": lost, "hp": 0}))
             self._finish("fainted", events)
             return events
@@ -354,6 +353,20 @@ class GatherSim:
             self.zero_oxy_ticks = 0
             self.hp -= 1
             events.append(("choke", {"hp": self.hp}))
+
+    def _lose_lifo(self, n: int) -> list:
+        """Lát 2 (Bảo): bỏ n món mới nhặt nhất khỏi giỏ (LIFO), trả về theo thứ tự mất: mới nhất trước.
+
+        Điểm duy nhất làm mất hàng (ngất do ngạt, `monster_hit`, ngất do quái). Phần tử giỏ là
+        mã nguyên liệu (v1.0–1.1) hoặc cá thể dict (v1.2); dict được sao chép để payload sự kiện
+        không bị đổi theo nếu giỏ còn tham chiếu.
+        """
+        n = max(0, min(int(n), len(self.hold)))
+        lost = []
+        for _ in range(n):
+            item = self.hold.pop()
+            lost.append(dict(item) if isinstance(item, dict) else item)
+        return lost
 
     def _in_dock(self) -> bool:
         return math.dist(self.pos, self.t["dock_pos"]) <= self.t["dock_radius"]
