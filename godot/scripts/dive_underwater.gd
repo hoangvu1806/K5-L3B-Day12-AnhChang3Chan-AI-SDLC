@@ -19,6 +19,11 @@ var cam_distance := 22.0
 var time_acc := 0.0
 
 var rng := RandomNumberGenerator.new()
+# Khi chạy trong game (scripts/game.gd) cảnh nhận `link` tới logic: vị trí lấy từ snapshot, không tự bơi.
+var link = null
+var live_fish: Dictionary = {}      # id -> Node3D (đàn cá theo logic)
+var live_monsters: Dictionary = {}  # id -> Node3D
+var _decor_hidden := false
 var fish_nodes: Array = []
 var ray_nodes: Array = []
 var bubble_nodes: Array = []
@@ -480,11 +485,14 @@ func _setup_camera_and_hud() -> void:
 	hud_label.position = Vector2(26, 22)
 	hud_label.add_theme_font_size_override("font_size", 16)
 	hud_label.add_theme_color_override("font_color", Color("#e6fbff"))
+	hud_label.visible = link == null
 	hud_label.text = "LAN BAT CA 2.5D | WASD/Mui ten: Boi lan | Cuon: Zoom | F1: Song | F2: Quan toi | F3: Lan sau"
 	canvas.add_child(hud_label)
 
 
 func _unhandled_input(ev: InputEvent) -> void:
+	if link != null and ev is InputEventKey:
+		return  # trong game: phím do SimLink gửi lên logic
 	if ev is InputEventKey and ev.pressed and not ev.echo:
 		if ev.keycode == KEY_F1:
 			get_tree().change_scene_to_file("res://scenes/GatherRiver.tscn")
@@ -502,6 +510,9 @@ func _unhandled_input(ev: InputEvent) -> void:
 func _physics_process(delta: float) -> void:
 	time_acc += delta
 
+	if _live_sync(delta):
+		_after_move(delta)
+		return
 	# Read WASD + Arrow keys
 	var ix := 0.0
 	var iy := 0.0
@@ -523,6 +534,10 @@ func _physics_process(delta: float) -> void:
 	diver_pos.x = clampf(diver_pos.x + diver_vel.x * delta, 0.0, 100.0)
 	diver_pos.y = clampf(diver_pos.y + diver_vel.y * delta, 0.0, 29.0)
 
+	_after_move(delta)
+
+
+func _after_move(delta: float) -> void:
 	if absf(diver_vel.x) > 0.2:
 		facing_right = diver_vel.x > 0.0
 
@@ -594,4 +609,55 @@ func _physics_process(delta: float) -> void:
 		if bn.position.y > -0.2:
 			bn.position.y = -29.2
 
+	hud_label.visible = link == null
 	hud_label.text = "LAN BAT CA 2.5D | x=%.1fm  Do sau d=%.1fm | WASD/Mui ten: Boi | Cuon: Zoom | F1: Song | F2: Quan | F3: Lan" % [diver_pos.x, diver_pos.y]
+
+
+# --- Nối logic (game.gd gán `link`) -------------------------------------------------
+const LIVE_FISH_MODEL := {
+	"ca_linh": ["fish_perch", 0.95], "ca_loc": ["fish_carp", 1.3], "ca_keo": ["fish_ca_keo", 0.27],
+	"ca_ho": ["ca_ho", 0.52],
+}
+const LIVE_MONSTER_MODEL := {"ca_sau": ["ca_sau", 1.4], "ran": ["ran_ho_may", 1.5]}
+
+
+func _live_sync(delta: float) -> bool:
+	if link == null or not link.connected or link.phase() != "gather":
+		return false
+	var s: Dictionary = link.state
+	var p: Dictionary = s.get("player", {})
+	var pos: Array = p.get("pos", [diver_pos.x, diver_pos.y])
+	var vel: Array = p.get("vel", [0.0, 0.0])
+	diver_pos = diver_pos.lerp(Vector2(float(pos[0]), float(pos[1])), minf(1.0, delta * 15.0))
+	diver_vel = Vector2(float(vel[0]), float(vel[1]))
+	if not _decor_hidden:  # cá trang trí đứng chỗ cố định: ẩn, thay bằng cá theo logic
+		for entry in fish_nodes:
+			(entry["node"] as Node3D).visible = false
+		_decor_hidden = true
+	_sync_pool(live_fish, s.get("fish", []), "aquatic", LIVE_FISH_MODEL, delta)
+	_sync_pool(live_monsters, s.get("monsters", []), "monsters", LIVE_MONSTER_MODEL, delta)
+	return true
+
+
+func _sync_pool(pool: Dictionary, items: Array, family: String, models: Dictionary, delta: float) -> void:
+	var seen := {}
+	for it in items:
+		var id := str(it.get("id", ""))
+		seen[id] = true
+		var pos: Array = it.get("pos", [0.0, 0.0])
+		var at := Vector3(float(pos[0]), -float(pos[1]), 0.0)
+		if not pool.has(id):
+			var spec: Array = models.get(str(it.get("kind", "")), models.values()[0])
+			var node := _asset(family, spec[0], at, Vector3.ONE * float(spec[1]), Vector3(0.0, 90.0, 0.0))
+			if node == null:
+				continue
+			_play_loop_anim(node, "Swimming_Normal")
+			pool[id] = node
+		var n: Node3D = pool[id]
+		n.position = n.position.lerp(at, minf(1.0, delta * 12.0))
+		var heading := deg_to_rad(float(it.get("heading_deg", 0.0)))
+		n.rotation.y = PI * 0.5 if cos(heading) >= 0.0 else -PI * 0.5
+	for id in pool.keys():
+		if not seen.has(id):  # đàn đã bị bắt
+			(pool[id] as Node3D).queue_free()
+			pool.erase(id)

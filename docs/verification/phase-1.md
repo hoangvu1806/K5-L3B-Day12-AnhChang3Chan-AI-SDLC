@@ -13,6 +13,8 @@
 | **STABILITY & PERF (Fuzz + Invariants + Soak 10,800 ticks + Live HTTP Stress)** | Chạy `python tools/qa_stability_suite.py --seeds 5 --ticks 1800` | [`docs/proof/phase-1/stability_report.md`](../proof/phase-1/stability_report.md) | **Đạt** (`10/10` Fuzz+Invariants, `44k ticks/s`, Peak RAM `120.4 KB`, `100/100` HTTP 200 OK) |
 | **TEAM & HARNESS**: `TEAM.md` 6 thành viên khớp `team_size: 6`, 5 skills trong `.agents/skills/`, `docs/contracts/README.md` | Chạy `python3 tools/check_team.py` và `Phase1HarnessAndContracts` | [`docs/proof/phase-1/check_team.log`](../proof/phase-1/check_team.log), [`docs/proof/phase-1/unittest_run.log`](../proof/phase-1/unittest_run.log) | **Đạt** |
 
+> Chạy lại ngày 2026-11-21 trên `dev` @ `6f919cf` (Hoàng Vũ): `PYTHONPATH=tests:. python -m unittest discover -s tests` → **Ran 62 tests, OK**.
+
 ## Đánh giá ngắn
 - **Yêu cầu nào đạt / chưa đạt:**
   - **Đạt 100% Phase 1:** Toàn bộ 4 lát logic (`gather.py` Lát 1+2, `quan.py` Lát 3+4, `scenario.py`), bộ đồ họa Godot 3D + Asset Tây Nam Bộ, 5 AI Skills, bộ kiểm thử tự động (**62/62 tests PASS**), và QA Stability Suite (**10/10 Fuzz + Invariant PASS**, **2/2 Determinism SHA-256 PASS**, **100/100 Live HTTP Stress PASS**).
@@ -20,3 +22,4 @@
 - **Điều cần chỉnh cho phase sau:**
   - Tiếp tục chạy `python tools/qa_stability_suite.py` sau mỗi lần gộp nhánh ở Phase 2, 3, 4.
   - Nhắc các thành viên kiểm tra đủ `>= 3` commits/người và bổ sung file cá nhân `docs/members/<handle>.md`.
+  - **Chưa xong:** tag `phase-1` chưa được gắn trên remote (Integrator cần gắn); tên sự kiện/`data` của Lát 3 (`customer_arrived`, `customer_left`, `no_dish`) và Lát 4 vẫn là giả định, chưa đối chiếu PRD-0 mục E/F.
