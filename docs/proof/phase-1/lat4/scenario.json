@@ -1,0 +1,26 @@
+{
+ "quan": {
+  "player": {
+   "pos": [
+    3,
+    8
+   ]
+  },
+  "stock": {
+   "ca_loc": 2,
+   "bong_sung": 2
+  },
+  "customers": [
+   {
+    "id": "C1",
+    "table_id": "T1",
+    "state": "waiting",
+    "dish_id": "ca_loc_nuong_trui",
+    "patience_ticks_left": 3600,
+    "reserved": {
+     "ca_loc": 1
+    }
+   }
+  ]
+ }
+}

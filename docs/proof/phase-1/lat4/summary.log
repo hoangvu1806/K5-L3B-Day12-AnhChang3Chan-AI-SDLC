@@ -1,0 +1,15 @@
+Lệnh: python3 -m chonoi.headless --mode quan --seed 1 --ticks 1200 --scenario docs/proof/phase-1/lat4/scenario.json --inputs docs/proof/phase-1/lat4/inputs.json --out full_loop.jsonl (chạy 2 lần để so sha256) --snapshot-every 60
+
+Sự kiện (tick, name, data):
+      1  cook_started  {"stove_id": "B1", "dish_id": "ca_loc_nuong_trui", "cook_ticks": 360}
+    361  dish_ready    {"stove_id": "B1", "dish_id": "ca_loc_nuong_trui"}
+    371  dish_picked   {"stove_id": "B1", "dish_id": "ca_loc_nuong_trui"}
+    496  served        {"customer_id": "C1", "table_id": "T1", "dish_id": "ca_loc_nuong_trui", "price": 60, "tip": 12}
+   1096  paid          {"customer_id": "C1", "table_id": "T1", "dish_id": "ca_loc_nuong_trui", "price": 60, "tip": 12, "money": 72, "reputation": 3.2}
+
+Dòng end: money=72 earned=72 reputation=3.2 score=372 reason=tick_limit
+
+Tất định (sha256):
+  run1 dd34c37c3940218f7274d00b1c37abe3aeca4a3f1fac3800894c883215dfb878
+  run2 dd34c37c3940218f7274d00b1c37abe3aeca4a3f1fac3800894c883215dfb878
+  giống nhau: True
