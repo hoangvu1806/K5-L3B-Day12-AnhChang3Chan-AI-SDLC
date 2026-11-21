@@ -2,6 +2,11 @@
 
 Liệt kê asset ngoài (nguồn, giấy phép) và công cụ hỗ trợ đã dùng trong dự án **Quán Ăn Chợ Nổi**.
 
+## Font
+
+- BBH Bogle Regular dùng cho đồng hồ. [Google Fonts](https://github.com/google/fonts/tree/main/ofl/bbhbogle) · [Giấy phép SIL OFL 1.1](godot/assets/fonts/bbh-bogle/OFL.txt)
+- Be Vietnam Pro Medium dùng cho chữ trên HUD và nhãn tên cá. [Google Fonts](https://fonts.google.com/specimen/Be+Vietnam+Pro) · [Giấy phép SIL OFL 1.1](godot/assets/fonts/be-vietnam-pro/OFL.txt)
+
 ## 3D Environment & Gameplay Assets (`godot/assets/external/`)
 
 ### 1. Cây miền Tây (`godot/assets/external/tropical/`) — CC0 1.0 Universal

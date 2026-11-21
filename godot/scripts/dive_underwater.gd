@@ -23,6 +23,7 @@ var rng := RandomNumberGenerator.new()
 var link = null
 var live_fish: Dictionary = {}      # id -> Node3D (đàn cá theo logic)
 var live_monsters: Dictionary = {}  # id -> Node3D
+var water_lilies: Dictionary = {}
 var _decor_hidden := false
 var fish_nodes: Array = []
 var ambient_fish_nodes: Array = []
@@ -34,6 +35,10 @@ const SHALLOW_FOG := Color("#6c8e58")
 const DEEP_FOG := Color("#1e3120")
 const SHALLOW_BG := Color("#648652")
 const DEEP_BG := Color("#162618")
+const LILY_FLOAT_HEIGHT := 0.15
+const FISH_LABEL_RADIUS := 4.0
+const FISH_NAMES := {"ca_linh": "Cá linh", "ca_loc": "Cá lóc", "ca_keo": "Cá kèo", "ca_ho": "Cá hô"}
+const HUD_FONT := preload("res://assets/fonts/be-vietnam-pro/BeVietnamPro-Medium.ttf")
 
 const PRD_NODES := [
 	{"id": "N1", "kind": "bong_dien_dien", "pos": Vector2(12.0, 0.0)},
@@ -372,7 +377,7 @@ func _build_prd_nodes_and_fish() -> void:
 			_asset("aquatic", "lily_pads_swamp", Vector3(p.x, 0.03, -0.4), Vector3.ONE * 1.4, Vector3(0.0, 0.0, 0.0))
 			_add_node_tag("Điên điển", Vector3(p.x, 1.35, 0.0), Color("#ffe45e"))
 		elif n["kind"] == "bong_sung":
-			_spawn_bong_sung_cluster(p.x, 0.0, 1.25, true)
+			_add_water_lily(n["id"], p.x)
 			_add_node_tag("Bông súng", Vector3(p.x, 1.55, 0.0), Color("#ff8ec4"))
 		else:
 			_asset("aquatic", "keo_neo", Vector3(p.x, -0.02, 0.0), Vector3.ONE * 2.2, Vector3(0.0, 15.0, 0.0))
@@ -405,6 +410,8 @@ func _build_prd_nodes_and_fish() -> void:
 				sc = 0.58
 			var inst := _asset("aquatic", f_id, base_pos, Vector3.ONE * sc, Vector3(0.0, 90.0 if k % 2 == 0 else -90.0, 0.0))
 			if inst != null:
+				if k == 0:
+					_add_fish_label(inst, kind)
 				if kind in ["ca_keo", "ca_ho"]:
 					_play_loop_anim(inst, "Swimming_Normal")
 				fish_nodes.append({
@@ -567,7 +574,8 @@ func _setup_camera_and_hud() -> void:
 
 	hud_label = Label.new()
 	hud_label.position = Vector2(26, 22)
-	hud_label.add_theme_font_size_override("font_size", 16)
+	hud_label.add_theme_font_override("font", HUD_FONT)
+	hud_label.add_theme_font_size_override("font_size", 13)
 	hud_label.add_theme_color_override("font_color", Color("#e6fbff"))
 	hud_label.visible = link == null
 	hud_label.text = "LAN BAT CA 2.5D | WASD/Mui ten: Boi lan | Cuon: Zoom | F1: Song | F2: Quan toi | F3: Lan sau"
@@ -681,6 +689,10 @@ func _after_move(delta: float) -> void:
 			var dy := cos(time_acc * sp * 0.7 + ph) * 0.25
 			fn.position = orig + Vector3(dx, dy, 0.0)
 			fn.rotation.y = (PI * 0.5) if cos(time_acc * sp + ph) >= 0.0 else (-PI * 0.5)
+			_update_fish_label(fn)
+
+	for lily: Node3D in water_lilies.values():
+		lily.position.y = LILY_FLOAT_HEIGHT + sin(time_acc * 1.2 + lily.position.x * 0.4) * 0.025
 
 	# Animate light shafts & rising bubbles
 	for r in ray_nodes:
@@ -706,6 +718,63 @@ const LIVE_FISH_MODEL := {
 const LIVE_MONSTER_MODEL := {"ca_sau": ["ca_sau", 1.4], "ran": ["ran_ho_may", 1.5]}
 
 
+func _add_water_lily(id: String, x: float) -> Node3D:
+	var cluster := Node3D.new()
+	cluster.position = Vector3(x, LILY_FLOAT_HEIGHT, 0.0)
+	add_child(cluster)
+	_asset("aquatic", "lily_pads_blossom", Vector3.ZERO, Vector3.ONE * 1.5, Vector3.ZERO, cluster)
+	_asset("aquatic", "lotus_clump", Vector3(0.6, 0.0, -0.5), Vector3.ONE * 1.2, Vector3(0.0, 45.0, 0.0), cluster)
+	water_lilies[id] = cluster
+	return cluster
+
+
+func _sync_water_lilies(nodes: Array) -> void:
+	var seen := {}
+	for node in nodes:
+		if node.get("kind") != "bong_sung":
+			continue
+		var id := str(node["id"])
+		var x := float(node["pos"][0])
+		seen[id] = true
+		var cluster: Node3D = water_lilies.get(id)
+		if cluster == null:
+			cluster = _add_water_lily(id, x)
+		cluster.position.x = x
+		cluster.visible = bool(node.get("ready", true))
+	for id in water_lilies.keys():
+		if not seen.has(id):
+			(water_lilies[id] as Node3D).queue_free()
+			water_lilies.erase(id)
+
+
+func _add_fish_label(fish: Node3D, kind: String) -> void:
+	if not FISH_NAMES.has(kind):
+		return
+	var label := Label3D.new()
+	label.name = "FishName"
+	label.text = FISH_NAMES[kind]
+	label.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+	label.font = HUD_FONT
+	label.font_size = 27
+	label.outline_size = 3
+	label.pixel_size = 0.014
+	label.modulate = Color("#e7f4ed")
+	label.outline_modulate = Color("#253a35")
+	label.top_level = true
+	label.hide()
+	fish.add_child(label)
+
+
+func _update_fish_label(fish: Node3D) -> void:
+	var label := fish.get_node_or_null("FishName") as Label3D
+	if label == null:
+		return
+	var pos := fish.global_position
+	label.visible = fish.visible and diver_pos.distance_squared_to(Vector2(pos.x, -pos.y)) <= FISH_LABEL_RADIUS * FISH_LABEL_RADIUS
+	if label.visible:
+		label.global_position = pos + Vector3.UP * 0.65
+
+
 func _live_sync(delta: float) -> bool:
 	if link == null or not link.connected or link.phase() != "gather":
 		return false
@@ -721,6 +790,7 @@ func _live_sync(delta: float) -> bool:
 		_decor_hidden = true
 	_sync_pool(live_fish, s.get("fish", []), "aquatic", LIVE_FISH_MODEL, delta)
 	_sync_pool(live_monsters, s.get("monsters", []), "monsters", LIVE_MONSTER_MODEL, delta)
+	_sync_water_lilies(s.get("nodes", []))
 	return true
 
 
@@ -744,17 +814,22 @@ func _sync_pool(pool: Dictionary, items: Array, family: String, models: Dictiona
 					var fnode := _asset(family, str(spec[0]), off, Vector3.ONE * float(spec[1]), Vector3.ZERO, school)
 					if fnode != null:
 						_play_loop_anim(fnode, "Swimming_Normal")
+				_add_fish_label(school, kind_str)
 				pool[id] = school
 			else:
 				var node := _asset(family, str(spec[0]), at, Vector3.ONE * float(spec[1]), Vector3(0.0, 90.0, 0.0))
 				if node == null:
 					continue
 				_play_loop_anim(node, "Swimming_Normal")
+				if family == "aquatic":
+					_add_fish_label(node, kind_str)
 				pool[id] = node
 		var n: Node3D = pool[id]
 		n.position = n.position.lerp(at, minf(1.0, delta * 12.0))
 		var heading := deg_to_rad(float(it.get("heading_deg", 0.0)))
 		n.rotation.y = PI * 0.5 if cos(heading) >= 0.0 else -PI * 0.5
+		if family == "aquatic":
+			_update_fish_label(n)
 	for id in pool.keys():
 		if not seen.has(id):  # đàn đã bị bắt
 			(pool[id] as Node3D).queue_free()
