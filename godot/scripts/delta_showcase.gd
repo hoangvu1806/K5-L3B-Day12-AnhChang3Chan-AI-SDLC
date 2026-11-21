@@ -12,6 +12,7 @@ var orbit := false
 var loaded_models := 0
 var missing_models := {}
 var rng := RandomNumberGenerator.new()
+var walkers: Array = []
 
 const WATER_LEVEL := 0.30
 const MUD := "#635036"
@@ -301,10 +302,10 @@ func _gather_scene() -> void:
         var fz := -45.0 + i * 8.0
         var fish_id := "fish_carp" if i % 2 == 0 else "fish_perch"
         _asset("aquatic", fish_id, Vector3(fx, WATER_LEVEL - 0.18, fz), rng.randf_range(0.7, 1.05), rng.randf_range(-3.14, 3.14))
-    # Characters on docks (Ut Sen 3D girl + fisherman).
-    _asset("characters", "ut_sen_girl", Vector3(-13.2, 0.55, -2.0), 0.42, 1.57)
-    _asset("river_delta", "conical_hats", Vector3(-13.2, 2.55, -2.0), 0.55, 0.0)
-    _asset("characters", "tidal_navigator", Vector3(13.2, 0.55, 6.0), 1.15, -1.57)
+    # Characters on docks (animated Ut Sen walking along dock).
+    var dock_ut := _asset("characters", "ut_sen_girl", Vector3(-13.2, 0.55, -2.0), 0.32, 0.0)
+    if dock_ut != null:
+        _add_walker(dock_ut, [Vector3(-13.2, 0.55, -4.8), Vector3(-13.2, 0.55, 2.2)], 1.6, 1.5)
 
 func _restaurant_scene() -> void:
     # Restaurant raft is an actual elevated timber floor with a readable 16 x 10m play area.
@@ -323,29 +324,34 @@ func _restaurant_scene() -> void:
     for i in range(22):
         var x := -7.8+i*.30
         _box(Vector3(x,5.22,2.45),Vector3(.055,.055,3.62),"#cab374")
-    # Kitchen B1 and table T1 with 3D KayKit CC0 kitchenware, dishes & characters.
+    # Kitchen B1, wooden prep counter, and table T1 with 3D KayKit CC0 kitchenware, dishes & animated NPCs.
     _asset("kitchen", "stove_single", Vector3(-4.9, 1.18, 2.9), 1.15, 3.14)
     _asset("kitchen", "pot_A_stew", Vector3(-5.15, 2.15, 2.85), 1.1, 0.4)
     _asset("kitchen", "pan_A", Vector3(-4.6, 2.15, 2.95), 1.05, -0.5)
-    _asset("kitchen", "cuttingboard", Vector3(-3.3, 1.20, 2.9), 1.2, 0.2)
-    _asset("aquatic", "fish_whole_raw", Vector3(-3.3, 1.32, 2.9), 0.85, 0.6)
+    _box(Vector3(-3.3, 1.62, 3.0), Vector3(1.15, 0.88, 1.15), WOOD)
+    _asset("kitchen", "cuttingboard", Vector3(-3.3, 2.08, 3.0), 1.15, 0.2)
+    _asset("aquatic", "fish_whole_raw", Vector3(-3.3, 2.18, 3.0), 0.8, 0.6)
     _asset("kitchen", "table_round_A", Vector3(2.0, 1.18, -1.6), 1.15, 0.0)
     _asset("kitchen", "stew_bowl", Vector3(1.75, 2.08, -1.5), 1.15, 0.0)
     _asset("kitchen", "food_dinner", Vector3(2.30, 2.08, -1.7), 1.15, 0.4)
     _asset("kitchen", "plate", Vector3(2.0, 2.08, -1.15), 1.1, 0.0)
-    for p in [Vector2(0.85, -1.6), Vector2(3.15, -1.6), Vector2(2.0, -2.75)]:
+    for p in [Vector2(0.05, -1.6), Vector2(3.95, -1.6), Vector2(2.0, -3.55)]:
         _asset("kitchen", "chair_stool", Vector3(p.x, 1.18, p.y), 1.1, 0.0)
-    # Ut Sen 3D girl at kitchen B1 and customers at table T1 / raft.
-    _asset("characters", "ut_sen_girl", Vector3(-4.8, 1.18, 1.5), 0.42, 0.2)
-    _asset("river_delta", "conical_hats", Vector3(-4.8, 3.18, 1.5), 0.55, 0.0)
-    _asset("characters", "customer_girl", Vector3(0.75, 1.18, -1.6), 0.42, 1.57)
-    _asset("characters", "tidal_navigator", Vector3(3.25, 1.18, -1.6), 1.15, -1.57)
-    # Wooden lantern beam with 3D hanging silk/paper lanterns.
+    # Animated Ut Sen walking between kitchen B1 and table T1 + seated/walking customers (no T-pose, no clipping!)
+    var ut_sen := _asset("characters", "ut_sen_girl", Vector3(-3.0, 1.18, 2.0), 0.30, 0.0)
+    if ut_sen != null:
+        _add_walker(ut_sen, [Vector3(-3.0, 1.18, 2.0), Vector3(-1.2, 1.18, -1.2), Vector3(-0.35, 1.18, -1.6)], 2.2, 1.6)
+    var guest_sit := _asset("characters", "customer_girl", Vector3(-0.08, 1.18, -1.6), 0.34, 1.57)
+    if guest_sit != null:
+        _play_anim(guest_sit, "Female_Sitting")
+    var guest_walk := _asset("characters", "customer_girl", Vector3(5.6, 1.18, 2.0), 0.34, 3.14)
+    if guest_walk != null:
+        _add_walker(guest_walk, [Vector3(5.6, 1.18, 2.2), Vector3(5.6, 1.18, -2.8)], 1.5, 1.8)
+    # Wooden lantern beam with clean round paper lanterns hanging underneath.
     _box(Vector3(0.0,5.5,-3.85),Vector3(15.3,.10,.10),WOOD)
     for i in range(9):
         var x := -6.4 + i * 1.6
-        var lantern_id := "lantern_silk" if i % 2 == 0 else "lantern_paper"
-        _asset("props", lantern_id, Vector3(x, 4.95, -3.85), 0.75, 0.0)
+        _asset("props", "lantern_paper", Vector3(x, 4.95, -3.85), 0.72, 0.0)
     # Aquatic lotus & lily pads around the floating restaurant.
     for p in [Vector2(-10.5, -6.5), Vector2(10.8, -5.5), Vector2(-11.0, 6.2), Vector2(10.2, 6.8)]:
         _asset("aquatic", "lotus_clump", Vector3(p.x, WATER_LEVEL + 0.02, p.y), 1.15, rng.randf_range(-3.14, 3.14))
@@ -363,6 +369,65 @@ func _restaurant_scene() -> void:
     for p in [Vector2(6.0, -4.0), Vector2(-6.0, -4.0), Vector2(0.0, 4.0)]:
         _asset("river_delta", "fruit_baskets", Vector3(p.x, 1.28, p.y), .7)
         _asset("river_delta", "fish_traps", Vector3(p.x, 1.28, p.y + 1.0), .4)
+
+func _play_anim(node: Node3D, preferred: String) -> AnimationPlayer:
+    var ap := node.find_child("AnimationPlayer", true, false)
+    if ap is AnimationPlayer:
+        var player: AnimationPlayer = ap
+        for aname in player.get_animation_list():
+            var a: Animation = player.get_animation(aname)
+            if a != null:
+                a.loop_mode = Animation.LOOP_LINEAR
+        if player.has_animation(preferred):
+            player.play(preferred, 0.2)
+        elif player.get_animation_list().size() > 0:
+            player.play(player.get_animation_list()[0])
+        return player
+    return null
+
+func _add_walker(node: Node3D, waypoints: Array, speed: float, pause_s: float) -> void:
+    var player := _play_anim(node, "Female_Walk")
+    walkers.append({
+        "node": node,
+        "player": player,
+        "waypoints": waypoints,
+        "idx": 1,
+        "dir": 1,
+        "speed": speed,
+        "pause_s": pause_s,
+        "wait": 0.0,
+    })
+
+func _process(delta: float) -> void:
+    for w in walkers:
+        var n: Node3D = w["node"]
+        if not is_instance_valid(n):
+            continue
+        var player: AnimationPlayer = w["player"]
+        if w["wait"] > 0.0:
+            w["wait"] -= delta
+            if player != null and player.has_animation("Female_Idle") and player.current_animation != "Female_Idle":
+                player.play("Female_Idle", 0.2)
+            continue
+        var pts: Array = w["waypoints"]
+        var target: Vector3 = pts[w["idx"]]
+        var diff := target - n.position
+        diff.y = 0.0
+        var dist := diff.length()
+        if dist < 0.12:
+            w["wait"] = w["pause_s"]
+            if w["idx"] >= pts.size() - 1:
+                w["dir"] = -1
+            elif w["idx"] <= 0:
+                w["dir"] = 1
+            w["idx"] += w["dir"]
+        else:
+            var step_dir := diff / dist
+            n.position += step_dir * minf(dist, w["speed"] * delta)
+            var target_yaw := atan2(step_dir.x, step_dir.z)
+            n.rotation.y = lerp_angle(n.rotation.y, target_yaw, minf(1.0, delta * 8.0))
+            if player != null and player.has_animation("Female_Walk") and player.current_animation != "Female_Walk":
+                player.play("Female_Walk", 0.2)
 
 func _camera() -> void:
     cam = Camera3D.new()
