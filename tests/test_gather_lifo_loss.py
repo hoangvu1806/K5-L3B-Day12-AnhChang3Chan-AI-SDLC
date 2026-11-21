@@ -5,6 +5,7 @@ Các test này chốt hành vi LIFO cho cả hai dạng phần tử, để khi �
 Chi tiết payload v1.2 chưa có ticket -> xem `docs/clarify.md` (câu 18–20).
 """
 
+import copy
 import unittest
 
 from chonoi.contract import load_contract
@@ -14,8 +15,19 @@ from chonoi.rng import Streams
 from chonoi.sim.gather import GatherSim
 
 
+def _tuning(hold):
+    """Giỏ mã nguyên liệu chạy trên tuning v1.1; giỏ cá thể bật v1.2 (freshness) như contract thật."""
+    tuning = copy.deepcopy(load_contract()["tuning"])
+    if hold and isinstance(hold[0], dict):
+        tuning.setdefault("freshness", {"initial": 100, "gather_decay_per_s": 0.5,
+                                        "quan_decay_per_s": 0.25, "spoiled_below": 30})
+    else:
+        tuning.pop("freshness", None)
+    return tuning
+
+
 def _sim(hold, player=None):
-    tuning = load_contract()["tuning"]
+    tuning = _tuning(hold)
     scenario = {"hold": hold, "random_fish": False, "fish": [], "monsters": []}
     if player:
         scenario["player"] = player
@@ -68,9 +80,10 @@ class LossEventsUseLifo(unittest.TestCase):
         self.assertEqual(sim.hold, [])
 
     def test_monster_hit_loses_floor_half_newest_first(self):
-        tuning = load_contract()["tuning"]
+        hold = _items("ca_loc", "bong_sung", "ca_linh", "keo_neo", "ca_keo")
+        tuning = _tuning(hold)
         spawn = next(s for s in tuning["gather"]["monsters"]["spawns"] if s["id"] == "M1")
-        sim = GatherSim(tuning, {"hold": _items("ca_loc", "bong_sung", "ca_linh", "keo_neo", "ca_keo"),
+        sim = GatherSim(tuning, {"hold": hold,
                                  "random_fish": False, "fish": [], "monsters": [spawn],
                                  "player": {"pos": list(spawn["pos"]), "hp": 3}},
                         Streams(1), IdAllocator())
