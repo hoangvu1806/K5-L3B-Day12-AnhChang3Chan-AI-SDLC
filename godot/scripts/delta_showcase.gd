@@ -12,6 +12,11 @@ var orbit := false
 var loaded_models := 0
 var missing_models := {}
 var rng := RandomNumberGenerator.new()
+# Khi chạy trong game (scripts/game.gd) cảnh nhận `link` tới logic: bếp/bàn/khách/Út Sen theo snapshot.
+var link = null
+var live: Dictionary = {}  # key -> Node3D
+var player_node: Node3D
+var player_world := Vector3.ZERO
 
 const WATER_LEVEL := 0.30
 const MUD := "#82694a"
@@ -282,6 +287,8 @@ func _restaurant_scene() -> void:
     for i in range(22):
         var x := -7.8+i*.30
         _box(Vector3(x,5.22,2.45),Vector3(.055,.055,3.62),"#cab374")
+    if link != null:
+        return  # trong game: bếp, bàn, khách, Út Sen đặt theo logic ở _process
     # Kitchen B1 and table T1 with 3D KayKit CC0 kitchenware, dishes & characters.
     _asset("kitchen", "stove_single", Vector3(-4.9, 1.18, 2.9), 1.15, 3.14)
     _asset("kitchen", "pot_A_stew", Vector3(-5.15, 2.15, 2.85), 1.1, 0.4)
@@ -340,6 +347,8 @@ func _camera_update() -> void:
     cam.look_at(focus)
 
 func _overlay() -> void:
+    if link != null:
+        return  # HUD do game.gd vẽ
     var canvas := CanvasLayer.new()
     add_child(canvas)
     var hint := Label.new()
@@ -356,6 +365,8 @@ func _overlay() -> void:
         canvas.add_child(missing)
 
 func _unhandled_input(ev: InputEvent) -> void:
+    if link != null and ev is InputEventKey:
+        return  # trong game: phím do SimLink gửi lên logic
     if ev is InputEventKey and ev.pressed and not ev.echo:
         if ev.keycode == KEY_F1: get_tree().change_scene_to_file("res://scenes/GatherRiver.tscn")
         if ev.keycode == KEY_F2: get_tree().change_scene_to_file("res://scenes/RestaurantNight.tscn")
@@ -373,3 +384,64 @@ func _unhandled_input(ev: InputEvent) -> void:
         azimuth -= ev.relative.x*.006
         elevation = clamp(elevation + ev.relative.y*.004, .12, 1.38)
         _camera_update()
+
+
+# --- Nối logic (game.gd gán `link`) -------------------------------------------------
+const FLOOR_Y := 1.18
+
+func _q2w(pos) -> Vector3:
+    # quán [x, z] với x ∈ [0,16], z ∈ [0,10] -> sàn bè 16 x 10 m đặt giữa gốc tọa độ
+    return Vector3(float(pos[0]) - 8.0, FLOOR_Y, float(pos[1]) - 5.0)
+
+func _live_node(key: String, family: String, id: String, at: Vector3, sc: float, yaw := 0.0) -> Node3D:
+    if live.has(key):
+        return live[key]
+    var n := _asset(family, id, at, sc, yaw)
+    if n != null:
+        live[key] = n
+    return n
+
+func _process(delta: float) -> void:
+    if link == null or stage != "quan" or not link.connected:
+        return
+    var s: Dictionary = link.state
+    if not s.has("stoves"):
+        return
+    for st in s.get("stoves", []):
+        var at := _q2w(st.get("pos", [2, 8]))
+        _live_node("stove_" + str(st["id"]), "kitchen", "stove_single", at, 1.15, PI)
+        var pot := _live_node("pot_" + str(st["id"]), "kitchen", "pot_A_stew", at + Vector3(0, 0.97, 0), 1.1)
+        if pot != null:
+            pot.visible = str(st.get("state", "idle")) != "idle"
+    var seated := {}
+    for c in s.get("customers", []):
+        seated[str(c.get("table_id", ""))] = c
+    for tb in s.get("tables", []):
+        var tid := str(tb["id"])
+        var at := _q2w(tb.get("pos", [9, 2]))
+        _live_node("table_" + tid, "kitchen", "table_round_A", at, 1.15)
+        _live_node("stool_" + tid, "kitchen", "chair_stool", at + Vector3(-1.15, 0, 0), 1.1)
+        var guest := _live_node("guest_" + tid, "characters", "customer_girl", at + Vector3(-1.25, 0, 0), 0.42, PI * 0.5)
+        var food := _live_node("food_" + tid, "kitchen", "food_dinner", at + Vector3(0, 0.9, 0), 1.15)
+        var c = seated.get(tid)
+        if guest != null:
+            guest.visible = c != null
+        if food != null:
+            food.visible = c != null and str(c.get("state", "")) == "eating"
+    var p: Dictionary = s.get("player", {})
+    if p.has("pos"):
+        var target := _q2w(p["pos"])
+        if player_node == null:
+            player_node = _live_node("player", "characters", "ut_sen_girl", target, 0.42)
+            player_world = target
+        var moved := target - player_world
+        player_world = player_world.lerp(target, minf(1.0, delta * 15.0))
+        if player_node != null:
+            player_node.position = player_world
+            if Vector2(moved.x, moved.z).length() > 0.01:
+                player_node.rotation.y = atan2(moved.x, moved.z)
+        # góc nhìn thứ 3: camera sau lưng, hơi cao, nhìn về phía bếp
+        if is_instance_valid(cam):
+            var want := player_world + Vector3(0.0, 5.5, 7.5)
+            cam.position = cam.position.lerp(want, minf(1.0, delta * 5.0))
+            cam.look_at(player_world + Vector3(0.0, 1.0, -1.5))
