@@ -497,6 +497,19 @@ func _build_gather_card(s: Dictionary, alerts: Array[String]) -> void:
 
 	# Monster proximity check
 	var pvec := Vector2(float(pos[0]), float(pos[1]))
+	var cooldown := int(p.get("catch_cd_ticks", 0))
+	left_vbox.add_child(_mk_label("Bắt cá: sẵn sàng" if cooldown <= 0 else "Bắt cá: chờ %.1f giây" % (float(cooldown) / 60.0), 13, Color("#cfe4f0")))
+	var meta: Dictionary = s.get("meta", {})
+	if bool(p.get("at_surface", false)):
+		var dock: Array = meta.get("dock_pos", [2, 0])
+		if pvec.distance_to(Vector2(float(dock[0]), float(dock[1]))) <= float(meta.get("dock_radius", 3)):
+			left_vbox.add_child(_mk_label("[E] Cập bến, mở quán", 13, Color("#ffe394")))
+		else:
+			for node in s.get("nodes", []):
+				var node_pos: Array = node.get("pos", [999, 999])
+				if bool(node.get("ready", false)) and pvec.distance_to(Vector2(float(node_pos[0]), float(node_pos[1]))) <= float(meta.get("interact_radius", 2)):
+					left_vbox.add_child(_mk_label("[E] Hái " + str(KIND_VI.get(node.get("kind", ""), node.get("kind", ""))), 13, Color("#ffe394")))
+					break
 	for m in s.get("monsters", []):
 		var mp: Array = m.get("pos", [999, 999])
 		if pvec.distance_to(Vector2(float(mp[0]), float(mp[1]))) <= 10.0 or str(m.get("state", "")) == "chase":
@@ -542,6 +555,32 @@ func _build_quan_card(s: Dictionary, alerts: Array[String]) -> void:
 	stock_lbl.custom_minimum_size = Vector2(210, 0)
 	left_vbox.add_child(stock_lbl)
 
+	# A customer only arrives when an eligible dish can be made from unreserved,
+	# unspoiled ingredients. Explain this instead of leaving an empty restaurant.
+	var available := _available_stock(s)
+	var cookable := _cookable_dishes(s, available)
+	if cookable.is_empty():
+		var no_dish := _mk_label("Chưa có món cho khách mới: nguyên liệu thiếu, đã ươn hoặc đang giữ cho khách khác.", 13, Color("#ffcf6b"))
+		no_dish.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		no_dish.custom_minimum_size = Vector2(210, 0)
+		left_vbox.add_child(no_dish)
+	else:
+		var dishes := []
+		for id in cookable:
+			dishes.append(str(DISH_VI.get(id, id)))
+		var menu_lbl := _mk_label("Có thể gọi: " + " · ".join(dishes), 13, Color("#b9eec9"))
+		menu_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		menu_lbl.custom_minimum_size = Vector2(210, 0)
+		left_vbox.add_child(menu_lbl)
+	var free_parts := []
+	for kind in available:
+		if int(available[kind]) > 0:
+			free_parts.append("%s ×%d" % [KIND_VI.get(kind, kind), int(available[kind])])
+	var free_lbl := _mk_label("Kho khả dụng: " + (" · ".join(free_parts) if not free_parts.is_empty() else "Trống"), 13, Color("#cfe4f0"))
+	free_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	free_lbl.custom_minimum_size = Vector2(210, 0)
+	left_vbox.add_child(free_lbl)
+
 	# Stoves row
 	var stove_row := HBoxContainer.new()
 	stove_row.add_theme_constant_override("separation", 8)
@@ -555,7 +594,7 @@ func _build_quan_card(s: Dictionary, alerts: Array[String]) -> void:
 	# Compact customers with slim 6px patience bars
 	var customers: Array = s.get("customers", [])
 	if customers.is_empty():
-		left_vbox.add_child(_mk_label("Chưa có khách ngồi bàn...", 13, Color("#9aaeb8")))
+		left_vbox.add_child(_mk_label("Chờ khách đến..." if not cookable.is_empty() else "Chưa có khách ngồi bàn.", 13, Color("#9aaeb8")))
 	else:
 		var patience_max := float(s.get("meta", {}).get("patience_s", 60)) * 60.0
 		for c in customers:
@@ -577,6 +616,51 @@ func _build_quan_card(s: Dictionary, alerts: Array[String]) -> void:
 
 	if active_alert_angry:
 		alerts.append("⚠ KHÁCH SẮP GIẬN!")
+
+
+func _available_stock(s: Dictionary) -> Dictionary:
+	var raw = s.get("stock", [])
+	var available := {}
+	var held_ids := {}
+	for customer in s.get("customers", []):
+		var reserved = customer.get("reserved", [])
+		if typeof(reserved) == TYPE_ARRAY:
+			for id in reserved:
+				held_ids[str(id)] = true
+	if typeof(raw) == TYPE_ARRAY:
+		var threshold := float(s.get("meta", {}).get("spoiled_below", 30))
+		for item in raw:
+			if typeof(item) != TYPE_DICTIONARY or held_ids.has(str(item.get("id", ""))) or float(item.get("fresh", 100)) < threshold:
+				continue
+			var kind := str(item.get("kind", ""))
+			available[kind] = int(available.get(kind, 0)) + 1
+	elif typeof(raw) == TYPE_DICTIONARY:
+		available = raw.duplicate()
+		for customer in s.get("customers", []):
+			var reserved = customer.get("reserved", {})
+			if typeof(reserved) == TYPE_DICTIONARY:
+				for kind in reserved:
+					available[kind] = int(available.get(kind, 0)) - int(reserved[kind])
+	return available
+
+
+func _cookable_dishes(s: Dictionary, available: Dictionary) -> Array:
+	var menu: Dictionary = s.get("meta", {}).get("menu", {})
+	var planned: Dictionary = s.get("day_plan", {}).get("dishes", {})
+	var result := []
+	for id in menu:
+		if s.has("day_plan") and not planned.has(id):
+			continue
+		var recipe: Dictionary = menu[id].get("recipe", {})
+		var enough := not recipe.is_empty()
+		for kind in recipe:
+			if int(available.get(kind, 0)) < int(recipe[kind]):
+				enough = false
+				break
+		if enough:
+			result.append(id)
+	result.sort()
+	return result
 
 
 func _summarize_items(raw_items) -> Dictionary:

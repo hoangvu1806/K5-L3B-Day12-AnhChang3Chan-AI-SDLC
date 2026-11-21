@@ -9,5 +9,6 @@
 - Godot 4.7.2: `Godot_v4.7.2-stable_win64_console.exe --headless --path godot --quit-after 5` tải scene chính, mã 0. Đây không phải bản 4.5.1 được dự án chỉ định.
 - Benchmark render 4.7.2, seed 42, 1280×720, làm nóng 3 giây, đo 30 giây: [bench-godot-4.7.2.json](bench-godot-4.7.2.json), trung bình 122.15 FPS, 1% low 71.63 FPS, load 497 ms. Chưa xác minh cảnh benchmark có đủ dữ liệu mô phỏng sống theo PRD; không coi đây là bằng chứng benchmark phát hành hoàn chỉnh.
 - Chưa thử điều khiển, ba cảnh báo và tương phản trực tiếp hoặc thử đóng gói.
+- Sau khi bật extension `burn` với `burn_s: 20`, ba test ngưỡng cháy và giữ chỗ lại trong `tests.test_quan_p2_bep.Burn` đạt. Test toàn bộ chạy 133 test, 18 failure và 1 error: các fixture cũ dùng schema v1.1, và một test cũ còn đòi `burn_s: null` dù extension đã bật. Chưa kết luận regression đạt.
 
 Các file JSONL được tạo thực tế nhưng bị `.gitignore` bỏ qua. `soak-check.json` là kết quả trước migration v1.1, không phải bằng chứng v1.3.
