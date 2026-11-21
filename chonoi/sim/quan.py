@@ -126,7 +126,8 @@ class QuanSim:
             return
         dish_id = self.rng.get("customer_dish").choice(dishes)
         c = {"id": self.ids.new("C"), "table_id": table_id, "dish_id": dish_id, "state": "waiting",
-             "patience_ticks_left": self.patience_ticks, "reserved": dict(self.menu[dish_id]["recipe"])}
+             "patience_ticks_left": self.patience_ticks, "reserved": dict(self.menu[dish_id]["recipe"]),
+             "order_tick": self.elapsed}  # P2: bếp lấy đơn cũ nhất theo order_tick rồi id bàn
         self.customers.append(c)
         events.append(("customer_arrived", {"customer_id": c["id"], "table_id": table_id, "dish_id": dish_id}))
 
