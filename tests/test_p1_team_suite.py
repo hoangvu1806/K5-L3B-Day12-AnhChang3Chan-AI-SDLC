@@ -62,9 +62,10 @@ class Phase1GatherAndQuanVerification(unittest.TestCase):
             self.assertFalse(s0["player"]["at_surface"])
 
     def test_gather_dock_priority_and_inventory_persistence(self):
-        """Ở trong vùng bến (dock_radius=3 quanh [2,0]), bấm interact phải cập bến ngay và xuất đúng kho LIFO."""
+        """Ở trong vùng bến (dock_radius=3 quanh [2,0]), bấm interact phải cập bến ngay và xuất đúng kho cá thể."""
         with Workdir() as w:
-            hold = ["bong_dien_dien", "ca_linh", "ca_linh", "ca_linh", "ca_loc"]
+            kinds = ["bong_dien_dien", "ca_linh", "ca_linh", "ca_linh", "ca_loc"]
+            hold = [{"id": f"I{i + 1}", "kind": k, "fresh": 100} for i, k in enumerate(kinds)]
             sc = write_json(w.path("sc.json"), {"gather": {"player": {"pos": [3.5, 0.0]}, "hold": hold}})
             inp = write_json(w.path("in.json"), frames({"tick": 0, "interact": True}))
             inv_out = w.path("kho.json")
@@ -75,10 +76,13 @@ class Phase1GatherAndQuanVerification(unittest.TestCase):
             end_evs = events(rows, "gather_end")
             self.assertEqual(len(end_evs), 1)
             self.assertEqual(end_evs[0]["data"]["reason"], "docked")
-            expected_inv = {"items": {"bong_dien_dien": 1, "ca_linh": 3, "ca_loc": 1}}
-            self.assertEqual(end_evs[0]["data"]["inventory"], expected_inv)
+            ev_items = end_evs[0]["data"]["inventory"]["items"]
+            self.assertEqual([(it["id"], it["kind"]) for it in ev_items],
+                             [(f"I{i + 1}", k) for i, k in enumerate(kinds)])
             with open(inv_out, encoding="utf-8") as f:
-                self.assertEqual(json.load(f), expected_inv)
+                saved = json.load(f)["items"]
+            self.assertEqual([(it["id"], it["kind"]) for it in saved],
+                             [(f"I{i + 1}", k) for i, k in enumerate(kinds)])
 
     def test_gather_node_regrow_event_emitted_when_timer_reaches_zero(self):
         """Nút hái đang có regrow_ticks=2 phải giảm về 0 ở tick 2 và phát sự kiện node_regrown."""
@@ -101,7 +105,8 @@ class Phase1GatherAndQuanVerification(unittest.TestCase):
     def test_quan_shift_end_and_deterministic_score(self):
         """Chế độ quan chạy hết time_left_ticks phải phát quan_end và tính đúng score = earned + 100 * floor(rep)."""
         with Workdir() as w:
-            sc = write_json(w.path("sc.json"), {"quan": {"time_left_ticks": 2, "reputation": 3.5, "stock": {"ca_loc": 2}}})
+            stock = [{"id": "I1", "kind": "ca_loc", "fresh": 100}, {"id": "I2", "kind": "ca_loc", "fresh": 100}]
+            sc = write_json(w.path("sc.json"), {"quan": {"time_left_ticks": 2, "reputation": 3.5, "stock": stock}})
             code, err = run_headless("--mode", "quan", "--seed", "5", "--ticks", "10", "--scenario", sc,
                                      "--out", w.path("q.jsonl"))
             self.assertEqual(code, 0, err)

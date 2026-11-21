@@ -60,6 +60,18 @@ class Spawn(unittest.TestCase):
         self.assertEqual(run(a, 200), run(b, 200))
 
 
+class OrderTick(unittest.TestCase):
+    def test_khach_moi_co_order_tick_va_bep_lay_don_cu_nhat(self):
+        # T1 có khách đến sau (order_tick lớn hơn) nhưng id bàn nhỏ hơn: bếp phải lấy đơn của khách đến trước
+        stock = {"ca_loc": 9, "bong_sung": 9, "ca_linh": 9, "bong_dien_dien": 9}
+        s = sim({"stock": stock, "customers": [
+            {"id": "C1", "table_id": "T2", "dish_id": "ca_loc_nuong_trui", "order_tick": 0}]})
+        run(s, Q["first_customer_tick"])
+        new = [c for c in s.customers if c["id"] != "C1"][0]
+        self.assertEqual((new["table_id"], new["order_tick"]), ("T1", Q["first_customer_tick"]))
+        self.assertEqual(s._next_order()["id"], "C1")
+
+
 class Patience(unittest.TestCase):
     def test_het_kien_nhan_bo_di_tra_cho_tru_uy_tin(self):
         sc = {"stock": {"ca_loc": 1}, "random_customers": False,

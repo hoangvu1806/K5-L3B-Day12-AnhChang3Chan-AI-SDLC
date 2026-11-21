@@ -55,16 +55,17 @@ class Lat4(unittest.TestCase):
 
     def test_cook_started_then_dish_ready(self):
         with Workdir() as w:
-            sc = {"player": {"pos": NEAR_STOVE}, "stock": {"ca_loc": 2},
-                  "customers": [customer(reserved={"ca_loc": 1})]}
+            stock = [{"id": "I1", "kind": "ca_loc", "fresh": 100}, {"id": "I2", "kind": "ca_loc", "fresh": 100}]
+            sc = {"player": {"pos": NEAR_STOVE}, "stock": stock,
+                  "customers": [customer(reserved=["I1"])]}
             rows = self.ok(w, sc, COOK_TICKS + 5, presses=[0])
             cs = events(rows, "cook_started")
             self.assertEqual(len(cs), 1)
             self.assertEqual(cs[0]["data"]["dish_id"], DISH)
             snap1 = [s for s in snapshots(rows) if s["tick"] == 1][0]
             self.assertEqual(snap1["stoves"][0]["state"], "cooking")
-            self.assertEqual(snap1["stock"], {"ca_loc": 1}, "trừ kho đúng công thức")
-            self.assertEqual(snap1["customers"][0]["reserved"], {}, "đã dùng phần giữ chỗ")
+            self.assertEqual([it["id"] for it in snap1["stock"]], ["I2"], "trừ kho đúng cá thể công thức")
+            self.assertEqual(snap1["customers"][0]["reserved"], [], "đã dùng phần giữ chỗ")
             dr = events(rows, "dish_ready")
             self.assertEqual(len(dr), 1)
             self.assertEqual(dr[0]["tick"], COOK_TICKS + 1)
@@ -72,14 +73,16 @@ class Lat4(unittest.TestCase):
 
     def test_no_cook_without_stock_or_customer(self):
         with Workdir() as w:
-            rows = self.ok(w, {"player": {"pos": NEAR_STOVE}, "stock": {"ca_loc": 2}}, 5, presses=[0])
+            stock = [{"id": "I1", "kind": "ca_loc", "fresh": 100}, {"id": "I2", "kind": "ca_loc", "fresh": 100}]
+            rows = self.ok(w, {"player": {"pos": NEAR_STOVE}, "stock": stock}, 5, presses=[0])
             self.assertEqual(events(rows, "cook_started"), [], "không có khách thì không nấu")
             rows = self.ok(w, {"player": {"pos": NEAR_STOVE}, "customers": [customer()]}, 5, presses=[0])
             self.assertEqual(events(rows, "cook_started"), [], "thiếu nguyên liệu thì không nấu")
 
     def test_one_dish_per_waiting_customer(self):
         with Workdir() as w:
-            sc = {"player": {"pos": NEAR_STOVE}, "stock": {"ca_loc": 2}, "hand": DISH,
+            stock = [{"id": "I1", "kind": "ca_loc", "fresh": 100}, {"id": "I2", "kind": "ca_loc", "fresh": 100}]
+            sc = {"player": {"pos": NEAR_STOVE}, "stock": stock, "hand": DISH,
                   "customers": [customer()]}
             rows = self.ok(w, sc, 5, presses=[0])
             self.assertEqual(events(rows, "cook_started"), [], "món cho khách đã có trên tay -> không nấu thêm")
@@ -145,7 +148,8 @@ class Lat4(unittest.TestCase):
 
     def test_full_loop_deterministic(self):
         with Workdir() as w:
-            sc = {"player": {"pos": NEAR_STOVE}, "stock": {"ca_loc": 1}, "customers": [customer()]}
+            sc = {"player": {"pos": NEAR_STOVE}, "stock": [{"id": "I1", "kind": "ca_loc", "fresh": 100}],
+                  "customers": [customer()]}
             outs = []
             for i in (1, 2):
                 code, err, out = run(w, sc, COOK_TICKS + 20, presses=[0, COOK_TICKS + 5], name=f"d{i}")

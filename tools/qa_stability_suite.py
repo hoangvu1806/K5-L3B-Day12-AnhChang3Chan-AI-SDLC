@@ -126,14 +126,33 @@ def _check_invariants(jsonl_path: str, mode: str, tuning: dict) -> list:
                     violations.append(f"tick {tick}: hold vượt sức chứa ({len(hold)} > {g['hold_capacity']})")
                 if row.get("hold_count") != len(hold):
                     violations.append(f"tick {tick}: hold_count ({row.get('hold_count')}) != len(hold) ({len(hold)})")
+                if hold and isinstance(hold[0], dict):
+                    seen_h = set()
+                    for it in hold:
+                        iid, fr = it.get("id"), it.get("fresh")
+                        if not iid or iid in seen_h:
+                            violations.append(f"tick {tick}: hold có item id rỗng hoặc trùng ({iid})")
+                        seen_h.add(iid)
+                        if not isinstance(fr, (int, float)) or not (0.0 - 1e-6 <= fr <= 100.0 + 1e-6):
+                            violations.append(f"tick {tick}: hold[{iid}].fresh ngoài [0, 100]: {fr}")
             else:
                 bx, bz = q["bounds"]["x"], q["bounds"]["z"]
                 if not (bx[0] - 1e-6 <= pos[0] <= bx[1] + 1e-6 and bz[0] - 1e-6 <= pos[1] <= bz[1] + 1e-6):
                     violations.append(f"tick {tick}: player.pos ngoài bounds quan: {pos}")
                 stock = row.get("stock", {})
-                for k, v in stock.items():
-                    if not isinstance(v, int) or v <= 0:
-                        violations.append(f"tick {tick}: stock[{k}] không dương ({v})")
+                if isinstance(stock, dict):
+                    for k, v in stock.items():
+                        if not isinstance(v, int) or v <= 0:
+                            violations.append(f"tick {tick}: stock[{k}] không dương ({v})")
+                elif isinstance(stock, list):
+                    seen_s = set()
+                    for it in stock:
+                        iid, fr = it.get("id"), it.get("fresh")
+                        if not iid or iid in seen_s:
+                            violations.append(f"tick {tick}: stock có item id rỗng hoặc trùng ({iid})")
+                        seen_s.add(iid)
+                        if not isinstance(fr, (int, float)) or not (0.0 - 1e-6 <= fr <= 100.0 + 1e-6):
+                            violations.append(f"tick {tick}: stock[{iid}].fresh ngoài [0, 100]: {fr}")
                 customers = row.get("customers", [])
                 tables_used = [c.get("table_id") for c in customers]
                 if len(tables_used) != len(set(tables_used)):
@@ -153,7 +172,19 @@ def _check_invariants(jsonl_path: str, mode: str, tuning: dict) -> list:
     return violations
 
 
-def run_fuzz_and_invariants(seeds: int, ticks: int, tuning: dict) -> dict:
+def _sample_quan_stock(is_v12: bool):
+    counts = {"ca_loc": 5, "bong_sung": 6, "ca_linh": 9, "bong_dien_dien": 4}
+    if not is_v12:
+        return counts
+    out, idx = [], 1
+    for k, n in counts.items():
+        for _ in range(n):
+            out.append({"id": f"I{idx}", "kind": k, "fresh": 100})
+            idx += 1
+    return out
+
+
+def run_fuzz_and_invariants(seeds: int, ticks: int, tuning: dict, is_v12: bool = False) -> dict:
     cmd = _headless_cmd()
     results = []
     passed = 0
@@ -171,7 +202,7 @@ def run_fuzz_and_invariants(seeds: int, ticks: int, tuning: dict) -> dict:
                         "--inputs", inp_path, "--snapshot-every", "10", "--out", out_path]
                 if mode == "quan":
                     with open(sc_path, "w", encoding="utf-8") as f:
-                        json.dump({"quan": {"stock": {"ca_loc": 5, "bong_sung": 6, "ca_linh": 9, "bong_dien_dien": 4}}}, f)
+                        json.dump({"quan": {"stock": _sample_quan_stock(is_v12)}}, f)
                     args.extend(["--scenario", sc_path])
 
                 t0 = time.perf_counter()
@@ -188,7 +219,7 @@ def run_fuzz_and_invariants(seeds: int, ticks: int, tuning: dict) -> dict:
     return {"passed": passed, "total": total, "details": results}
 
 
-def run_determinism_check(ticks: int) -> dict:
+def run_determinism_check(ticks: int, is_v12: bool = False) -> dict:
     cmd = _headless_cmd()
     checks = []
     with tempfile.TemporaryDirectory() as tmp:
@@ -202,7 +233,7 @@ def run_determinism_check(ticks: int) -> dict:
             if mode == "quan":
                 sc_path = os.path.join(tmp, "det_quan_sc.json")
                 with open(sc_path, "w", encoding="utf-8") as f:
-                    json.dump({"quan": {"stock": {"ca_loc": 4, "bong_sung": 4, "ca_linh": 6, "bong_dien_dien": 2}}}, f)
+                    json.dump({"quan": {"stock": _sample_quan_stock(is_v12)}}, f)
                 sc_args = ["--scenario", sc_path]
 
             p1 = subprocess.run([*cmd, "--mode", mode, "--seed", "42", "--ticks", str(ticks),
@@ -217,13 +248,13 @@ def run_determinism_check(ticks: int) -> dict:
     return {"passed": sum(1 for c in checks if c[1]), "total": len(checks), "checks": checks}
 
 
-def run_perf_soak(tuning: dict) -> dict:
+def run_perf_soak(tuning: dict, is_v12: bool = False) -> dict:
     """Chạy full 1 ca (180s = 10,800 ticks) trực tiếp trong memory để đo tốc độ & Peak RAM."""
     metrics = []
     for mode in ("gather", "quan"):
         full_ticks = int(round(tuning[mode]["duration_s"] * 60))
         frames = _generate_fuzz_frames(99, full_ticks, mode)["frames"]
-        scenario = {"stock": {"ca_loc": 10, "bong_sung": 10, "ca_linh": 15, "bong_dien_dien": 5}} if mode == "quan" else {}
+        scenario = {"stock": _sample_quan_stock(is_v12)} if mode == "quan" else {}
         player = InputPlayer(frames)
 
         tracemalloc.start()
@@ -350,10 +381,13 @@ def main(argv=None) -> int:
     p.add_argument("--out", help="Đường dẫn lưu báo cáo Markdown (tùy chọn)")
     a = p.parse_args(argv)
 
-    tuning = load_contract()["tuning"]
-    fuzz = run_fuzz_and_invariants(a.seeds, a.ticks, tuning)
-    det = run_determinism_check(a.ticks)
-    perf = run_perf_soak(tuning)
+    contract = load_contract()
+    tuning = contract["tuning"]
+    ver = tuple(int(x) for x in str(contract.get("contract_version", "1.0")).split(".")[:2])
+    is_v12 = ver >= (1, 2) or "freshness" in tuning
+    fuzz = run_fuzz_and_invariants(a.seeds, a.ticks, tuning, is_v12=is_v12)
+    det = run_determinism_check(a.ticks, is_v12=is_v12)
+    perf = run_perf_soak(tuning, is_v12=is_v12)
     live = run_live_http_stress(tuning)
 
     report = format_markdown(fuzz, det, perf, live, a.seeds, a.ticks)

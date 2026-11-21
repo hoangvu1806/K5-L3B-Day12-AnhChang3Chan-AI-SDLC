@@ -25,9 +25,14 @@ Game cần chế độ **headless** theo Test Contract (`python3 -m chonoi.headl
 
 ## Chạy project Godot
 
-1. Tải [Godot 4.5.1 Standard](https://godotengine.org/download/archive/4.5.1-stable/) cho hệ điều hành của bạn. Project dùng GDScript và renderer Compatibility.
-2. Trong Godot Project Manager, chọn **Import** và mở `godot/project.godot`.
-3. Nhấn **F6** để chạy scene đang mở hoặc **F5** để chạy project. Dùng phím mũi tên để thử di chuyển điểm đánh dấu.
+Yêu cầu Python 3 và [Godot 4.5.1 Standard](https://godotengine.org/download/archive/4.5.1-stable/) trên PATH. Từ gốc repo, chạy server và mở game trong hai terminal:
+
+```bash
+python3 -m chonoi.live --mode day --days 5
+godot --path godot
+```
+
+Server phải tiếp tục chạy trong lúc chơi; dừng bằng Ctrl+C. WASD hoặc phím mũi tên để di chuyển, E để hái/cập bến/nấu/bưng/phục vụ, Space để bắt cá, Esc hoặc P để tạm dừng, H để bật tương phản cao. Ở Shop dùng 1 hoặc 2 để mua nâng cấp và Enter để sang ngày tiếp theo; R chơi lại khi tạm dừng hoặc kết thúc. Có thể chạy riêng `--mode gather` hoặc `--mode quan` (quán nhận kho qua `--inventory <file>`).
 
 Từ thư mục gốc của repo, dùng lệnh sau để kiểm tra project và tải scene với Godot trên PATH.
 
@@ -35,7 +40,28 @@ Từ thư mục gốc của repo, dùng lệnh sau để kiểm tra project và 
 godot --headless --path godot --quit-after 5
 ```
 
-Scene Godot hiện là bản kiểm tra hiển thị và đầu vào. Khi tích hợp gameplay, dùng dữ liệu từ `game.contract.json` và duy trì lệnh `python3 -m chonoi.headless` theo Test Contract để chấm tự động.
+Không có server thì client chỉ hiển thị cảnh xem trước. Logic và dữ liệu chơi nằm ở server Python; client đọc snapshot và gửi đầu vào.
+
+```bash
+PYTHONPATH=tests:. python3 -m unittest discover -s tests -v
+python3 -m chonoi.headless --mode gather --seed 1 --ticks 600 --out out.jsonl
+python3 -m chonoi.soak --seed 7 --days 10 --out soak.json
+bash tools/bench.sh --seed 42 --duration 30 --out bench.json
+```
+
+Benchmark cần cửa sổ đồ họa và Godot trên PATH (hoặc đặt `GODOT_BIN`). Manifest khai Test Contract v1.3; kho dùng mảng cá thể `{id, kind, fresh}` từ v1.2, không đọc kho đếm của v1.1. Kết quả benchmark & soak đã được kiểm chứng thực tế trên GPU (`docs/proof/phase-4/bench-godot-4.7.2.json`, `docs/proof/phase-4/bench.json`, `docs/proof/phase-4/soak-v13.json`) cùng toàn bộ **148/148 bài test PASS** (`docs/verification/phase-4.md`).
+
+## Sáng tạo của nhóm (`AnhChang3Chan`)
+
+Nhóm giữ nguyên 100% lõi mô phỏng Python tất định (`chonoi/`) tương thích Test Contract `v1.3` cho chấm tự động headless, đồng thời mở rộng các điểm sáng tạo sau:
+- **Lớp trình diễn Godot 3D bối cảnh Tây Nam Bộ (`godot/`):** Cảnh lặn 2.5D (`DiveUnderwater`) có nước shader, đàn cá bơi, cụm bông súng nở, thủy quái tuần tra/truy đuổi và quán bè nổi 3D (`FloatingShop`) với nhân vật có hoạt ảnh đi/ngồi, đèn lồng, tín hiệu bếp/khách 3D và xử lý va chạm hiển thị không xuyên bàn/bếp.
+- **Mở rộng cơ chế gameplay khai báo rõ trong manifest:** `extensions: ["burn", "snake"]` — **cháy món (`burn_s: 20`)** khi để món chín quá lâu trên bếp và **Rắn Hổ Mây (`M3`)** truy đuổi tốc độ cao dưới nước, cùng module mô phỏng dòng nước lũ (`current`).
+- **Cảnh báo HUD cấu hình bằng dữ liệu & Khả năng tiếp cận:** Ngưỡng cảnh báo thủy quái gần (`detect_radius`), oxy thấp, khách sắp giận nằm trong `tuning.hud_alerts` gửi qua `meta.alerts` của `chonoi.live` (không ảnh hưởng JSONL headless), kèm chế độ **Tương phản cao** (phím `H`).
+- **Bộ công cụ QA tự động hóa (`tools/qa_stability_suite.py`):** Kiểm thử Fuzz + Invariant, so sánh SHA-256 từng byte cho Determinism và kiểm tải 100 request liên tục lên server `chonoi.live`.
+
+## Mở rộng Phase 3
+
+Phần mô phỏng dòng nước lũ (`current`) được kiểm chứng bằng `PYTHONPATH=tests:. python3 -m unittest tests.test_gather_current -v`. Khi tích hợp manifest v1.2, khai `current` trong `extensions` và đặt `tuning.gather.current` thành `{"interval_ticks":1800,"duration_ticks":480,"warning_ticks":120,"min_depth":10,"speed":1.5}`. Godot có thể dùng `current_warning` để hiện cảnh báo trước khi dòng bắt đầu. [Bằng chứng Gather Phase 3](docs/proof/phase-3/gather-freshness.md)
 
 ## Tự do sáng tạo
 

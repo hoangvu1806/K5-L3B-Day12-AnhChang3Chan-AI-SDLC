@@ -34,6 +34,18 @@ MAX_BODY = 4096
 RECENT_EVENTS = 40
 
 
+def hud_alerts(tuning) -> dict:
+    """Ngưỡng cảnh báo HUD (Ticket-04) lấy từ dữ liệu: oxy/kiên nhẫn theo tỉ lệ, thủy quái gần theo
+    detect_radius của từng loài. Chỉ đi qua `meta` của API live, KHÔNG ghi vào JSONL headless."""
+    a = dict(tuning.get("hud_alerts", {}))
+    a.setdefault("oxygen_low_ratio", 0.25)
+    a.setdefault("patience_low_ratio", 0.25)
+    a.setdefault("time_low_s", 30)
+    species = tuning.get("gather", {}).get("monsters", {}).get("species", {})
+    a["monster_near_m"] = {k: v["detect_radius"] for k, v in sorted(species.items()) if "detect_radius" in v}
+    return a
+
+
 class LiveGame:
     """Một lượt chơi + luồng nền bước 60 tick/s. Mọi truy cập trạng thái đi qua khóa."""
 
@@ -102,7 +114,8 @@ class LiveGame:
         with self._lock:
             snap = self.session.snapshot()
             phase = snap.get("phase", self.mode)
-            snap["meta"] = dict(self.tuning.get(phase, {}), menu=self.tuning["menu"])
+            snap["meta"] = dict(self.tuning.get(phase, {}), menu=self.tuning["menu"],
+                                alerts=hud_alerts(self.tuning))
             snap["events"] = list(self.events)
             snap["finished"] = self.session.done
             snap["reason"] = self.session.sim.reason if self.session.done else None
@@ -190,7 +203,9 @@ class LiveServer:
     def __init__(self, game: LiveGame, host="127.0.0.1", port=8000):
         handler = type("Handler", (_Handler,), {"game": game})
         self.game = game
-        self.httpd = ThreadingHTTPServer((host, port), handler)
+        # Windows: SO_REUSEADDR cho 2 server mở trùng cổng mà không báo lỗi -> tắt để lỗi 'cổng đã dùng' hiện ra
+        server_cls = type("Server", (ThreadingHTTPServer,), {"allow_reuse_address": False})
+        self.httpd = server_cls((host, port), handler)
         self.httpd.daemon_threads = True
         self.host = host
         self.port = self.httpd.server_address[1]
@@ -229,9 +244,10 @@ def main(argv=None) -> int:
             raise BadInput("--inventory chỉ dùng với quan")
         if a.inventory_out and a.mode != "gather":
             raise BadInput("--inventory-out chỉ dùng với gather")
-        tuning = load_contract()["tuning"]
+        contract = load_contract()
+        tuning = contract["tuning"]
         scenario = load_scenario(a.scenario, a.mode, tuning)
-        inventory = read_inventory(a.inventory) if a.inventory else None
+        inventory = read_inventory(a.inventory, version=contract.get("contract_version", "1.0")) if a.inventory else None
         if inventory is not None and "stock" in scenario:
             raise BadInput("vừa có quan.stock vừa có --inventory")
         if not 1 <= a.days <= 5:

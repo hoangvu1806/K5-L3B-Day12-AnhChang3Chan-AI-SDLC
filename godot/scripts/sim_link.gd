@@ -15,6 +15,7 @@ var _poll_busy := false
 var _poll_t := 0.0
 var _last_payload := ""
 var _queued: Array = []  # lệnh một lần (buy, restart)
+var _send_busy := false
 
 
 func _ready() -> void:
@@ -23,11 +24,15 @@ func _ready() -> void:
 	_poll.request_completed.connect(_on_state)
 	_send = HTTPRequest.new()
 	add_child(_send)
-	_send.request_completed.connect(func(_r, _c, _h, _b): _flush_queue())
+	_send.request_completed.connect(func(result, code, _h, _b):
+		_send_busy = false
+		if result != HTTPRequest.RESULT_SUCCESS or code != 200:
+			_last_payload = ""
+		_flush_queue())
 
 
 func phase() -> String:
-	return str(state.get("phase", ""))
+	return str(state.get("phase", state.get("mode", "")))
 
 
 func buy(action: String) -> void:
@@ -41,11 +46,13 @@ func restart() -> void:
 
 
 func _flush_queue() -> void:
-	if _queued.is_empty() or _send.get_http_client_status() != HTTPClient.STATUS_DISCONNECTED:
+	if _queued.is_empty() or _send_busy:
 		return
 	var job: Dictionary = _queued.pop_front()
-	_send.request(SERVER_URL + str(job["path"]), ["Content-Type: application/json"], HTTPClient.METHOD_POST,
-		JSON.stringify(job["body"]))
+	_send_busy = true
+	if _send.request(SERVER_URL + str(job["path"]), ["Content-Type: application/json"], HTTPClient.METHOD_POST,
+		JSON.stringify(job["body"])) != OK:
+		_send_busy = false
 
 
 func _physics_process(delta: float) -> void:
@@ -67,10 +74,12 @@ func _physics_process(delta: float) -> void:
 		"pause": Input.is_key_pressed(KEY_ESCAPE) or Input.is_key_pressed(KEY_P),
 		"shop_done": Input.is_key_pressed(KEY_ENTER),
 	})
-	if connected and payload != _last_payload and _queued.is_empty() \
-			and _send.get_http_client_status() == HTTPClient.STATUS_DISCONNECTED:
+	if connected and payload != _last_payload and _queued.is_empty() and not _send_busy:
 		_last_payload = payload
-		_send.request(SERVER_URL + "/input", ["Content-Type: application/json"], HTTPClient.METHOD_POST, payload)
+		_send_busy = true
+		if _send.request(SERVER_URL + "/input", ["Content-Type: application/json"], HTTPClient.METHOD_POST, payload) != OK:
+			_send_busy = false
+			_last_payload = ""
 
 	_poll_t += delta
 	if _poll_t >= POLL_INTERVAL and not _poll_busy:
@@ -84,9 +93,12 @@ func _on_state(result: int, code: int, _h: PackedStringArray, body: PackedByteAr
 	_poll_busy = false
 	if result != HTTPRequest.RESULT_SUCCESS or code != 200:
 		connected = false
+		_last_payload = ""
 		return
 	var parsed = JSON.parse_string(body.get_string_from_utf8())
 	if typeof(parsed) != TYPE_DICTIONARY:
+		connected = false
+		_last_payload = ""
 		return
 	connected = true
 	state = parsed

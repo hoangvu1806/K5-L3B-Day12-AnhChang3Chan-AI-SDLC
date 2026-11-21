@@ -13,14 +13,14 @@
 
 ## Phân công theo phase (chi tiết trong `docs/plan/phase-n.md`)
 
-| Thành viên | Phase 2 (v1.1) | Phase 3 (v1.2) |
-|---|---|---|
-| Nguyễn An (`AnK17-UIT`) | Số chuẩn gather, cá bơi/sinh, N5/N6 | Hao tươi giỏ, `spoiled`, cấp id cá thể · mở rộng `current` |
-| Từ Huy Bảo (`thbao4545`) | Cá Sấu, Máu/ngất do quái · mở rộng `snake` | LIFO cá thể khi mất hàng, ghi kho cá thể khi `gather_end` |
-| Hoàng Vũ (`hoangvu1806`) | `--mode day`, Shop, pause; khách quán theo lịch mới; gắn tag | Adapter kho cá thể, giữ chỗ theo id, bàn giao trong `day`; gắn tag · mở rộng `reservations` (cùng Hà Anh) |
-| Hà Anh (`hnha02`) | 2 bếp/4 bàn, 6 món, đóng ca · mở rộng `burn` | Hao tươi kho quán, giá theo tươi, boa · mở rộng `reservations` |
-| Trần Gia Bảo (`Jay-Gabriel`) | Menu, màn chuyển pha, pause, HUD sáng/quán | HUD độ tươi / hàng ươn |
-| Nhật Nguyên (`double-n-021`) | Manifest v1.1, test, smoke, verification P2 | Test ngưỡng/bàn giao, regression, `CHANGELOG.md`, verification P3 |
+| Thành viên | Phase 2 (v1.1) | Phase 3 (v1.2) | Phase 4 (v1.3) |
+|---|---|---|---|
+| Nguyễn An (`AnK17-UIT`) | Số chuẩn gather, cá bơi/sinh, N5/N6 | Hao tươi giỏ, `spoiled`, cấp id cá thể · mở rộng `current` | Đóng gói, README ≤ 3 lệnh, bản export Godot |
+| Từ Huy Bảo (`thbao4545`) | Cá Sấu, Máu/ngất do quái · mở rộng `snake` | LIFO cá thể khi mất hàng, ghi kho cá thể khi `gather_end` | Mở rộng `leaderboard` |
+| Hoàng Vũ (`hoangvu1806`) | `--mode day`, Shop, pause; khách quán theo lịch mới; gắn tag | Adapter kho cá thể, giữ chỗ theo id, bàn giao trong `day`; gắn tag · mở rộng `reservations` (cùng Hà Anh) | Contract v1.3, `soak_cmd`, release notes, tag `phase-4` + Release `v1.0.0` |
+| Hà Anh (`hnha02`) | 2 bếp/4 bàn, 6 món, đóng ca · mở rộng `burn` | Hao tươi kho quán, giá theo tươi, boa · mở rộng `reservations` | Ngưỡng cảnh báo, `CHANGELOG.md`, `CREDITS.md`, `LICENSE` |
+| Trần Gia Bảo (`Jay-Gabriel`) | Menu, màn chuyển pha, pause, HUD sáng/quán | HUD độ tươi / hàng ươn | `bench_cmd`, HUD cảnh báo + tương phản cao |
+| Nhật Nguyên (`double-n-021`) | Manifest v1.1, test, smoke, verification P2 | Test ngưỡng/bàn giao, regression, `CHANGELOG.md`, verification P3 | Bench/regression, verification P4, điều phối retro |
 
 **Vai quy trình:** PO (đầu mối hỏi giảng viên, giữ `docs/clarify.md`) · Integrator (giữ `docs/contracts/`, gắn tag) · QA lead · Scrum/Release.
 

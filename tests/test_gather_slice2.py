@@ -31,12 +31,13 @@ class GatherSlice2(unittest.TestCase):
                                   [{"tick": 0, "interact": True}], inventory=True)
         self.assertEqual([e["name"] for e in events(rows)], ["node_regrown", "gather", "gather_end"])
         self.assertEqual(events(rows, "gather")[0]["data"]["node_id"], "N2")
-        self.assertEqual(inv, {"items": {"bong_dien_dien": 1}})
+        self.assertEqual(inv, {"items": [{"id": "I1", "kind": "bong_dien_dien", "fresh": 100}]})
 
     def test_catch_requires_full_yield_and_does_not_try_other_fish(self):
         fish = [{"id": "F1", "kind": "ca_linh", "pos": [20, 5]},
                 {"id": "F2", "kind": "ca_loc", "pos": [21, 5]}]
-        rows = self.run_case({"player": {"pos": [20, 5]}, "hold": ["ca_loc"] * 10, "fish": fish},
+        hold = [{"id": f"I{i + 1}", "kind": "ca_loc", "fresh": 100} for i in range(10)]
+        rows = self.run_case({"player": {"pos": [20, 5]}, "hold": hold, "fish": fish},
                              [{"tick": 0, "catch": True}])
         self.assertEqual(events(rows, "hold_full")[0]["data"],
                          {"action": "catch", "fish_id": "F1", "required": 3, "free": 2})
@@ -48,10 +49,17 @@ class GatherSlice2(unittest.TestCase):
                                    "fish": [{"id": "F1", "kind": "ca_linh", "pos": [22, 5]}]},
                                   [{"tick": 0, "catch": True}], inventory=True)
         self.assertEqual(events(rows, "fish_caught")[0]["data"]["yield"], 3)
-        self.assertEqual(inv, {"items": {"ca_linh": 3}})
-        rows, inv = self.run_case({"hold": ["ca_loc"]}, [{"tick": 0, "interact": True}], inventory=True)
+        self.assertEqual(inv, {"items": [
+            {"id": "I1", "kind": "ca_linh", "fresh": 100},
+            {"id": "I2", "kind": "ca_linh", "fresh": 100},
+            {"id": "I3", "kind": "ca_linh", "fresh": 100},
+        ]})
+        rows, inv = self.run_case({"hold": [{"id": "I1", "kind": "ca_loc", "fresh": 100}]},
+                                  [{"tick": 0, "interact": True}], inventory=True)
         self.assertEqual(events(rows, "gather_end")[0]["data"]["reason"], "docked")
-        self.assertEqual(inv, {"items": {"ca_loc": 1}})
+        self.assertEqual(len(inv["items"]), 1)
+        self.assertEqual((inv["items"][0]["id"], inv["items"][0]["kind"]), ("I1", "ca_loc"))
+        self.assertAlmostEqual(inv["items"][0]["fresh"], 100 - 0.5 / 60, places=5)
 
 
 if __name__ == "__main__":

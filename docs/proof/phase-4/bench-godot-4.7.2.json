@@ -1,0 +1,10 @@
+{
+  "avg_fps": 122.15,
+  "frames": 3665,
+  "load_ms": 497,
+  "measured_s": 30.004,
+  "p1_low_fps": 71.63,
+  "resolution": "1280x720",
+  "seed": 42,
+  "warmup_s": 3.0
+}

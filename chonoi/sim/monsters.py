@@ -185,10 +185,7 @@ def step_monsters(sim, events: list):
         sp = species_map[hitter["kind"]]
         sim.hp = max(0, sim.hp - 1)
         loss_ratio = float(m_cfg.get("loss_ratio", 0.5))
-        drop_count = math.floor(len(sim.hold) * loss_ratio)
-        lost = []
-        for _ in range(drop_count):
-            lost.append(sim.hold.pop())
+        lost = sim._lose_lifo(math.floor(len(sim.hold) * loss_ratio))
         sim.invuln_ticks = int(m_cfg.get("invuln_ticks", 90))
         hitter["state"] = "recoil"
         hitter["state_ticks_left"] = int(sp["recoil_ticks"])
@@ -203,9 +200,8 @@ def step_monsters(sim, events: list):
             },
         ))
         if sim.hp == 0:
-            faint_lost = []
-            while sim.hold:
-                faint_lost.append(sim.hold.pop())
+            faint_lost = sim._lose_lifo(len(sim.hold))
+            sim._end_current(events, "phase_end")
             events.append((
                 "faint",
                 {
