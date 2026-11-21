@@ -49,7 +49,15 @@ python3 -m chonoi.soak --seed 7 --days 10 --out soak.json
 bash tools/bench.sh --seed 42 --duration 30 --out bench.json
 ```
 
-Benchmark cần cửa sổ đồ họa và Godot trên PATH (hoặc đặt `GODOT_BIN`). Manifest khai Test Contract v1.3; kho dùng mảng cá thể `{id, kind, fresh}` từ v1.2, không đọc kho đếm của v1.1. Kết quả benchmark phát hành vẫn cần được xác minh trước khi công bố.
+Benchmark cần cửa sổ đồ họa và Godot trên PATH (hoặc đặt `GODOT_BIN`). Manifest khai Test Contract v1.3; kho dùng mảng cá thể `{id, kind, fresh}` từ v1.2, không đọc kho đếm của v1.1. Kết quả benchmark & soak đã được kiểm chứng thực tế trên GPU (`docs/proof/phase-4/bench-godot-4.7.2.json`, `docs/proof/phase-4/bench.json`, `docs/proof/phase-4/soak-v13.json`) cùng toàn bộ **148/148 bài test PASS** (`docs/verification/phase-4.md`).
+
+## Sáng tạo của nhóm (`AnhChang3Chan`)
+
+Nhóm giữ nguyên 100% lõi mô phỏng Python tất định (`chonoi/`) tương thích Test Contract `v1.3` cho chấm tự động headless, đồng thời mở rộng các điểm sáng tạo sau:
+- **Lớp trình diễn Godot 3D bối cảnh Tây Nam Bộ (`godot/`):** Cảnh lặn 2.5D (`DiveUnderwater`) có nước shader, đàn cá bơi, cụm bông súng nở, thủy quái tuần tra/truy đuổi và quán bè nổi 3D (`FloatingShop`) với nhân vật có hoạt ảnh đi/ngồi, đèn lồng, tín hiệu bếp/khách 3D và xử lý va chạm hiển thị không xuyên bàn/bếp.
+- **Mở rộng cơ chế gameplay khai báo rõ trong manifest:** `extensions: ["burn", "snake"]` — **cháy món (`burn_s: 20`)** khi để món chín quá lâu trên bếp và **Rắn Hổ Mây (`M3`)** truy đuổi tốc độ cao dưới nước, cùng module mô phỏng dòng nước lũ (`current`).
+- **Cảnh báo HUD cấu hình bằng dữ liệu & Khả năng tiếp cận:** Ngưỡng cảnh báo thủy quái gần (`detect_radius`), oxy thấp, khách sắp giận nằm trong `tuning.hud_alerts` gửi qua `meta.alerts` của `chonoi.live` (không ảnh hưởng JSONL headless), kèm chế độ **Tương phản cao** (phím `H`).
+- **Bộ công cụ QA tự động hóa (`tools/qa_stability_suite.py`):** Kiểm thử Fuzz + Invariant, so sánh SHA-256 từng byte cho Determinism và kiểm tải 100 request liên tục lên server `chonoi.live`.
 
 ## Mở rộng Phase 3
 
