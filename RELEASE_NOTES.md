@@ -29,4 +29,4 @@ godot --path godot
 - Client Godot 3D cần server Python (`chonoi.live`) chạy song song.
 - Benchmark GPU được thực hiện trên Godot `4.7.2` (phiên bản cài đặt trên máy kiểm thử) thay vì `4.5.1`; thông số trung thực nằm trong `docs/verification/phase-4.md`.
 - Một số model 3D thay thế gần đúng và giấy phép bên thứ ba được kê khai rõ trong `CREDITS.md` và `LICENSE` (mục `docs/clarify.md #26` ghi nhận cần rà lại phân phối lại thư mục `river_delta`).
-- Phản tư cá nhân hiện có 4/6 thành viên trong `docs/members/` (`double-n-021`, `hnha02`, `hoangvu1806`, `Jay-Gabriel`); `AnK17-UIT` và `thbao4545` bổ sung sau.
+- Phản tư cá nhân đã có đủ 6/6 thành viên trong `docs/members/` (`AnK17-UIT`, `double-n-021`, `hnha02`, `hoangvu1806`, `Jay-Gabriel`, `thbao4545`).
