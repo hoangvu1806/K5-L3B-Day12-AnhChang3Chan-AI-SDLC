@@ -32,7 +32,7 @@ if [[ -z "$OUT" ]]; then
   exit 2
 fi
 
-if [[ "$OUT" != /* ]]; then
+if [[ "$OUT" != /* && ! "$OUT" =~ ^[A-Za-z]: ]]; then
   OUT="$(pwd)/$OUT"
 fi
 

@@ -284,11 +284,6 @@ class GatherSim:
         if self._fish_moves:
             self._step_fish()
             self._spawn_fish_if_due(events)
-            return events
-        # 6. nếu còn giờ: cá bơi và sinh thêm theo lịch
-        if self.random_fish:
-            self._step_fish()
-            self._spawn_fish_if_due(events)
         return events
 
     # --- cá bơi & sinh thêm (v1.1) ---------------------------------------------
