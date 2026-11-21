@@ -190,7 +190,9 @@ class LiveServer:
     def __init__(self, game: LiveGame, host="127.0.0.1", port=8000):
         handler = type("Handler", (_Handler,), {"game": game})
         self.game = game
-        self.httpd = ThreadingHTTPServer((host, port), handler)
+        # Windows: SO_REUSEADDR cho 2 server mở trùng cổng mà không báo lỗi -> tắt để lỗi 'cổng đã dùng' hiện ra
+        server_cls = type("Server", (ThreadingHTTPServer,), {"allow_reuse_address": False})
+        self.httpd = server_cls((host, port), handler)
         self.httpd.daemon_threads = True
         self.host = host
         self.port = self.httpd.server_address[1]
