@@ -186,8 +186,12 @@ func _river_banks() -> void:
                     var next := [inner, shore, high, outer]
                     for n in range(3):
                         surface.set_color(Color(BANK) if n>0 else Color(MUD))
-                        surface.add_vertex(_bank_strip_a[n]); surface.add_vertex(next[n]); surface.add_vertex(_bank_strip_a[n+1])
-                        surface.add_vertex(_bank_strip_a[n+1]); surface.add_vertex(next[n]); surface.add_vertex(next[n+1])
+                        if side < 0.0:
+                            surface.add_vertex(_bank_strip_a[n]); surface.add_vertex(next[n]); surface.add_vertex(_bank_strip_a[n+1])
+                            surface.add_vertex(_bank_strip_a[n+1]); surface.add_vertex(next[n]); surface.add_vertex(next[n+1])
+                        else:
+                            surface.add_vertex(_bank_strip_a[n]); surface.add_vertex(_bank_strip_a[n+1]); surface.add_vertex(next[n])
+                            surface.add_vertex(_bank_strip_a[n+1]); surface.add_vertex(next[n+1]); surface.add_vertex(next[n])
         surface.generate_normals()
         var mesh_instance := MeshInstance3D.new()
         mesh_instance.mesh = surface.commit()
