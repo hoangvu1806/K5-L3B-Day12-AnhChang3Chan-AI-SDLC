@@ -68,6 +68,11 @@ test_catch_requires_full_yield_and_does_not_try_other_fish
 test_catch_then_dock_transfers_items (test_gather_slice2.GatherSlice2.test_catch_then_dock_transfers_items) ... ok
 test_harvest_tie_and_regrowth_on_last_tick 
 (test_gather_slice2.GatherSlice2.test_harvest_tie_and_regrowth_on_last_tick) ... ok
+test_jsonl_headless_khong_doi (test_hud_alerts.HudAlerts.test_jsonl_headless_khong_doi) ... ok
+test_live_meta_co_alerts_cho_ca_ba_pha (test_hud_alerts.HudAlerts.test_live_meta_co_alerts_cho_ca_ba_pha) ... ok
+test_nguong_lay_tu_contract (test_hud_alerts.HudAlerts.test_nguong_lay_tu_contract) ... ok
+test_thieu_khoi_hud_alerts_van_co_mac_dinh (test_hud_alerts.HudAlerts.test_thieu_khoi_hud_alerts_van_co_mac_dinh) ... 
+ok
 test_dem_sang_ca_the_va_nguoc_lai (test_inventory_adapter.Adapter.test_dem_sang_ca_the_va_nguoc_lai) ... ok
 test_doc_kho_ca_the_va_kho_rong (test_inventory_adapter.ReadV12.test_doc_kho_ca_the_va_kho_rong) ... ok
 test_v11_van_doc_kho_dem (test_inventory_adapter.ReadV12.test_v11_van_doc_kho_dem) ... ok
@@ -75,14 +80,14 @@ test_v12_tu_choi_kho_dem_va_sai_schema (test_inventory_adapter.ReadV12.test_v12_
 test_chon_schema_theo_phien_ban (test_inventory_adapter.Version.test_chon_schema_theo_phien_ban) ... ok
 test_ghi_kho_rong (test_inventory_adapter.WriteV12.test_ghi_kho_rong) ... 
 F:\AI-In-Action\K5-L3B-Day12-AnhChang3Chan-AI-SDLC\tests\test_inventory_adapter.py:70: ResourceWarning: unclosed file 
-<_io.TextIOWrapper name='C:\\Users\\ACER\\AppData\\Local\\Temp\\tmpfqm9fesk\\kho.json' mode='r' encoding='utf-8'>
+<_io.TextIOWrapper name='C:\\Users\\ACER\\AppData\\Local\\Temp\\tmphc_h1l64\\kho.json' mode='r' encoding='utf-8'>
   self.assertEqual(json.load(open(p, encoding="utf-8")), {"items": []})
 ResourceWarning: Enable tracemalloc to get the object allocation traceback
 ok
 test_ghi_theo_id_va_doc_lai_giu_nguyen_quanh_nguong_30 
 (test_inventory_adapter.WriteV12.test_ghi_theo_id_va_doc_lai_giu_nguyen_quanh_nguong_30) ... 
 F:\AI-In-Action\K5-L3B-Day12-AnhChang3Chan-AI-SDLC\tests\test_inventory_adapter.py:60: ResourceWarning: unclosed file 
-<_io.TextIOWrapper name='C:\\Users\\ACER\\AppData\\Local\\Temp\\tmp9bo4rrz6\\kho.json' mode='r' encoding='utf-8'>
+<_io.TextIOWrapper name='C:\\Users\\ACER\\AppData\\Local\\Temp\\tmpfmflyhbw\\kho.json' mode='r' encoding='utf-8'>
   data = json.load(open(p, encoding="utf-8"))
 ResourceWarning: Enable tracemalloc to get the object allocation traceback
 ok
@@ -185,6 +190,22 @@ test_bep_lay_don_reserved_cu_nhat_theo_order_tick_roi_id_ban
 test_hoa_order_tick_thi_id_ban_nho_truoc (test_quan_p2_bep.OrderAndStoves.test_hoa_order_tick_thi_id_ban_nho_truoc) 
 ... ok
 test_khong_nau_don_khong_con_phan_giu (test_quan_p2_bep.OrderAndStoves.test_khong_nau_don_khong_con_phan_giu) ... ok
+test_hao_025_moi_giay_ke_ca_hang_dang_giu (test_quan_p3_tuoi.Decay.test_hao_025_moi_giay_ke_ca_hang_dang_giu) ... ok
+test_kep_day_0 (test_quan_p3_tuoi.Decay.test_kep_day_0) ... ok
+test_nhieu_ca_the_cung_uon_phat_theo_id (test_quan_p3_tuoi.Decay.test_nhieu_ca_the_cung_uon_phat_theo_id) ... ok
+test_spoiled_dung_mot_lan_tu_30_xuong_duoi_30 (test_quan_p3_tuoi.Decay.test_spoiled_dung_mot_lan_tu_30_xuong_duoi_30) 
+... ok
+test_spoiled_truoc_khi_xu_ly_giu_cho_bi_uon (test_quan_p3_tuoi.Decay.test_spoiled_truoc_khi_xu_ly_giu_cho_bi_uon) ... 
+ok
+test_boa_tren_gia_da_chot_va_paid_dung_gia_chot 
+(test_quan_p3_tuoi.Price.test_boa_tren_gia_da_chot_va_paid_dung_gia_chot) ... ok
+test_chot_base_price_theo_trung_binh_fresh_luc_nau 
+(test_quan_p3_tuoi.Price.test_chot_base_price_theo_trung_binh_fresh_luc_nau) ... ok
+test_floor_sat_bien (test_quan_p3_tuoi.Price.test_floor_sat_bien) ... ok
+test_kho_dem_khong_doi_gia (test_quan_p3_tuoi.Price.test_kho_dem_khong_doi_gia) ... ok
+test_mon_chin_khong_hao_va_gia_chot_theo_mon_len_tay_toi_khach 
+(test_quan_p3_tuoi.Price.test_mon_chin_khong_hao_va_gia_chot_theo_mon_len_tay_toi_khach) ... ok
+test_hand_object_sai_thi_ma_2 (test_quan_p3_tuoi.Scenario.test_hand_object_sai_thi_ma_2) ... ok
 test_con_01_ticks_zero_and_end_line (test_smoke_p1.Contract.test_con_01_ticks_zero_and_end_line) ... ok
 test_con_02_deterministic_bytes (test_smoke_p1.Contract.test_con_02_deterministic_bytes) ... ok
 test_con_03_bad_input_exit_2 (test_smoke_p1.Contract.test_con_03_bad_input_exit_2) ... ok
@@ -219,6 +240,6 @@ test_too_few_members (test_team_check.TeamCheck.test_too_few_members) ... ok
 test_wrong_size_duplicate_and_outsider (test_team_check.TeamCheck.test_wrong_size_duplicate_and_outsider) ... ok
 
 ----------------------------------------------------------------------
-Ran 133 tests in 131.861s
+Ran 148 tests in 93.876s
 
 OK

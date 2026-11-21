@@ -1,6 +1,6 @@
 # Ma trận truy vết Phase 3 (TICKET-03 — Mùa Nước Nổi, Test Contract v1.2 / v1.3)
 
-> **Trạng thái hiện tại:** **Đạt 100%** trên nhánh `dev` (từ nền `e7884bf`, `contract_version: "1.3"`, đã kích hoạt đầy đủ khối `freshness`). Toàn bộ **7/7 bài test hộp đen Phase 3** (`tests/test_p3_freshness_qa.py`) và **133/133 bài test toàn repo** (0 fail, 0 error, 0 skip) đều **PASS**.
+> **Trạng thái hiện tại:** **Đạt 100%** trên nhánh `dev` (sau khi hợp nhất PR #23, #24, #29, #30 trên nền `contract_version: "1.3"`, đã kích hoạt đầy đủ khối `freshness`). Toàn bộ **7/7 bài test hộp đen Phase 3** (`tests/test_p3_freshness_qa.py`), **11/11 test Quán độ tươi** (`tests/test_quan_p3_tuoi.py`) và **148/148 bài test toàn repo** (0 fail, 0 error, 0 skip) đều **PASS**.
 
 | AC / Hạng mục | Người phụ trách | Cách kiểm chứng | Bằng chứng (link `docs/proof/...`) | Kết quả |
 |---|---|---|---|---|
