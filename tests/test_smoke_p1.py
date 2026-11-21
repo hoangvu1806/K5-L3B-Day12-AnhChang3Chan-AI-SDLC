@@ -62,7 +62,7 @@ class Contract(unittest.TestCase):
             self.assertEqual(run_headless("--mode", "gather", "--seed", "1", "--ticks", "10", "--inputs", bad, "--out", out)[0], 2)
             self.assertFalse(os.path.exists(out), "lỗi đầu vào phải thoát TRƯỚC khi ghi đầu ra")
             self.assertEqual(run_headless("--mode", "gather", "--seed", "1", "--ticks", "-1", "--out", out)[0], 2)
-            for button in ("jump", "attack"):  # nút lạ / của phase sau
+            for button in ("jump",):  # nút lạ (v1.1: attack hợp lệ, chưa bật mở rộng thì bỏ qua)
                 unk = write_json(w.path("unk.json"), frames({"tick": 0, button: True}))
                 self.assertEqual(run_headless("--mode", "gather", "--seed", "1", "--ticks", "10", "--inputs", unk, "--out", out)[0], 2, button)
             self.assertFalse(os.path.exists(out))
@@ -70,7 +70,7 @@ class Contract(unittest.TestCase):
     def test_con_03_old_and_future_modes_rejected(self):
         with Workdir() as w:
             out = w.path("o.jsonl")
-            for mode in ("river", "day"):
+            for mode in ("river",):  # v1.1: day hợp lệ
                 self.assertEqual(run_headless("--mode", mode, "--seed", "1", "--ticks", "0", "--out", out)[0], 2, mode)
             self.assertFalse(os.path.exists(out))
             old = write_json(w.path("old.json"), {"river": {"hold": []}})
