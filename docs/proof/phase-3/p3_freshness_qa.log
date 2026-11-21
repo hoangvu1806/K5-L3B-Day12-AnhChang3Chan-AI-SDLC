@@ -1,0 +1,29 @@
+python : test_manifest_v12_freshness_config 
+(tests.test_p3_freshness_qa.Phase3ContractV12Freshness.test_manifest_v12_freshness_config) ... ok
+At line:1 char:225
++ ... ONUTF8="1"; python -m unittest tests.test_p3_freshness_qa -v 2>&1 | O ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (test_manifest_v..._config) ... ok:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+test_quan_re_reserve_on_spoil_and_fresh_base_price 
+(tests.test_p3_freshness_qa.Phase3ContractV12Freshness.test_quan_re_reserve_on_spoil_and_fresh_base_price)
+Khi cá thể giữ chỗ vừa ươn, quán nhả và giữ lại cá thể tươi còn lại; lúc nấu chốt base_price theo fresh. ... ok
+test_smoke_inventory_file_handover_exact_fresh 
+(tests.test_p3_freshness_qa.Phase3ContractV12Freshness.test_smoke_inventory_file_handover_exact_fresh)
+Smoke bàn giao file TICKET-03: fresh=100 + interact tick 0 -> quan --inventory --ticks 0 khớp id/kind/fresh. ... ok
+test_smoke_threshold_fresh_30_spoils_on_tick_1 
+(tests.test_p3_freshness_qa.Phase3ContractV12Freshness.test_smoke_threshold_fresh_30_spoils_on_tick_1)
+Fixture chính thức trong TICKET-03: fresh=30 ở gather không input -> tick 1 phát spoiled. ... ok
+test_v12_rejects_counted_inventory_and_invalid_fresh_exit_2 
+(tests.test_p3_freshness_qa.Phase3ContractV12Freshness.test_v12_rejects_counted_inventory_and_invalid_fresh_exit_2)
+Contract v1.2 bắt buộc trả mã 2 cho file kho đếm cũ, id trùng hoặc fresh ngoài [0, 100]. ... ok
+test_changelog_documents_v12_breaking_changes 
+(tests.test_p3_freshness_qa.Phase3DocsAndToolingReady.test_changelog_documents_v12_breaking_changes) ... ok
+test_verification_phase3_doc_exists 
+(tests.test_p3_freshness_qa.Phase3DocsAndToolingReady.test_verification_phase3_doc_exists) ... ok
+
+----------------------------------------------------------------------
+Ran 7 tests in 3.387s
+
+OK

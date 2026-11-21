@@ -383,7 +383,8 @@ def main(argv=None) -> int:
 
     contract = load_contract()
     tuning = contract["tuning"]
-    is_v12 = contract.get("contract_version") == "1.2"
+    ver = tuple(int(x) for x in str(contract.get("contract_version", "1.0")).split(".")[:2])
+    is_v12 = ver >= (1, 2) or "freshness" in tuning
     fuzz = run_fuzz_and_invariants(a.seeds, a.ticks, tuning, is_v12=is_v12)
     det = run_determinism_check(a.ticks, is_v12=is_v12)
     perf = run_perf_soak(tuning, is_v12=is_v12)

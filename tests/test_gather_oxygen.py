@@ -34,7 +34,7 @@ class GatherOxygen(unittest.TestCase):
             scenario = write_json(w.path("scenario.json"), {
                 "gather": {
                     "player": {"pos": [10, 5], "oxygen_ticks": 0, "zero_oxy_ticks": 59, "hp": 1},
-                    "hold": ["ca_loc"],
+                    "hold": [{"id": "I1", "kind": "ca_loc", "fresh": 100}],
                     "time_left_ticks": 1,
                 },
             })
@@ -45,7 +45,7 @@ class GatherOxygen(unittest.TestCase):
             self.assertEqual(code, 0, err)
             rows = read_jsonl(out)
             with open(inventory, encoding="utf-8") as f:
-                self.assertEqual(json.load(f)["items"], {})
+                self.assertEqual(json.load(f)["items"], [])
 
         self.assertEqual([e["name"] for e in events(rows)], ["choke", "faint", "gather_end"])
         final = snapshots(rows)[-1]

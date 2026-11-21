@@ -53,14 +53,23 @@ class DayLoop(unittest.TestCase):
 
     def test_ke_hoach_ngay_2_va_ban_giao_kho(self):
         with Workdir() as w:
-            code, err, rows = day(w, scenario={"gather": {"hold": ["ca_loc", "bong_sung", "bong_sung"]}},
+            hold = [
+                {"id": "I1", "kind": "ca_loc", "fresh": 100},
+                {"id": "I2", "kind": "bong_sung", "fresh": 100},
+                {"id": "I3", "kind": "bong_sung", "fresh": 100},
+            ]
+            code, err, rows = day(w, scenario={"gather": {"hold": hold}},
                                   inputs=[DOCK], days=2)
             self.assertEqual(code, 0, err)
             plans = events(rows, "day_plan")
             self.assertEqual([p["day"] for p in plans], [1, 2])
             self.assertEqual(plans[1]["data"]["dishes"], T["day_plan"][1]["dishes"])
             q0 = [s for s in snapshots(rows) if s["phase"] == "quan" and s["phase_tick"] == 0][0]
-            self.assertEqual(q0["stock"], {"bong_sung": 2, "ca_loc": 1})
+            self.assertEqual([it["id"] for it in q0["stock"]], ["I1", "I2", "I3"])
+            counts = {}
+            for it in q0["stock"]:
+                counts[it["kind"]] = counts.get(it["kind"], 0) + 1
+            self.assertEqual(counts, {"bong_sung": 2, "ca_loc": 1})
             arrived = {e["data"]["dish_id"] for e in events(rows, "customer_arrived")}
             self.assertTrue(arrived and arrived <= set(T["day_plan"][0]["dishes"]) | set(T["day_plan"][1]["dishes"]))
 

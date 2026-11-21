@@ -4,6 +4,29 @@ Mọi thay đổi đáng chú ý của **Quán Ăn Chợ Nổi** (Nhóm `AnhChan
 
 ---
 
+## [Phase 4 — v1.3] — TICKET-04 "Phát hành v1.0.0" (Contract v1.3)
+
+### Added & Changed
+- Nâng `contract_version: "1.3"`, kích hoạt đầy đủ `freshness`, `burn_s: 20` (khớp `extensions: ["burn", "snake"]`), `soak_cmd: "python3 -m chonoi.soak"` và `bench_cmd: "bash tools/bench.sh"` trong `game.contract.json`.
+- Hoàn thiện `chonoi/sim/quan.py` (hao độ tươi kho quán `-0.25/s`, sự kiện `spoiled` tại `location: "stock"`, chốt `base_price` theo trung bình độ tươi lúc `cook_started`), `chonoi/soak.py` (bot tất định 10 Ngày, 0 crash), HUD thẻ kính Godot 3D có cảnh báo + chế độ tương phản cao (`H`), và tín hiệu 3D bếp/khách.
+- Nâng cấp `tools/qa_stability_suite.py` nhận diện phiên bản `>= 1.2` (bao gồm `1.3`) khi sinh kho kiểm thử fuzz & determinism.
+- Đưa toàn bộ bộ kiểm thử tự động từ trạng thái đỏ sau chuyển schema (`18 failures, 1 error`) lên **133/133 tests PASS (0 fail, 0 error, 0 skip)** trên Contract v1.3.
+
+### Danh sách Test P1–P2 đã cập nhật có lý do khi chuyển sang v1.2/v1.3
+| File test | Số test cập nhật | Lý do cập nhật theo Breaking Change v1.2/v1.3 |
+|---|---:|---|
+| `tests/test_smoke_p1.py` | 2 | Chuyển `gather.hold` và kiểm tra file `inv.json`/`quan.stock` từ kho đếm sang mảng cá thể `{id, kind, fresh}`. |
+| `tests/test_p1_team_suite.py` | 2 | Chuyển fixture `gather.hold` và `quan.stock` sang mảng cá thể v1.2/v1.3. |
+| `tests/test_p2_v11_suite.py` | 3 | Cho phép `contract_version >= 1.1`; chuyển `hold`, `monster_hit.lost`, `faint.lost`, `quan.stock`, `reserved` sang mảng cá thể. |
+| `tests/test_day_mode.py` | 1 | Chuyển `gather.hold` và kiểm tra `q0["stock"]` bàn giao trong `day` sang mảng cá thể. |
+| `tests/test_gather_oxygen.py` | 1 | Chuyển `gather.hold` sang mảng cá thể; kho rỗng khi ngất là `{"items": []}` thay vì `{}`. |
+| `tests/test_gather_slice2.py` | 3 | Chuyển `gather.hold` và kiểm tra file kho xuất ra sang mảng cá thể `{id, kind, fresh}`. |
+| `tests/test_python_starter_units.py` | 1 | Chuyển `gather.hold` sang mảng cá thể (tránh `AttributeError` khi `GatherSim` sao chép dict cá thể). |
+| `tests/test_quan_lat4.py` | 4 | Chuyển `quan.stock` và `customers[].reserved` sang mảng cá thể / danh sách ID `["I1"]`. |
+| `tests/test_quan_p2_bep.py` | 2 | Chuyển `quan.stock`/`reserved` trong test đóng ca sang mảng cá thể; kiểm `burn_s == 20` khi manifest bật extension `"burn"` và test lõi `burn_s=None` qua `sim_with(..., burn_s=None)`. |
+
+---
+
 ## [Phase 3 — v1.2] — TICKET-03 "Mùa Nước Nổi" (Change Request)
 
 ### BREAKING CHANGES (Thay thế luật cũ v1.0 / v1.1)
