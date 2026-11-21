@@ -51,6 +51,7 @@ class QuanSim:
         for e in self.customers:
             ids.reserve(e["id"])
         self.random_customers = scenario.get("random_customers", True)
+        self.menu_filter = None  # v1.1 day: chỉ các món trong kế hoạch Ngày (DaySim gán)
         self.elapsed = 0
         self.next_customer_tick = int(t["first_customer_tick"])
         self.customer_interval_ticks = max(1, int(round(t["customer_interval_s"] * 60)))
@@ -85,7 +86,7 @@ class QuanSim:
     def cookable_dishes(self) -> list:
         avail = self.available()
         return sorted(d for d, m in self.menu.items()
-                      if all(avail.get(k, 0) >= n for k, n in m["recipe"].items()))
+                      if (self.menu_filter is None or d in self.menu_filter) and all(avail.get(k, 0) >= n for k, n in m["recipe"].items()))
 
     def release(self, customer):
         customer["reserved"] = {}
