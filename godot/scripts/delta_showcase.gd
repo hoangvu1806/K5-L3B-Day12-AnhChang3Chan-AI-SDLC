@@ -19,6 +19,18 @@ var player_node: Node3D
 var player_anim: AnimationPlayer
 var player_world := Vector3.ZERO
 var walkers: Array = []
+# Tín hiệu quán 3D (chỉ đọc snapshot): bong bóng gọi món + thanh kiên nhẫn, tiến độ bếp, món trên tay.
+var cues: Dictionary = {}       # key -> {"label": Label3D, "bar": Node3D, "fill": MeshInstance3D}
+var cue_max: Dictionary = {}    # key -> tick lớn nhất đã thấy (dự phòng khi thiếu meta)
+const DISH_VI := {
+    "ca_loc_nuong_trui": "Cá lóc nướng trui",
+    "goi_bong_sung": "Gỏi bông súng",
+    "lau_ca_linh_dien_dien": "Lẩu cá linh điên điển",
+    "canh_chua_ca_loc": "Canh chua cá lóc",
+    "ca_keo_nuong": "Cá kèo nướng",
+    "lau_mam": "Lẩu mắm",
+}
+const BAR_W := 1.4
 
 const WATER_LEVEL := 0.30
 const MUD := "#635036"
@@ -506,6 +518,142 @@ func _step_walkers(delta: float) -> void:
             if player != null and player.has_animation("Female_Walk") and player.current_animation != "Female_Walk":
                 player.play("Female_Walk", 0.2)
 
+func _billboard_mat(c: Color, prio: int) -> StandardMaterial3D:
+    var m := StandardMaterial3D.new()
+    m.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+    m.billboard_mode = BaseMaterial3D.BILLBOARD_ENABLED
+    m.no_depth_test = true
+    m.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+    m.albedo_color = c
+    m.render_priority = prio
+    return m
+
+func _cue(key: String) -> Dictionary:
+    if cues.has(key):
+        return cues[key]
+    var label := Label3D.new()
+    label.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+    label.no_depth_test = true
+    label.render_priority = 3
+    label.outline_render_priority = 2
+    label.font_size = 56
+    label.outline_size = 14
+    label.pixel_size = 0.0045
+    label.outline_modulate = Color(0, 0, 0, 0.9)
+    add_child(label)
+    var bar := Node3D.new()
+    add_child(bar)
+    var bg := MeshInstance3D.new()
+    var bg_mesh := QuadMesh.new()
+    bg_mesh.size = Vector2(BAR_W + 0.08, 0.2)
+    bg.mesh = bg_mesh
+    bg.material_override = _billboard_mat(Color(0.05, 0.07, 0.09, 0.85), 1)
+    bar.add_child(bg)
+    var fill := MeshInstance3D.new()
+    fill.mesh = QuadMesh.new()
+    fill.material_override = _billboard_mat(Color.WHITE, 2)
+    bar.add_child(fill)
+    var c := {"label": label, "bar": bar, "fill": fill}
+    cues[key] = c
+    return c
+
+func _show_cue(key: String, at: Vector3, text: String, col: Color, ratio := -1.0, bar_col := Color.WHITE) -> void:
+    var c := _cue(key)
+    var label: Label3D = c["label"]
+    var bar: Node3D = c["bar"]
+    label.visible = true
+    label.text = text
+    label.modulate = col
+    label.position = at + Vector3(0, 0.32, 0)
+    bar.visible = ratio >= 0.0
+    if ratio >= 0.0:
+        var r := clampf(ratio, 0.0, 1.0)
+        bar.position = at
+        var fill: MeshInstance3D = c["fill"]
+        var q: QuadMesh = fill.mesh
+        q.size = Vector2(maxf(0.001, BAR_W * r), 0.12)
+        q.center_offset = Vector3(-BAR_W * 0.5 + BAR_W * r * 0.5, 0, 0)  # đầy từ trái
+        (fill.material_override as StandardMaterial3D).albedo_color = bar_col
+
+func _hide_cue(key: String) -> void:
+    if cues.has(key):
+        (cues[key]["label"] as Label3D).visible = false
+        (cues[key]["bar"] as Node3D).visible = false
+
+func _left_ratio(key: String, left: float, full: float) -> float:
+    # tỉ lệ còn lại; `full` lấy từ meta, thiếu thì dùng giá trị lớn nhất đã thấy
+    if full <= 0.0:
+        full = maxf(float(cue_max.get(key, 0.0)), left)
+        cue_max[key] = full
+    return left / full if full > 0.0 else 0.0
+
+func _patience_col(r: float) -> Color:
+    return Color("#7bed9f") if r > 0.5 else (Color("#ffd35c") if r > 0.25 else Color("#ff6b6b"))
+
+func _dish_vi(id) -> String:
+    return str(DISH_VI.get(str(id), str(id)))
+
+func _quan_cues(s: Dictionary) -> void:
+    var meta: Dictionary = s.get("meta", {}) if typeof(s.get("meta")) == TYPE_DICTIONARY else {}
+    var menu: Dictionary = meta.get("menu", {}) if typeof(meta.get("menu")) == TYPE_DICTIONARY else {}
+    var tick_hz := 60.0
+    # Bếp: đang nấu -> thanh tiến độ cam; chín -> nhãn xanh "E để lấy"
+    for st in s.get("stoves", []):
+        var key := "stove_cue_" + str(st["id"])
+        var at := _q2w(st.get("pos", [2, 8])) + Vector3(0, 2.1, 0)
+        var state := str(st.get("state", "idle"))
+        var dish = st.get("dish")
+        if state == "cooking" and dish != null:
+            var cook_s := float(menu.get(str(dish), {}).get("cook_s", 0)) if typeof(menu.get(str(dish))) == TYPE_DICTIONARY else 0.0
+            var left := float(st.get("cook_ticks_left", 0))
+            var done := 1.0 - _left_ratio(key + str(dish), left, cook_s * tick_hz)
+            _show_cue(key, at, "Đang nấu %s  %d%%" % [_dish_vi(dish), int(round(done * 100.0))], Color("#ffb347"), done, Color("#ff9f1a"))
+        elif state == "ready" and dish != null:
+            cue_max.erase(key + str(dish))
+            var bob := 0.12 * sin(Time.get_ticks_msec() / 160.0)
+            _show_cue(key, at + Vector3(0, bob, 0), "CHÍN RỒI · %s\n[E] để lấy" % _dish_vi(dish), Color("#7bed9f"))
+        else:
+            _hide_cue(key)
+    # Khách: chờ món -> bong bóng món + thanh kiên nhẫn đổi màu; đang ăn -> thanh ăn
+    var by_table := {}
+    for c in s.get("customers", []):
+        by_table[str(c.get("table_id", ""))] = c
+    for tb in s.get("tables", []):
+        var tid := str(tb["id"])
+        var key := "guest_cue_" + tid
+        var c = by_table.get(tid)
+        if c == null:
+            _hide_cue(key)
+            continue
+        var at := _q2w(tb.get("pos", [9, 2])) + Vector3(-1.9, 2.0, 0)
+        var cid := str(c.get("id", ""))
+        if str(c.get("state", "")) == "eating":
+            var eat_left := float(c.get("eat_ticks_left", 0))
+            var r := _left_ratio(key + "eat" + cid, eat_left, float(meta.get("eat_s", 0)) * tick_hz)
+            _show_cue(key, at, "Đang ăn ngon", Color("#9fd8ff"), 1.0 - r, Color("#4fc3f7"))
+        else:
+            var p_left := float(c.get("patience_ticks_left", 0))
+            var r := _left_ratio(key + "wait" + cid, p_left, float(meta.get("patience_s", 0)) * tick_hz)
+            var txt := "Gọi: %s" % _dish_vi(c.get("dish_id", ""))
+            if r <= 0.25:
+                txt += "\nSắp giận!"
+            _show_cue(key, at, txt, Color("#ffffff"), r, _patience_col(r))
+    # Món trên tay Út Sen
+    var hand = s.get("hand")
+    var hand_id := ""
+    if typeof(hand) == TYPE_DICTIONARY:
+        hand_id = str(hand.get("dish_id", ""))
+    elif hand != null:
+        hand_id = str(hand)
+    var carried := _live_node("hand_food", "kitchen", "food_dinner", player_world, 0.8)
+    if carried != null:
+        carried.visible = not hand_id.is_empty()
+        carried.position = player_world + Vector3(0, 1.05, 0)
+    if hand_id.is_empty():
+        _hide_cue("hand_cue")
+    else:
+        _show_cue("hand_cue", player_world + Vector3(0, 1.75, 0), "Bưng: %s" % _dish_vi(hand_id), Color("#ffe394"))
+
 func _process(delta: float) -> void:
     if link == null:
         _step_walkers(delta)
@@ -565,3 +713,4 @@ func _process(delta: float) -> void:
             var want := player_world + Vector3(0.0, 5.5, 7.5)
             cam.position = cam.position.lerp(want, minf(1.0, delta * 5.0))
             cam.look_at(player_world + Vector3(0.0, 1.0, -1.5))
+    _quan_cues(s)
