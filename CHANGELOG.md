@@ -4,6 +4,26 @@ Mọi thay đổi đáng chú ý của **Quán Ăn Chợ Nổi** (Nhóm `AnhChan
 
 ---
 
+## [Phase 4 — v1.3] — TICKET-04 "Phát hành v1.0.0" (Tag `phase-4`, Release `v1.0.0`)
+
+> Gameplay, tuning, kho và JSONL **giữ nguyên v1.2**. Phase 4 chỉ thêm lệnh đo, cảnh báo, đóng gói và tài liệu.
+
+### Added
+- Manifest khai `soak_cmd` (`python3 -m chonoi.soak --seed <int> --days <N> --out soak.json`): bot tất định chạy N Ngày, D1–D5 lặp ở Ngày 6–10, xuất `days, days_completed, crashes, results[{day, earned, reputation, score}], duration_s`.
+- Benchmark có render: cảnh `godot/scenes/Bench.tscn` + `godot/scripts/bench.gd`, lệnh `tools/bench.sh --seed 42 --duration 30 --out bench.json` (1280×720, làm nóng 3 s, đo 30 s; xuất `avg_fps, p1_low_fps, frames, measured_s, load_ms`).
+- Cảnh báo HUD bằng chữ/biểu tượng cho **thủy quái gần**, **oxy sắp hết**, **khách sắp giận**, và chế độ **tương phản cao** (phím `H`).
+- Ngưỡng cảnh báo là **dữ liệu**: `tuning.hud_alerts {oxygen_low_ratio: 0.25, patience_low_ratio: 0.25, time_low_s: 30}`; "thủy quái gần" dùng `detect_radius` của từng loài (Cá Sấu 10 m, Rắn Hổ Mây 8 m). `chonoi.live` gửi ngưỡng qua `meta.alerts`; **không** ghi vào JSONL headless (`tests/test_hud_alerts.py`).
+- `LICENSE` (MIT cho mã nguồn; asset bên thứ ba theo giấy phép riêng trong `CREDITS.md`), rà `CREDITS.md`.
+
+### Changed
+- HUD Godot (`godot/scripts/game.gd`) đọc ngưỡng từ `meta.alerts` thay cho số ghi cứng; thiếu khóa thì giữ mặc định cũ. Sửa ngưỡng "thủy quái gần" cho Rắn Hổ Mây (trước đây dùng chung 10 m).
+
+### Pending (trước khi gắn tag)
+- `contract_version: "1.3"` và khai `bench_cmd` ở gốc manifest (Integrator).
+- Release notes chính thức, bản đóng gói đính kèm Release `v1.0.0`.
+
+---
+
 ## [Phase 3 — v1.2] — TICKET-03 "Mùa Nước Nổi" (Change Request)
 
 ### BREAKING CHANGES (Thay thế luật cũ v1.0 / v1.1)
