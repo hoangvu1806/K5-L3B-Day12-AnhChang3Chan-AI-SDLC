@@ -41,9 +41,7 @@ class LiveServerTest(unittest.TestCase):
             self.assertEqual(st["player"]["pos"], [2, 0])
             self.assertEqual(_post(base + "/input", {"move": [1, 0], "interact": False, "catch": False}), 200)
             self.assertEqual(_post(base + "/input", {"move": [5, 0]}), 400)
-            code, html = _get(base + "/")
-            self.assertEqual(code, 200)
-            self.assertIn(b"<canvas", html)
+            # giao diện 2D trên trình duyệt đã bỏ (client là Godot 3D): server chỉ còn API
             deadline = time.time() + 3
             while time.time() < deadline:
                 st2 = json.loads(_get(base + "/state")[1])

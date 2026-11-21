@@ -1,8 +1,8 @@
-"""Cửa sổ chơi trực tiếp bằng TRÌNH DUYỆT, chỉ dùng thư viện chuẩn Python.
+"""Cầu nối mô phỏng cho client Godot 3D (`godot/`), chỉ dùng thư viện chuẩn Python.
 
     python3 -m chonoi.live --mode gather|quan [--seed N] [--port 8000]
 
-Máy chủ HTTP nhỏ (ThreadingHTTPServer) phục vụ `chonoi/web/index.html` và hai API:
+Máy chủ HTTP nhỏ (ThreadingHTTPServer), chỉ có API (giao diện 2D trên trình duyệt đã bỏ, nhóm dùng Godot 3D):
     GET  /state  -> snapshot JSON hiện tại (cùng trường như dòng snapshot của headless) + `meta` + `events`
     POST /input  -> {"move": [a, b], "interact": bool, "catch": bool}   (trạng thái phím đang giữ)
     POST /restart -> chơi lại từ đầu (cùng seed, cùng scenario)
@@ -28,7 +28,6 @@ from .inventory import read_inventory
 from .runner import Session
 from .scenario import load_scenario
 
-WEB_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "web")
 TICK_S = 1.0 / 60.0
 MAX_BODY = 4096
 RECENT_EVENTS = 40
@@ -148,12 +147,6 @@ class _Handler(BaseHTTPRequestHandler):
         path = self.path.split("?", 1)[0]
         if path == "/state":
             self._send(200, self.game.state_json())
-        elif path in ("/", "/index.html"):
-            try:
-                with open(os.path.join(WEB_DIR, "index.html"), "rb") as f:
-                    self._send(200, f.read(), "text/html; charset=utf-8")
-            except OSError:
-                self._send(404, b'{"error":"thieu index.html"}')
         else:
             self._send(404, b'{"error":"khong co"}')
 
@@ -214,7 +207,7 @@ class LiveServer:
 
 
 def main(argv=None) -> int:
-    p = argparse.ArgumentParser(prog="chonoi.live", description="Chơi trực tiếp trên trình duyệt (starter).")
+    p = argparse.ArgumentParser(prog="chonoi.live", description="Server mô phỏng cho client Godot 3D.")
     p.add_argument("--mode", required=True, choices=["gather", "quan"])
     p.add_argument("--seed", type=int, default=1)
     p.add_argument("--port", type=int, default=8000, help="0 = cổng ngẫu nhiên")
@@ -242,7 +235,8 @@ def main(argv=None) -> int:
         sys.stderr.write(f"không mở được cổng {a.port}: {e}\n")
         return 1
     server.start()
-    print(f"Mở trình duyệt tại {server.url}  (chế độ {a.mode}, seed {a.seed}). Ctrl+C để dừng.", flush=True)
+    print(f"Server mô phỏng tại {server.url}  (chế độ {a.mode}, seed {a.seed}). Mở Godot (godot/) rồi nhấn F5. "
+          "Ctrl+C để dừng.", flush=True)
     try:
         while True:
             time.sleep(0.5)
