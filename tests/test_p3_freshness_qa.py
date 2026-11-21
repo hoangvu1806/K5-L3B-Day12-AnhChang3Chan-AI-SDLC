@@ -28,7 +28,7 @@ def _contract() -> dict:
 
 
 def _is_v12() -> bool:
-    return _contract().get("contract_version") == "1.2"
+    return tuple(map(int, _contract().get("contract_version", "1.0").split("."))) >= (1, 2)
 
 
 class Phase3DocsAndToolingReady(unittest.TestCase):
@@ -53,7 +53,7 @@ class Phase3DocsAndToolingReady(unittest.TestCase):
 class Phase3ContractV12Freshness(unittest.TestCase):
     def test_manifest_v12_freshness_config(self):
         c = _contract()
-        self.assertEqual(c["contract_version"], "1.2")
+        self.assertGreaterEqual(tuple(map(int, c["contract_version"].split("."))), (1, 2))
         fr = c["tuning"].get("freshness")
         self.assertIsInstance(fr, dict)
         self.assertEqual(fr.get("initial"), 100)

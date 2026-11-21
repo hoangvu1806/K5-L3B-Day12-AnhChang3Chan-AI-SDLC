@@ -404,7 +404,7 @@ func _process(delta: float) -> void:
 
 func _on_state(s: Dictionary) -> void:
 	last_state = s
-	var ph := str(s.get("phase", "gather"))
+	var ph := str(s.get("phase", s.get("mode", "gather")))
 	if SCENE_FOR_PHASE.has(ph):
 		_show_world(SCENE_FOR_PHASE[ph])
 

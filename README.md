@@ -25,9 +25,14 @@ Game cần chế độ **headless** theo Test Contract (`python3 -m chonoi.headl
 
 ## Chạy project Godot
 
-1. Tải [Godot 4.5.1 Standard](https://godotengine.org/download/archive/4.5.1-stable/) cho hệ điều hành của bạn. Project dùng GDScript và renderer Compatibility.
-2. Trong Godot Project Manager, chọn **Import** và mở `godot/project.godot`.
-3. Nhấn **F6** để chạy scene đang mở hoặc **F5** để chạy project. Dùng phím mũi tên để thử di chuyển điểm đánh dấu.
+Yêu cầu Python 3 và [Godot 4.5.1 Standard](https://godotengine.org/download/archive/4.5.1-stable/) trên PATH. Từ gốc repo, chạy server và mở game trong hai terminal:
+
+```bash
+python3 -m chonoi.live --mode day --days 5
+godot --path godot
+```
+
+Server phải tiếp tục chạy trong lúc chơi; dừng bằng Ctrl+C. WASD hoặc phím mũi tên để di chuyển, E để hái/cập bến/nấu/bưng/phục vụ, Space để bắt cá, Esc hoặc P để tạm dừng, H để bật tương phản cao. Ở Shop dùng 1 hoặc 2 để mua nâng cấp và Enter để sang ngày tiếp theo; R chơi lại khi tạm dừng hoặc kết thúc. Có thể chạy riêng `--mode gather` hoặc `--mode quan` (quán nhận kho qua `--inventory <file>`).
 
 Từ thư mục gốc của repo, dùng lệnh sau để kiểm tra project và tải scene với Godot trên PATH.
 
@@ -35,7 +40,16 @@ Từ thư mục gốc của repo, dùng lệnh sau để kiểm tra project và 
 godot --headless --path godot --quit-after 5
 ```
 
-Scene Godot hiện là bản kiểm tra hiển thị và đầu vào. Khi tích hợp gameplay, dùng dữ liệu từ `game.contract.json` và duy trì lệnh `python3 -m chonoi.headless` theo Test Contract để chấm tự động.
+Không có server thì client chỉ hiển thị cảnh xem trước. Logic và dữ liệu chơi nằm ở server Python; client đọc snapshot và gửi đầu vào.
+
+```bash
+PYTHONPATH=tests:. python3 -m unittest discover -s tests -v
+python3 -m chonoi.headless --mode gather --seed 1 --ticks 600 --out out.jsonl
+python3 -m chonoi.soak --seed 7 --days 10 --out soak.json
+bash tools/bench.sh --seed 42 --duration 30 --out bench.json
+```
+
+Benchmark cần cửa sổ đồ họa và Godot trên PATH (hoặc đặt `GODOT_BIN`). Manifest khai Test Contract v1.3; kho dùng mảng cá thể `{id, kind, fresh}` từ v1.2, không đọc kho đếm của v1.1. Kết quả benchmark phát hành vẫn cần được xác minh trước khi công bố.
 
 ## Mở rộng Phase 3
 
