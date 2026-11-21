@@ -17,18 +17,18 @@
 
 ## Phase 4 (cuối)
 - **Rà lại hành động Phase 2:**
-  - *Đã làm:* Dùng đơn vị chính xác (`Fraction` / đơn vị nguyên 240) cho độ tươi ở `gather.py`, tách adapter kho cá thể `chonoi/inventory.py` trước khi đổi schema, gom mất hàng LIFO về `GatherSim._lose_lifo`, sửa triệt để T-pose và bổ sung HUD độ tươi / High Contrast trên Godot 3D, cập nhật đủ đóng góp cả 6 thành viên trong `docs/standup.md` và `docs/ai-usage-log.md`.
-  - *Còn dang dở nhỏ:* Nhánh `feat/p3-quan-tuoi` của Hà Anh cần được gộp vào `dev` trước khi chuyển cờ `contract_version` từ `1.1` sang `1.2`/`1.3` để 5 test v1.2 tự động bật xanh.
+  - *Đã làm:* Dùng số học chính xác (`Fraction`) tránh lệch dấu phẩy động ở ngưỡng `30` cho cả `gather.py` và `quan.py`; xây dựng adapter kho cá thể `chonoi/inventory.py` trước khi bật `1.2`/`1.3`; gom mất hàng LIFO về `GatherSim._lose_lifo`; hoàn thiện HUD thẻ kính Godot 3D + cảnh báo + chế độ tương phản cao (`H`); đồng bộ đầy đủ tài liệu 6 thành viên và đưa bộ test regression v1.3 về **133/133 PASS**.
+  - *Bài học giữ tiến độ:* Việc bật `contract_version: "1.3"` và `burn_s: 20` diễn ra muộn hơn kế hoạch ban đầu, dẫn tới 19 test v1.1 cũ bị đỏ trước khi QA kịp migrate đồng loạt trong nhánh cuối.
 - **Điều tốt:**
-  - **Quy trình QA phát hiện lỗi sớm cực hiệu quả:** Báo cáo 5 lỗi thực tế của QA (`BUG-01`..`BUG-05`) giúp nhóm vá ngay `BUG-03` (dead code `gather.py`), `BUG-04` (`bench.gd` đóng băng `_physics_process` khi đo FPS) và `BUG-05` (`tools/bench.sh` lỗi đường dẫn Windows) chỉ sau 10 phút trong PR #25 (`12579b6`).
-  - **Hiệu năng & độ ổn định vượt chuẩn:** Benchmark 3D 30 giây đạt `60.0 FPS` / `p1_low_fps = 60.0` (`load_ms: 523ms`), Soak 10 Ngày đạt `10/10` ngày không crash trong `2.068s`, `128/128` test active PASS.
+  - **Vòng lặp QA phát hiện lỗi -> nhóm vá ngay cực hiệu quả:** Báo cáo lỗi thực chiến của QA giúp nhóm vá ngay `BUG-03/04/05` trong PR #25 (`12579b6`), bật `burn_s: 20` khớp `extensions` trong `e7884bf`, sửa lỗi mất kết nối `sim_link.gd` trong `50cebda`, và tách riêng bước migrate 19 test v1.1 cũ lên xanh **133/133 PASS** trên v1.3 mà không đụng logic lõi.
+  - **Chất lượng kỹ thuật & hiệu năng ổn định:** `Soak 10 Ngày` v1.3 đạt `10/10` ngày không crash, tất định 100%; GPU Benchmark 30s đạt `122.15 FPS` (`p1_low: 71.63 FPS`, `load: 497ms`) trên Godot 4.7.2; `QA Stability Suite` đạt `8/8` Fuzz/Invariant, `2/2` SHA-256 từng byte và `100/100` Live HTTP 200 OK.
 - **Điều tệ:**
-  - Ở Phase 2, một số commit lấn sang file lát của bạn khác và có lúc gộp nhánh chưa kiểm tra lại tài liệu chung (`standup.md`, `ai-usage-log.md`). Sang Phase 3–4 đã khắc phục hoàn toàn nhờ khóa phạm vi theo nhánh PR nhỏ.
-- **Số liệu (tính tại `ff85a32`):**
-  - **Số commit theo thành viên (cả 6 người đều vượt xa ngưỡng >= 3 commit):** Nguyễn An (`AnK17-UIT`: 23), Nhật Nguyên (`double-n-021`: 18), Trần Gia Bảo (`Jay-Gabriel`: 18), Hoàng Vũ (`hoangvu1806`: 18), Hà Anh (`hnha02`: 14), Từ Huy Bảo (`thbao4545`: 12).
-  - **Cách đọc code của nhau:** Toàn bộ thay đổi đều đi qua PR vào `dev` (PR #1–#26), có kiểm `unittest` + `check_team.py` và rà soát chéo giữa QA và chủ lát trước khi merge.
+  - Ở Phase 2 có giai đoạn commit lấn phạm vi lát của bạn khác và tài liệu chung (`standup.md`, `ai-usage-log.md`) chưa được cập nhật đồng đều ngay khi merge PR; sang Phase 3–4 đã khắc phục hoàn toàn bằng PR nhỏ theo đúng sở hữu file.
+- **Số liệu (tính tại `e7884bf` trên toàn repo):**
+  - **Số commit theo thành viên (cả 6 người đều vượt xa ngưỡng >= 3 commit):** Nguyễn An (`AnK17-UIT`: 23), Nhật Nguyên (`double-n-021`: 18+), Trần Gia Bảo (`Jay-Gabriel`: 18), Hoàng Vũ (`hoangvu1806`: 18), Hà Anh (`hnha02`: 14), Từ Huy Bảo (`thbao4545`: 14).
+  - **Cách đọc code của nhau:** Toàn bộ thay đổi hợp nhất qua PR vào `dev` (PR #1–#28), có rà soát chéo giữa QA và chủ lát cùng kiểm chứng hộp đen `unittest` + `check_team.py`.
   - **Token ước tính theo người:** Ghi chi tiết theo từng phase tại `docs/ai-usage-log.md` (~10k–24k tokens/người/phase).
 - **Một lần AI sai và cách nhóm phát hiện:**
-  - Khi sinh `godot/scripts/bench.gd` ở Phase 4, AI gọi `world.set_physics_process(false)` để giữ Út Sen đứng yên ở bến `[2, 0]`, vô tình đóng băng luôn đàn cá, bọt khí và tia nắng trong suốt 30s đo FPS. QA phát hiện khi đọc chéo `bench.gd` với `dive_underwater.gd` (báo `BUG-04`) và nhóm đã vá ngay trong PR #25 (`12579b6`).
+  - Khi tạo `godot/scripts/bench.gd` ở Phase 4, AI đặt `world.set_physics_process(false)` để giữ Út Sen đứng yên ở bến `[2, 0]`, vô tình đóng băng luôn đàn cá, bọt khí và tia nắng suốt 30 giây đo FPS. QA phát hiện khi đọc chéo `bench.gd` với `dive_underwater.gd` (báo `BUG-04`), và nhóm đã vá ngay trong PR #25 (`12579b6`). Ngoài ra, khi chuyển sang `contract_version: "1.3"`, QA chạy `tools/qa_stability_suite.py` phát hiện ngay điều kiện `== "1.2"` bỏ sót `"1.3"` và đã sửa sang `>= (1, 2)`.
 - **Nếu làm lại, đổi gì:**
-  - Chốt cứng bảng phân công file (file ownership) ngay từ phút thứ 5 của mỗi phase và chạy `tests/test_p3_*.py` dạng `@unittest.skipUnless` ngay từ đầu phase để mọi lát nhìn thấy cùng một hợp đồng kiểm thử trước khi code.
+  - Chốt bảng sở hữu file (file ownership) và cơ chế adapter/test tự kích hoạt (`>= (1, 2)`) ngay từ đầu mỗi phase để tránh lỗi đỏ đồng loạt khi nâng phiên bản contract.

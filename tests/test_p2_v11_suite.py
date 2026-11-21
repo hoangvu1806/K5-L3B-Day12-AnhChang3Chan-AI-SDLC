@@ -18,7 +18,7 @@ class Phase2ContractAndExtensions(unittest.TestCase):
     def test_contract_v11_and_extensions_declared(self):
         with open(os.path.join(ROOT, "game.contract.json"), encoding="utf-8") as f:
             c = json.load(f)
-        self.assertEqual(c["contract_version"], "1.1")
+        self.assertGreaterEqual(tuple(map(int, c["contract_version"].split("."))), (1, 1))
         self.assertTrue({"burn", "snake"} <= set(c.get("extensions", [])))
         t = c["tuning"]
         self.assertEqual(len(t["gather"]["nodes"]), 6)
@@ -48,10 +48,12 @@ class Phase2ContractAndExtensions(unittest.TestCase):
     def test_monster_hit_lifo_loss_recoil_and_faint_cause_monster(self):
         with Workdir() as w:
             # Đặt người chơi tại [60, 24] trùng vị trí M1 (Cá Sấu), giỏ có 5 nguyên liệu, hp = 2
+            kinds = ["ca_loc", "bong_sung", "ca_linh", "keo_neo", "ca_keo"]
+            hold = [{"id": f"I{i + 1}", "kind": k, "fresh": 100} for i, k in enumerate(kinds)]
             sc = write_json(w.path("sc.json"), {
                 "gather": {
                     "player": {"pos": [60.0, 24.0], "hp": 2},
-                    "hold": ["ca_loc", "bong_sung", "ca_linh", "keo_neo", "ca_keo"],
+                    "hold": hold,
                     "random_fish": False,
                 }
             })
@@ -63,10 +65,11 @@ class Phase2ContractAndExtensions(unittest.TestCase):
             self.assertEqual(len(hits), 1)
             self.assertEqual(hits[0]["data"]["monster_id"], "M1")
             self.assertEqual(hits[0]["data"]["hp"], 1)
-            # floor(5 / 2) = 2 nguyên liệu mất theo LIFO: ca_keo rồi keo_neo
-            self.assertEqual(hits[0]["data"]["lost"], ["ca_keo", "keo_neo"])
+            # floor(5 / 2) = 2 nguyên liệu mất theo LIFO: ca_keo (I5) rồi keo_neo (I4)
+            self.assertEqual([(it["id"], it["kind"]) for it in hits[0]["data"]["lost"]],
+                             [("I5", "ca_keo"), ("I4", "keo_neo")])
             s1 = [s for s in snapshots(rows) if s["tick"] == 1][0]
-            self.assertEqual(s1["hold"], ["ca_loc", "bong_sung", "ca_linh"])
+            self.assertEqual([it["kind"] for it in s1["hold"]], ["ca_loc", "bong_sung", "ca_linh"])
             self.assertEqual(s1["player"]["invuln_ticks"], 90)
             m1 = next(m for m in s1["monsters"] if m["id"] == "M1")
             self.assertEqual(m1["state"], "recoil")
@@ -77,7 +80,10 @@ class Phase2ContractAndExtensions(unittest.TestCase):
             sc2 = write_json(w.path("sc2.json"), {
                 "gather": {
                     "player": {"pos": [72.0, 14.0], "hp": 1},  # vị trí M3 (Rắn Hổ Mây)
-                    "hold": ["ca_loc", "bong_sung"],
+                    "hold": [
+                        {"id": "I1", "kind": "ca_loc", "fresh": 100},
+                        {"id": "I2", "kind": "bong_sung", "fresh": 100},
+                    ],
                     "random_fish": False,
                 }
             })
@@ -86,11 +92,11 @@ class Phase2ContractAndExtensions(unittest.TestCase):
             self.assertEqual(code, 0, err)
             rows = read_jsonl(w.path("f.jsonl"))
             hits = events(rows, "monster_hit")
-            self.assertEqual(hits[0]["data"]["lost"], ["bong_sung"])
+            self.assertEqual([it["kind"] for it in hits[0]["data"]["lost"]], ["bong_sung"])
             faints = events(rows, "faint")
             self.assertEqual(len(faints), 1)
             self.assertEqual(faints[0]["data"]["cause"], "monster")
-            self.assertEqual(faints[0]["data"]["lost"], ["ca_loc"])
+            self.assertEqual([it["kind"] for it in faints[0]["data"]["lost"]], ["ca_loc"])
             self.assertEqual(events(rows, "gather_end")[0]["data"]["reason"], "fainted")
 
     def test_burn_extension_re_reserves_or_marks_unfulfillable(self):
@@ -103,10 +109,10 @@ class Phase2ContractAndExtensions(unittest.TestCase):
         t = copy.deepcopy(load_contract()["tuning"])
         t["quan"]["burn_s"] = 20
         sc = {
-            "stock": {},
+            "stock": [],
             "stoves": [{"id": "B1", "state": "ready", "dish": "ca_loc_nuong_trui", "ready_ticks": 1200, "order_id": "C1"}],
             "customers": [{"id": "C1", "table_id": "T1", "dish_id": "ca_loc_nuong_trui",
-                           "state": "waiting", "reserved": {}}],
+                           "state": "waiting", "reserved": []}],
             "random_customers": False,
         }
         sim = QuanSim(t, sc, Streams(1), IdAllocator())
@@ -126,12 +132,12 @@ class Phase2ContractAndExtensions(unittest.TestCase):
                 "quan": {
                     "time_left_ticks": 1,
                     "reputation": 3.0,
-                    "stock": {"ca_loc": 1},
+                    "stock": [{"id": "I1", "kind": "ca_loc", "fresh": 100}],
                     "customers": [
                         {"id": "C1", "table_id": "T1", "dish_id": "ca_loc_nuong_trui",
                          "state": "eating", "price": 60, "tip": 12, "eat_ticks_left": 500},
                         {"id": "C2", "table_id": "T2", "dish_id": "ca_loc_nuong_trui",
-                         "state": "waiting", "patience_ticks_left": 1000, "reserved": {"ca_loc": 1}},
+                         "state": "waiting", "patience_ticks_left": 1000, "reserved": ["I1"]},
                     ],
                     "random_customers": False,
                 }

@@ -120,10 +120,10 @@ class CloseShift(unittest.TestCase):
         dish = "ca_loc_nuong_trui"
         price = MENU[dish]["price"]
         tip = math.floor(price * Q["tip_rate"] + 1e-9)
-        sc = {"time_left_ticks": 3, "stock": {"ca_loc": 1},
+        sc = {"time_left_ticks": 3, "stock": [{"id": "I1", "kind": "ca_loc", "fresh": 100}],
               "customers": [cust("C1", "T1", dish, state="eating", price=price, tip=tip, eat_ticks_left=EAT,
-                                 reserved={}),
-                            cust("C2", "T2", dish)]}
+                                 reserved=[]),
+                            cust("C2", "T2", dish, reserved=["I1"])]}
         with Workdir() as w:
             code, err, out = run(w, sc, 10)
             self.assertEqual(code, 0, err)
@@ -189,8 +189,12 @@ class Burn(unittest.TestCase):
         self.assertEqual((c1["state"], c1["reserved"]), ("waiting", {}))
 
     def test_burn_null_trong_loi_khong_bao_gio_chay(self):
-        self.assertIsNone(Q["burn_s"])
-        sim = sim_with({"stoves": [{"id": "B1", "state": "ready", "dish": "goi_bong_sung", "ready_ticks": 99999}]})
+        if "burn" in C.get("extensions", []):
+            self.assertEqual(Q["burn_s"], self.BURN)
+        else:
+            self.assertIsNone(Q["burn_s"])
+        sim = sim_with({"stoves": [{"id": "B1", "state": "ready", "dish": "goi_bong_sung", "ready_ticks": 99999}]},
+                       burn_s=None)
         self.assertEqual([n for n, _ in sim.step(Inp()) if n == "dish_burnt"], [])
 
 

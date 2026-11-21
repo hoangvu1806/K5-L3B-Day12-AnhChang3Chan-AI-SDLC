@@ -1,4 +1,4 @@
-﻿python : test_day_plan_ghi_de (test_day_mode.DayInputErrors.test_day_plan_ghi_de) ... ok
+python : test_day_plan_ghi_de (test_day_mode.DayInputErrors.test_day_plan_ghi_de) ... ok
 At line:1 char:225
 + ... :PYTHONUTF8="1"; python -m unittest discover -s tests -v 2>&1 | Out-F ...
 +                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -75,14 +75,14 @@ test_v12_tu_choi_kho_dem_va_sai_schema (test_inventory_adapter.ReadV12.test_v12_
 test_chon_schema_theo_phien_ban (test_inventory_adapter.Version.test_chon_schema_theo_phien_ban) ... ok
 test_ghi_kho_rong (test_inventory_adapter.WriteV12.test_ghi_kho_rong) ... 
 F:\AI-In-Action\K5-L3B-Day12-AnhChang3Chan-AI-SDLC\tests\test_inventory_adapter.py:70: ResourceWarning: unclosed file 
-<_io.TextIOWrapper name='C:\\Users\\ACER\\AppData\\Local\\Temp\\tmpx22m3b58\\kho.json' mode='r' encoding='utf-8'>
+<_io.TextIOWrapper name='C:\\Users\\ACER\\AppData\\Local\\Temp\\tmpfqm9fesk\\kho.json' mode='r' encoding='utf-8'>
   self.assertEqual(json.load(open(p, encoding="utf-8")), {"items": []})
 ResourceWarning: Enable tracemalloc to get the object allocation traceback
 ok
 test_ghi_theo_id_va_doc_lai_giu_nguyen_quanh_nguong_30 
 (test_inventory_adapter.WriteV12.test_ghi_theo_id_va_doc_lai_giu_nguyen_quanh_nguong_30) ... 
 F:\AI-In-Action\K5-L3B-Day12-AnhChang3Chan-AI-SDLC\tests\test_inventory_adapter.py:60: ResourceWarning: unclosed file 
-<_io.TextIOWrapper name='C:\\Users\\ACER\\AppData\\Local\\Temp\\tmpa_1hsmhj\\kho.json' mode='r' encoding='utf-8'>
+<_io.TextIOWrapper name='C:\\Users\\ACER\\AppData\\Local\\Temp\\tmp9bo4rrz6\\kho.json' mode='r' encoding='utf-8'>
   data = json.load(open(p, encoding="utf-8"))
 ResourceWarning: Enable tracemalloc to get the object allocation traceback
 ok
@@ -92,7 +92,7 @@ test_gather_at_surface_flag_and_bounds
 Kiểm tra cờ at_surface ở d=0 (True) và khi lặn xuống d > surface_depth (False). ... ok
 test_gather_dock_priority_and_inventory_persistence 
 (test_p1_team_suite.Phase1GatherAndQuanVerification.test_gather_dock_priority_and_inventory_persistence)
-Ở trong vùng bến (dock_radius=3 quanh [2,0]), bấm interact phải cập bến ngay và xuất đúng kho LIFO. ... ok
+Ở trong vùng bến (dock_radius=3 quanh [2,0]), bấm interact phải cập bến ngay và xuất đúng kho cá thể. ... ok
 test_gather_node_regrow_event_emitted_when_timer_reaches_zero 
 (test_p1_team_suite.Phase1GatherAndQuanVerification.test_gather_node_regrow_event_emitted_when_timer_reaches_zero)
 Nút hái đang có regrow_ticks=2 phải giảm về 0 ở tick 2 và phát sự kiện node_regrown. ... ok
@@ -115,24 +115,19 @@ test_monster_hit_lifo_loss_recoil_and_faint_cause_monster
 test_quan_shift_close_pays_eating_and_dismisses_waiting_without_penalty (test_p2_v11_suite.Phase2ContractAndExtensions.
 test_quan_shift_close_pays_eating_and_dismisses_waiting_without_penalty) ... ok
 test_manifest_v12_freshness_config 
-(test_p3_freshness_qa.Phase3ContractV12Freshness.test_manifest_v12_freshness_config) ... skipped "Chờ nhóm bật 
-contract_version='1.2' sau khi tích hợp adapter + gather + quan"
+(test_p3_freshness_qa.Phase3ContractV12Freshness.test_manifest_v12_freshness_config) ... ok
 test_quan_re_reserve_on_spoil_and_fresh_base_price 
 (test_p3_freshness_qa.Phase3ContractV12Freshness.test_quan_re_reserve_on_spoil_and_fresh_base_price)
-Khi cá thể giữ chỗ vừa ươn, quán nhả và giữ lại cá thể tươi còn lại; lúc nấu chốt base_price theo fresh. ... skipped 
-"Chờ nhóm bật contract_version='1.2' sau khi tích hợp adapter + gather + quan"
+Khi cá thể giữ chỗ vừa ươn, quán nhả và giữ lại cá thể tươi còn lại; lúc nấu chốt base_price theo fresh. ... ok
 test_smoke_inventory_file_handover_exact_fresh 
 (test_p3_freshness_qa.Phase3ContractV12Freshness.test_smoke_inventory_file_handover_exact_fresh)
-Smoke bàn giao file TICKET-03: fresh=100 + interact tick 0 -> quan --inventory --ticks 0 khớp id/kind/fresh. ... 
-skipped "Chờ nhóm bật contract_version='1.2' sau khi tích hợp adapter + gather + quan"
+Smoke bàn giao file TICKET-03: fresh=100 + interact tick 0 -> quan --inventory --ticks 0 khớp id/kind/fresh. ... ok
 test_smoke_threshold_fresh_30_spoils_on_tick_1 
 (test_p3_freshness_qa.Phase3ContractV12Freshness.test_smoke_threshold_fresh_30_spoils_on_tick_1)
-Fixture chính thức trong TICKET-03: fresh=30 ở gather không input -> tick 1 phát spoiled. ... skipped "Chờ nhóm bật 
-contract_version='1.2' sau khi tích hợp adapter + gather + quan"
+Fixture chính thức trong TICKET-03: fresh=30 ở gather không input -> tick 1 phát spoiled. ... ok
 test_v12_rejects_counted_inventory_and_invalid_fresh_exit_2 
 (test_p3_freshness_qa.Phase3ContractV12Freshness.test_v12_rejects_counted_inventory_and_invalid_fresh_exit_2)
-Contract v1.2 bắt buộc trả mã 2 cho file kho đếm cũ, id trùng hoặc fresh ngoài [0, 100]. ... skipped "Chờ nhóm bật 
-contract_version='1.2' sau khi tích hợp adapter + gather + quan"
+Contract v1.2 bắt buộc trả mã 2 cho file kho đếm cũ, id trùng hoặc fresh ngoài [0, 100]. ... ok
 test_changelog_documents_v12_breaking_changes 
 (test_p3_freshness_qa.Phase3DocsAndToolingReady.test_changelog_documents_v12_breaking_changes) ... ok
 test_verification_phase3_doc_exists 
@@ -198,7 +193,8 @@ test_gather_snapshot_has_gather_fields (test_smoke_p1.Contract.test_gather_snaps
 test_scenario_out_of_domain_exit_2 (test_smoke_p1.Contract.test_scenario_out_of_domain_exit_2) ... ok
 test_inv_01_gather_writes_inventory_quan_reads_it 
 (test_smoke_p1.Integration.test_inv_01_gather_writes_inventory_quan_reads_it)
-Ví dụ smoke test trong PRD-0 mục G: cập bến ở tick 0, quán đọc kho đúng nội dung. ... ok
+Ví dụ smoke test trong PRD-0 mục G (chuyển schema kho cá thể v1.2/v1.3): cập bến ở tick 0, quán đọc kho đúng nội dung. 
+... ok
 test_inv_01_not_written_when_tick_limit_first 
 (test_smoke_p1.Integration.test_inv_01_not_written_when_tick_limit_first) ... ok
 test_inv_bad_schema_exit_2 (test_smoke_p1.Integration.test_inv_bad_schema_exit_2) ... ok
@@ -223,6 +219,6 @@ test_too_few_members (test_team_check.TeamCheck.test_too_few_members) ... ok
 test_wrong_size_duplicate_and_outsider (test_team_check.TeamCheck.test_wrong_size_duplicate_and_outsider) ... ok
 
 ----------------------------------------------------------------------
-Ran 133 tests in 28.687s
+Ran 133 tests in 131.861s
 
-OK (skipped=5)
+OK
