@@ -79,7 +79,8 @@ class LayoutAndMenu(unittest.TestCase):
 
     def test_boa_floor_gia_x_ty_le_cho_ca_6_mon(self):
         for dish, m in MENU.items():
-            sim = sim_with({"player": {"pos": [10, 2]}, "hand": dish, "customers": [cust("C1", "T1", dish)]})
+            sim = sim_with({"player": {"pos": [10, 2]}, "hand": dish,
+                            "customers": [cust("C1", "T1", dish, reserved=[])]})
             ev = sim.step(Inp(interact=True))
             served = [d for n, d in ev if n == "served"]
             self.assertEqual(served[0]["tip"], math.floor(m["price"] * Q["tip_rate"] + 1e-9), dish)
@@ -120,7 +121,8 @@ class CloseShift(unittest.TestCase):
         dish = "ca_loc_nuong_trui"
         price = MENU[dish]["price"]
         tip = math.floor(price * Q["tip_rate"] + 1e-9)
-        sc = {"time_left_ticks": 3, "stock": [{"id": "I1", "kind": "ca_loc", "fresh": 100}],
+        sc = {"time_left_ticks": 3, "random_reservations": False,
+              "stock": [{"id": "I1", "kind": "ca_loc", "fresh": 100}],
               "customers": [cust("C1", "T1", dish, state="eating", price=price, tip=tip, eat_ticks_left=EAT,
                                  reserved=[]),
                             cust("C2", "T2", dish, reserved=["I1"])]}

@@ -1,0 +1,11 @@
+2026-11-22 Asia/Bangkok
+Base: ef824ad
+PYTHONPATH=tests:. python3 -m unittest discover -s tests -v
+Ran 159 tests in 24.652s
+OK
+python3 -m chonoi.headless --mode gather --seed 1 --ticks 600 --out <file>
+SHA-256: 5f31a161b670f66b9187cc08d378c9298436b88cc4aacb57fe2984068a1eb378
+python3 -m chonoi.headless --mode quan --seed 1 --ticks 600 --out <file>
+SHA-256: e4fd95e2843b1d325c6f4733a4a7948aec32584468a61a41737e2b8a00c25aa3
+python3 -m chonoi.headless --mode quan --seed 1 --ticks -1 --out <file>
+Exit status: 2. Output file absent.

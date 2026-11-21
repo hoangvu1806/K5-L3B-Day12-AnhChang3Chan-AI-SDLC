@@ -8,6 +8,7 @@ extends Node3D
 const HUD_FONT := preload("res://assets/fonts/be-vietnam-pro/BeVietnamPro-Medium.ttf")
 const CLOCK_FONT := preload("res://assets/fonts/bbh-bogle/BBHBogle-Regular.ttf")
 const GLASS_SHADER := preload("res://shaders/hud_frosted_glass.gdshader")
+const ALERT_AUDIO := preload("res://scripts/alert_audio.gd")
 const SCENE_FOR_PHASE := {
 	"gather": "res://scenes/DiveUnderwater.tscn",
 	"quan": "res://scenes/RestaurantNight.tscn",
@@ -38,6 +39,16 @@ const CUST_VI := {
 	"waiting": "Chờ món",
 	"eating": "Đang ăn",
 }
+const RESERVATION_VI := {
+	"scheduled": "Đã đặt", "holding": "Giữ bàn", "waiting": "Chờ món",
+	"served": "Đã giao", "failed": "Lỡ đơn",
+}
+const CUE_SUBTITLES := {
+	"monster": "[Âm trầm] Thủy quái đến gần",
+	"oxygen": "[Bíp ngắn] Oxy sắp hết",
+	"customer": "[Chuông báo] Khách sắp giận",
+	"current": "[Hai tiếng báo] Dòng nước lũ sắp đến",
+}
 
 var link: Node
 var world: Node3D
@@ -50,9 +61,18 @@ var phase_badge: Label
 var time_label: Label
 var stats_label: Label
 var contrast_btn: Button
+var sound_btn: Button
+var cue_audio: Node
+var previous_cues: Dictionary = {}
+var cue_run_id := -1
+var subtitle_panel: PanelContainer
+var subtitle_label: Label
+var subtitle_seconds := 0.0
 
 var left_panel: PanelContainer
 var left_vbox: VBoxContainer
+var reservation_panel: PanelContainer
+var reservation_label: Label
 
 var alert_panel: PanelContainer
 var alert_label: Label
@@ -63,6 +83,9 @@ var bottom_label: Label
 
 var center_panel: PanelContainer
 var center_label: Label
+var continue_btn: Button
+var menu_btn: Button
+var quit_btn: Button
 var shop_panel: PanelContainer
 var shop_label: Label
 var dim: ColorRect
@@ -83,6 +106,8 @@ func _ready() -> void:
 	link.name = "SimLink"
 	add_child(link)
 	link.state_updated.connect(_on_state)
+	cue_audio = ALERT_AUDIO.new()
+	add_child(cue_audio)
 	_build_world_viewport()
 	_build_ui()
 	_apply_contrast_theme()
@@ -219,6 +244,8 @@ func _build_ui() -> void:
 	contrast_btn.add_theme_font_size_override("font_size", 12)
 	contrast_btn.pressed.connect(_toggle_high_contrast)
 	top_hbox.add_child(contrast_btn)
+	sound_btn = _make_button("M · Âm thanh", _toggle_mute)
+	top_hbox.add_child(sound_btn)
 
 	# 2. MINIMALIST LEFT INFO CARD
 	left_panel = PanelContainer.new()
@@ -229,6 +256,19 @@ func _build_ui() -> void:
 	left_vbox = VBoxContainer.new()
 	left_vbox.add_theme_constant_override("separation", 5)
 	left_panel.add_child(left_vbox)
+
+	reservation_panel = PanelContainer.new()
+	reservation_panel.set_anchors_preset(Control.PRESET_TOP_RIGHT)
+	reservation_panel.grow_horizontal = Control.GROW_DIRECTION_BEGIN
+	reservation_panel.offset_left = -14
+	reservation_panel.offset_right = -14
+	reservation_panel.offset_top = 104
+	reservation_panel.offset_bottom = 104
+	reservation_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	reservation_panel.hide()
+	canvas.add_child(reservation_panel)
+	reservation_label = _mk_label("", 13, Color.WHITE)
+	reservation_panel.add_child(reservation_label)
 
 	# 3. COMPACT TOP-CENTER WARNING PILL
 	alert_panel = PanelContainer.new()
@@ -256,6 +296,19 @@ func _build_ui() -> void:
 	bottom_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	bottom_panel.add_child(bottom_label)
 
+	subtitle_panel = PanelContainer.new()
+	subtitle_panel.set_anchors_preset(Control.PRESET_CENTER_BOTTOM)
+	subtitle_panel.grow_horizontal = Control.GROW_DIRECTION_BOTH
+	subtitle_panel.grow_vertical = Control.GROW_DIRECTION_BEGIN
+	subtitle_panel.offset_top = -48
+	subtitle_panel.offset_bottom = -48
+	subtitle_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	subtitle_panel.visible = false
+	canvas.add_child(subtitle_panel)
+	subtitle_label = _mk_label("", 15, Color.WHITE)
+	subtitle_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	subtitle_panel.add_child(subtitle_label)
+
 	# 5. CENTER PAUSE / END CARD
 	center_panel = PanelContainer.new()
 	center_panel.set_anchors_preset(Control.PRESET_CENTER)
@@ -264,9 +317,17 @@ func _build_ui() -> void:
 	center_panel.visible = false
 	canvas.add_child(center_panel)
 
-	center_label = _mk_label("", 22, Color("#fff3c4"))
+	var center_box := VBoxContainer.new()
+	center_box.add_theme_constant_override("separation", 8)
+	center_panel.add_child(center_box)
+	center_label = _mk_label("", 20, Color("#fff3c4"))
 	center_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	center_panel.add_child(center_label)
+	center_box.add_child(center_label)
+	continue_btn = _make_button("Tiếp tục", func(): link.request_action("/continue"))
+	menu_btn = _make_button("Về menu", func(): link.request_action("/menu"))
+	quit_btn = _make_button("Thoát", func(): get_tree().quit())
+	for button in [continue_btn, menu_btn, quit_btn]:
+		center_box.add_child(button)
 
 	# 6. COMPACT SHOP MODAL CARD
 	shop_panel = PanelContainer.new()
@@ -301,6 +362,15 @@ func _build_ui() -> void:
 	_add_glass_card(canvas, shop_panel, 16.0)
 
 
+func _make_button(title: String, action: Callable) -> Button:
+	var button := Button.new()
+	button.text = title
+	button.add_theme_font_override("font", HUD_FONT)
+	button.add_theme_font_size_override("font_size", 14)
+	button.pressed.connect(action)
+	return button
+
+
 func _add_glass_card(canvas: CanvasLayer, panel: PanelContainer, radius: float) -> void:
 	var card := ColorRect.new()
 	card.z_index = -1
@@ -333,6 +403,10 @@ func _apply_contrast_theme() -> void:
 	contrast_btn.text = "H · Tương phản" + (" ✓" if high_contrast else "")
 	for panel in glass_cards:
 		glass_cards[panel].visible = panel.visible and not high_contrast
+	var subtitle_border := Color("#ffff00") if high_contrast else Color("#c6e6e3")
+	subtitle_panel.add_theme_stylebox_override("panel", _card_style(Color(0, 0, 0, 0.94), subtitle_border, 8))
+	var reservation_bg := Color(0, 0, 0, 0.96) if high_contrast else Color(0.04, 0.10, 0.09, 0.74)
+	reservation_panel.add_theme_stylebox_override("panel", _card_style(reservation_bg, subtitle_border, 10))
 	if high_contrast:
 		top_panel.add_theme_stylebox_override("panel", _card_style(Color(0, 0, 0, 0.96), Color("#ffff00"), 8, 10, 4, 2))
 		left_panel.add_theme_stylebox_override("panel", _card_style(Color(0, 0, 0, 0.95), Color("#ffff00"), 8, 8, 6, 2))
@@ -361,6 +435,12 @@ func _unhandled_input(ev: InputEvent) -> void:
 	if ev is InputEventKey and ev.pressed and not ev.echo:
 		if ev.keycode == KEY_H:
 			_toggle_high_contrast()
+		elif ev.keycode == KEY_M:
+			_toggle_mute()
+		elif last_state.get("presentation") != null:
+			var screen: Dictionary = last_state["presentation"]
+			if screen["name"] != "menu" or ev.keycode == KEY_ENTER:
+				link.request_action("/continue")
 		elif ev.keycode == KEY_1 and link.phase() == "shop":
 			link.buy("oxygen")
 		elif ev.keycode == KEY_2 and link.phase() == "shop":
@@ -383,6 +463,9 @@ func _clear_left_card() -> void:
 
 
 func _process(delta: float) -> void:
+	if subtitle_seconds > 0.0:
+		subtitle_seconds = maxf(0.0, subtitle_seconds - delta)
+		subtitle_panel.visible = subtitle_seconds > 0.0
 	blink_t += delta
 	var pulse := 0.55 + 0.45 * absf(sin(blink_t * 6.0))
 	for r in monster_border:
@@ -406,6 +489,44 @@ func _process(delta: float) -> void:
 
 func _al(key: String, fallback: float) -> float:
 	return float(alert_cfg.get(key, fallback))
+
+
+func _toggle_mute() -> void:
+	cue_audio.toggle_mute()
+	sound_btn.text = "M · Đã tắt tiếng" if cue_audio.muted else "M · Âm thanh"
+
+
+func _current_warning(s: Dictionary) -> bool:
+	var phase_tick := int(s.get("phase_tick", 0))
+	var warning_ticks := int(s.get("meta", {}).get("current", {}).get("warning_ticks", 0))
+	for event in s.get("events", []):
+		if event.get("name") != "current_warning" or event.get("day") != s.get("day"):
+			continue
+		var starts_at := int(event["data"]["starts_at_phase_tick"])
+		if phase_tick >= starts_at - warning_ticks and phase_tick < starts_at:
+			return true
+	return false
+
+
+func _update_sound_cues(s: Dictionary, current_warning: bool) -> void:
+	var run_id := int(s.get("run_id", 0))
+	if run_id != cue_run_id:
+		cue_run_id = run_id
+		previous_cues.clear()
+		subtitle_seconds = 0.0
+		subtitle_panel.hide()
+	var cues := {"monster": active_alert_monster, "oxygen": active_alert_oxy,
+		"customer": active_alert_angry, "current": current_warning}
+	var captions: Array[String] = []
+	for key in cues:
+		if cues[key] and not previous_cues.get(key, false):
+			cue_audio.cue(key)
+			captions.append(CUE_SUBTITLES[key])
+	previous_cues = cues
+	if not captions.is_empty():
+		subtitle_label.text = "\n".join(captions)
+		subtitle_seconds = 3.0
+		subtitle_panel.show()
 
 
 func _on_state(s: Dictionary) -> void:
@@ -446,31 +567,98 @@ func _on_state(s: Dictionary) -> void:
 		left_vbox.add_child(_mk_label("Mua nâng cấp cho Ngày kế tiếp.", 13, Color("#ffe394")))
 		bottom_label.text = "1: Bình oxy  ·  2: Áo phao  ·  Enter: Đóng Shop  ·  H: Tương phản"
 
+	var warning := ph == "gather" and _current_warning(s)
+	if warning:
+		alerts.append("≈ DÒNG NƯỚC LŨ SẮP ĐẾN")
+	elif ph == "gather" and s.get("current") != null:
+		var flow: Dictionary = s["current"]
+		alerts.append("DÒNG NƯỚC LŨ " + ("→" if int(flow["direction"]) > 0 else "←"))
+	_update_reservation_card(s.get("reservations", []))
+	_update_sound_cues(s, warning)
+
 	if alerts.size() > 0:
 		alert_label.text = "   |   ".join(alerts)
 		var bg := Color(0.50, 0.10, 0.74, 0.94) if active_alert_monster else Color(0.74, 0.14, 0.14, 0.94)
 		var bd := Color("#e8a8ff") if active_alert_monster else Color("#ffcf6b")
+		if high_contrast:
+			bg = Color.BLACK
+			bd = Color.YELLOW
+		alert_label.add_theme_color_override("font_color", Color.YELLOW if high_contrast else Color.WHITE)
 		alert_panel.add_theme_stylebox_override("panel", _card_style(bg, bd, 12, 18, 8, 2))
 		alert_panel.visible = true
 	else:
 		alert_panel.visible = false
 
-	shop_panel.visible = ph == "shop" and not bool(s.get("finished", false))
+	var paused := str(s.get("state", "")) == "paused"
+	shop_panel.visible = ph == "shop" and not bool(s.get("finished", false)) and not paused and s.get("presentation") == null
 	if shop_panel.visible:
 		shop_label.text = "CỬA HÀNG NÂNG CẤP — 💰 %dk\nĐã mua: %s (áp dụng từ Ngày kế)" % [
 			money_i, JSON.stringify(s.get("upgrades", {}))]
 
-	var paused := str(s.get("state", "")) == "paused"
-	dim.visible = paused or bool(s.get("finished", false))
+	_update_center_card(s, day_num, paused, score_i, money_i, rep_f)
+
+
+func _update_reservation_card(orders: Array) -> void:
+	reservation_panel.visible = not orders.is_empty()
+	if orders.is_empty():
+		return
+	var rows := PackedStringArray(["ĐẶT TRƯỚC"])
+	for order in orders:
+		var dish := str(order["dish_id"])
+		var seconds := int(ceil(float(order["arrival_tick"]) / 60.0))
+		var words := "%s · %s · %d:%02d\n%s · %s" % [order["id"], order["table_id"],
+			seconds / 60, seconds % 60, DISH_VI.get(dish, dish), RESERVATION_VI.get(order["state"], order["state"])]
+		rows.append(words)
+	reservation_label.text = "\n".join(rows)
+
+
+func _update_center_card(s: Dictionary, day_num: int, paused: bool, score_i: int, money_i: int, rep_f: float) -> void:
+	var screen = s.get("presentation")
+	var screen_name := str(screen["name"]) if screen != null else ""
+	continue_btn.visible = paused or screen != null
+	continue_btn.text = "Chơi" if screen_name == "menu" else "Tiếp tục"
+	menu_btn.visible = screen_name != "menu" and s.has("presentation") and (paused or bool(s.get("finished", false)))
+	quit_btn.visible = screen_name == "menu"
+	dim.visible = screen != null or paused or bool(s.get("finished", false))
+	center_panel.visible = dim.visible
+	if screen != null:
+		match screen_name:
+			"menu":
+				center_label.text = "QUÁN ĂN CHỢ NỔI"
+			"day_intro":
+				var dishes := PackedStringArray()
+				for dish in s.get("day_plan", {}).get("dishes", {}):
+					var count: int = int(s["day_plan"]["dishes"][dish])
+					dishes.append("%s ×%d" % [DISH_VI.get(dish, dish), count])
+				center_label.text = "NGÀY %d · MÁ TƯ DẶN\n%s" % [day_num, "\n".join(dishes)]
+			"evening_intro":
+				var stock = s.get("stock", [])
+				var available := _cookable_dishes(s, _available_stock(s))
+				var names := PackedStringArray()
+				for dish in available:
+					names.append(DISH_VI.get(dish, dish))
+				center_label.text = "MỞ QUÁN · NGÀY %d\nNhập kho %d nguyên liệu\n%s" % [day_num,
+					stock.size(), " · ".join(names) if not names.is_empty() else "Chưa có món đủ nguyên liệu"]
+			"day_result":
+				var summary: Dictionary = s.get("shift_summary", {})
+				center_label.text = "KẾT CA · NGÀY %d\nĐã phục vụ %d · Bỏ đi %d\nThu %dk · Boa %dk · Uy tín %+.1f" % [
+					day_num, int(summary.get("served", 0)), int(summary.get("left", 0)),
+					int(summary.get("earned", 0)), int(summary.get("tips", 0)), rep_f - float(summary.get("reputation_start", rep_f))]
+		return
 	if bool(s.get("finished", false)):
-		center_label.text = "KẾT THÚC (%s)\n🏆 Điểm: %d   ·   💰 Tiền: %dk\nNhấn R để chơi lại" % [
-			str(s.get("reason", "")), score_i, money_i]
-		center_panel.visible = true
+		var sales: Dictionary = s.get("dish_sales", {})
+		var best := ""
+		var best_count := 0
+		var dishes := sales.keys()
+		dishes.sort()
+		for dish in dishes:
+			if int(sales[dish]) > best_count:
+				best = dish
+				best_count = int(sales[dish])
+		center_label.text = "TỔNG KẾT\nĐiểm %d · Tiền %dk · Uy tín %.1f\nMón bán chạy: %s\nNhấn R để chơi lại" % [
+			score_i, money_i, rep_f, DISH_VI.get(best, "—")]
 	elif paused:
 		center_label.text = "TẠM DỪNG\nEsc / P: Tiếp tục   ·   R: Chơi lại từ đầu   ·   H: Tương phản cao"
-		center_panel.visible = true
-	else:
-		center_panel.visible = false
 
 
 func _build_gather_card(s: Dictionary, alerts: Array[String]) -> void:

@@ -2,6 +2,13 @@
 
 Mọi thay đổi đáng chú ý của **Quán Ăn Chợ Nổi** (Nhóm `AnhChang3Chan`) qua các phase SDLC được ghi nhận tại đây.
 
+## Chưa phát hành
+
+- **Phase 2:** Thêm luồng màn hình Godot từ menu, kế hoạch của Má Tư, mở quán, kết ca, Shop tới tổng kết. Màn giới thiệu dừng đồng hồ live trong khi hiện.
+- **Phase 3:** Bật dòng nước lũ và thêm hai đơn đặt trước mỗi Ngày. Sự kiện đặt trước xuất hiện ở tick 0 và khi bàn, khách, món chuyển trạng thái. Fixture P1–P2 vốn kiểm thứ tự cũ hoặc uy tín khi đóng ca dùng `random_reservations:false` để cô lập luật gốc. Test vòng Ngày kiểm thêm hai sự kiện công bố. Fixture tiền boa dùng phần giữ cá thể rỗng vì món đã ở trên tay.
+- **Phase 3:** Kiểm ID món giữ chỗ theo kho thực lúc mở quán từ file hoặc trong Ngày. Dữ liệu mẫu được ánh xạ sang ID mới ở các Ngày sau. Nếu fixture mâu thuẫn, mã 2 và file JSONL đích được giữ nguyên.
+- **Phase 4:** Thêm lưu/xuất top 10, phụ đề cảnh báo hoạt động khi tắt tiếng và lệnh khởi chạy Godot từ checkout sạch. Benchmark áp seed trước khi dựng cảnh và dùng thời gian thực để tạo đúng năm trường.
+
 ---
 
 ## [Phase 4 — v1.3] — TICKET-04 "Phát hành v1.0.0" (Tag `phase-4`, Release `v1.0.0`)

@@ -15,3 +15,10 @@
 - **Test Phase 1 được cập nhật có lý do:**
   - `test_gather_snapshot_has_gather_fields` (`tests/test_smoke_p1.py`): đọc số đàn cá khởi tạo từ `tuning_gather()["fish_initial"]` (8 đàn ở v1.1 thay vì cố định 6 ở v1.0).
   - `test_full_loop_deterministic` (`tests/test_quan_lat4.py`): lọc tập sự kiện Lát 4 vì từ khi tích hợp Lát 3 có thêm sự kiện sinh khách theo lịch.
+
+## Kiểm lại vòng ngày sau đợt bổ sung
+
+| AC | Bằng chứng | Kết quả |
+|---|---|---|
+| AC-P2-03/04 | `tests/test_p2_v11_suite.py`, `tests/test_quan_p2_bep.py`, [regression](../proof/phase-4/extensions-check.log) | Hai mở rộng `snake` và `burn` vẫn đạt. |
+| AC-P2-05/06 | `tests/test_live_presentation.py`, [Godot live](../proof/phase-4/extensions-check.log) | Từ checkout sạch, đi qua Chơi → giới thiệu Ngày → Lặn → mở quán → kết ca → Shop → tổng kết. Fixture giữ đồng hồ ở tick 0 trong các màn giới thiệu. |

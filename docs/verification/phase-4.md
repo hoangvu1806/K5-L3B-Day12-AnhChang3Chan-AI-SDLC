@@ -16,3 +16,18 @@
 - **Thành tựu chính:** Đã hợp nhất đủ 4 PR cuối (#23, #24, #29, #30) vào `dev`, hoàn tất đủ **6/6** phản tư cá nhân (`docs/members/`) và phát hành lên `main` cùng các tag `phase-3`, `phase-4`, `v1.0.0`; bộ regression v1.3 **XANH tuyệt đối `148/148` PASS (0 fail, 0 error, 0 skip)** cùng `QA Stability Suite` (`8/8` Fuzz/Invariant, `2/2` SHA-256 từng byte, `100/100` Live HTTP 200 OK), `Soak 10 Ngày` (`0` crash) và đầy đủ `LICENSE`, `CREDITS.md`, `CHANGELOG.md`, `RELEASE_NOTES.md`, mục "Sáng tạo của nhóm" trong `README.md`.
 - **Ghi nhận trung thực còn lại:**
   1. Mục `#26` trong `docs/clarify.md` ghi nhận thư mục `godot/assets/external/river_delta/` cần nhóm kiểm tra lại quyền phân phối lại.
+
+## Kiểm chứng đợt bổ sung từ `origin/dev` tại `24448ee`
+
+| AC | Bằng chứng | Kết quả |
+|---|---|---|
+| AC-P4-02 Soak | [Lần 1](../proof/phase-4/soak-extensions.json), [lần 2](../proof/phase-4/soak-extensions-repeat.json) | `--seed 7 --days 10`, đủ 10 Ngày, 0 crash, trường gameplay giống nhau sau khi bỏ `duration_s`. |
+| AC-P4-03 Benchmark | [Intel UHD Graphics, 1280×720](../proof/phase-4/bench-intel-uhd-extensions.json) | Đủ năm trường và đo 30,032 giây. Trung bình 20,04 FPS, 1% low 12,11 FPS, tải 2.724 ms. Đạt định dạng và mốc tải, dưới hai mốc FPS báo cáo. |
+| AC-P4-04 Cảnh báo và phụ đề | [Gather tương phản cao](../proof/phase-4/extensions-gather-high-contrast.png), [Quán tương phản cao](../proof/phase-4/extensions-quan-high-contrast.png), [Godot live](../proof/phase-4/extensions-check.log) | Kiểm chữ và phụ đề thủy quái, oxy, khách sắp giận và dòng lũ. Tắt tiếng vẫn thấy phụ đề. |
+| AC-P4-05 Regression | [Unittest](../proof/phase-4/extensions-check.log), [Stability](../proof/phase-4/stability-extensions.md) | 159/159 unittest, fuzz, JSONL tất định và HTTP stress đạt. |
+| AC-P4-07 Top 10 | `tests/test_leaderboard.py`, [regression](../proof/phase-4/extensions-check.log) | Một kết quả cho lượt đủ 5 Ngày, bỏ lượt fixture, giữ thứ tự khi hòa điểm, hỗ trợ tên Unicode, xuất bằng `run_cmd` và JSONL đầu ra giống từng byte. |
+| AC-P4-08 Chạy từ bản sạch | `bash tools/play.sh`, [Godot live](../proof/phase-4/extensions-check.log) | Đã import từ checkout không có cache và chạy thử hết vòng Ngày qua Godot 4.5.1 trên WSL2. |
+
+Bằng chứng trên thuộc đợt bổ sung. Các tag `phase-4` và `v1.0.0` của bản phát hành trước trỏ đến `095c186`.
+
+Sau khi tích hợp với `origin/dev` tại `ef824ad`, regression đạt 159/159 và JSONL của Lặn, Quán giống từng byte khi chạy lại cùng seed. [Kết quả trước khi push](../proof/phase-4/extensions-prepush.log).

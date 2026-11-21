@@ -134,6 +134,12 @@ def validate_tuning(t, version="1.1", extensions=None):
         if not (_num(speed) and 0 < speed < float("inf")):
             raise BadInput("tuning.gather.current.speed phải là số hữu hạn > 0")
     _between("quan.duration_s", q.get("duration_s"), 60, 600)
+    reservations = t.get("reservations")
+    if reservations is not None or "reservations" in (extensions or []):
+        expected = {"count": 2, "table_hold_s": 30, "price_multiplier": 1.5, "failed_reputation_delta": -1}
+        if (reservations != expected or type(reservations["count"]) is not int
+                or any(not _num(v) for v in reservations.values())):
+            raise BadInput("tuning.reservations phải dùng giá trị chuẩn của TICKET-03")
     _bounds("quan", q.get("bounds"), ("x", "z"))
     _between("quan.patience_s", q.get("patience_s"), 20, 180)
     _between("quan.walk_speed", q.get("walk_speed"), 1, 10)

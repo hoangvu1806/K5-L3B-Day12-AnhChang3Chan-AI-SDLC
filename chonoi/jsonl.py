@@ -1,6 +1,8 @@
 """Ghi JSONL tất định: làm tròn 3 chữ số khi XUẤT (tính toán dùng giá trị chính xác)."""
 
 import json
+import os
+import tempfile
 
 
 def _clean(v):
@@ -20,10 +22,21 @@ def dumps(obj) -> str:
 
 class JsonlWriter:
     def __init__(self, path: str):
-        self._f = open(path, "w", encoding="utf-8", newline="\n")
+        self.path = path
+        self._f = tempfile.NamedTemporaryFile(mode="w", encoding="utf-8", newline="\n",
+                                              dir=os.path.dirname(os.path.abspath(path)), delete=False)
+
+    def __enter__(self):
+        return self
 
     def write(self, obj):
         self._f.write(dumps(obj) + "\n")
 
-    def close(self):
-        self._f.close()
+    def __exit__(self, exc_type, exc_value, traceback):
+        try:
+            self._f.close()
+            if exc_type is None:
+                os.replace(self._f.name, self.path)
+        finally:
+            if os.path.exists(self._f.name):
+                os.unlink(self._f.name)

@@ -27,8 +27,9 @@ class Contract(unittest.TestCase):
                 code, err = run_headless("--mode", mode, "--seed", "1", "--ticks", "0", "--out", w.path(f"{mode}.jsonl"))
                 self.assertEqual(code, 0, err)
                 rows = read_jsonl(w.path(f"{mode}.jsonl"))
-                self.assertEqual(rows[0]["type"], "snapshot")
-                self.assertEqual(rows[0]["tick"], 0)
+                self.assertEqual([row["tick"] for row in snapshots(rows)], [0])
+                self.assertTrue(all(row["tick"] == 0 and row["name"] == "reservation_announced"
+                                    for row in events(rows)))
                 self.assertEqual(rows[-1]["type"], "end")
                 self.assertEqual(sum(r["type"] == "end" for r in rows), 1)
 

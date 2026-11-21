@@ -10,10 +10,12 @@ DaySim điều phối, KHÔNG nhân đôi luật: buổi sáng là GatherSim, bu
 
 import copy
 
+from ..errors import BadInput
 from ..ids import sort_by_id
 
 from .gather import GatherSim
 from .quan import QuanSim
+from .reservations import announcements, schedule
 
 UPGRADE_FIELD = {"oxygen": "oxygen_max_s", "hp": "hp_max"}
 
@@ -107,6 +109,8 @@ class DaySim:
              "upgrades": dict(sorted(self.upgrades.items())),
              "active_upgrades": dict(sorted(self.active_upgrades.items()))}
         s.update(self.cur.snapshot())
+        if self.phase == "gather" and "reservations" in self.tuning:
+            s["reservations"] = [dict(order) for order in self.reservations]
         return s
 
     # --- một bước ---------------------------------------------------------------
@@ -153,13 +157,30 @@ class DaySim:
             if lvl > 0:
                 t["gather"][field] = shop[kind][lvl - 1][field]
         sim = GatherSim(t, self.gather_tpl, self.rng, self.ids, day=self.day)
+        self.fixture_item_ids = {}
+        if t.get("freshness") is not None:
+            self.fixture_item_ids = {old["id"]: new["id"] for old, new in zip(self.gather_tpl.get("hold", []), sim.hold)}
         sim.money, sim.earned, sim.reputation = self.money, self.earned, self.reputation
         self._set_phase("gather", sim, out)
+        self.reservations = schedule(self.tuning, self.quan_tpl, self.rng, self.plan["dishes"])
+        out.extend(announcements(self.reservations, "gather"))
 
     def _to_quan(self, out):
         # cùng tick gather_end: kho đếm (v1.1) hoặc mảng cá thể giữ id/fresh (v1.2); ngất: giỏ đã rỗng
         items = self.cur.inventory_items()
-        sim = QuanSim(self.tuning, self.quan_tpl, self.rng, self.ids, inventory=items)
+        scenario = copy.deepcopy(self.quan_tpl)
+        hand = scenario.get("hand")
+        dishes = {c["dish_id"] for c in scenario.get("customers", [])}
+        dishes.update(stove["dish"] for stove in scenario.get("stoves", []) if stove.get("dish"))
+        if hand:
+            dishes.add(hand["dish_id"] if isinstance(hand, dict) else hand)
+        if not dishes <= self.plan["dishes"].keys():
+            raise BadInput(f"món của scenario quán phải thuộc kế hoạch Ngày {self.day}")
+        for customer in scenario.get("customers", []):
+            if isinstance(customer.get("reserved"), list):
+                customer["reserved"] = [self.fixture_item_ids.get(i, i) for i in customer["reserved"]]
+        sim = QuanSim(self.tuning, scenario, self.rng, self.ids, inventory=items,
+                      reservations=self.reservations)
         sim.money, sim.earned, sim.reputation = self.money, self.earned, self.reputation
         sim.menu_filter = set(self.plan["dishes"])  # khách chọn trong kế hoạch Ngày
         self._set_phase("quan", sim, out)

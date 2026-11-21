@@ -19,6 +19,7 @@ var cam_distance := 22.0
 var time_acc := 0.0
 
 var rng := RandomNumberGenerator.new()
+var scene_seed := 20261121
 # Khi chạy trong game (scripts/game.gd) cảnh nhận `link` tới logic: vị trí lấy từ snapshot, không tự bơi.
 var link = null
 var live_fish: Dictionary = {}      # id -> Node3D (đàn cá theo logic)
@@ -63,7 +64,7 @@ const PRD_FISH := [
 
 
 func _ready() -> void:
-	rng.seed = 20261121
+	rng.seed = scene_seed
 	_setup_environment()
 	_build_water_surface_and_shore()
 	_build_underwater_cliffs_and_seabed()

@@ -140,6 +140,7 @@ class Phase2ContractAndExtensions(unittest.TestCase):
                          "state": "waiting", "patience_ticks_left": 1000, "reserved": ["I1"]},
                     ],
                     "random_customers": False,
+                    "random_reservations": False,
                 }
             })
             code, err = run_headless("--mode", "quan", "--seed", "1", "--ticks", "5", "--scenario", sc,

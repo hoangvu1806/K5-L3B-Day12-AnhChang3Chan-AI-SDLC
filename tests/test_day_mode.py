@@ -29,13 +29,35 @@ def names(rows):
 
 
 class DayLoop(unittest.TestCase):
+    def test_kept_fixture_items_are_remapped_and_invalid_handoff_preserves_output(self):
+        fixture = {
+            "gather": {"hold": [{"id": "I1", "kind": "ca_loc", "fresh": 100}]},
+            "quan": {"time_left_ticks": 1, "random_reservations": False, "random_customers": False,
+                     "customers": [{"id": "C1", "table_id": "T1", "dish_id": "ca_loc_nuong_trui", "reserved": ["I1"]}]},
+        }
+        inputs = [DOCK, {"tick": 1, "interact": False}, {"tick": 2, "shop_done": True},
+                  {"tick": 3, "interact": True}]
+        with Workdir() as w:
+            code, err, rows = day(w, scenario=fixture, inputs=inputs, days=2, ticks=4)
+            self.assertEqual(code, 0, err)
+            orders = [s["customers"][0]["reserved"] for s in snapshots(rows) if s["phase"] == "quan"]
+            self.assertEqual(orders, [["I1"], ["I2"]])
+            fixture["gather"]["hold"][0]["fresh"] = 30
+            with open(w.path("o.jsonl"), "rb") as stream:
+                existing = stream.read()
+            code, err, _ = day(w, scenario=fixture, inputs=inputs, ticks=4)
+            self.assertEqual(code, 2, err)
+            with open(w.path("o.jsonl"), "rb") as stream:
+                self.assertEqual(stream.read(), existing)
+
     def test_mo_dau_ngay_va_doi_pha(self):
         with Workdir() as w:
             code, err, rows = day(w, inputs=[DOCK])
             self.assertEqual(code, 0, err)
-            first = [(r["tick"], r["phase"], r["day"], r["name"]) for r in events(rows)[:5]]
+            first = [(r["tick"], r["phase"], r["day"], r["name"]) for r in events(rows)[:7]]
             self.assertEqual(first, [(0, "gather", 1, "day_start"), (0, "gather", 1, "day_plan"),
-                                     (0, "gather", 1, "phase_start"), (1, "gather", 1, "gather_end"),
+                                     (0, "gather", 1, "phase_start"), (0, "gather", 1, "reservation_announced"),
+                                     (0, "gather", 1, "reservation_announced"), (1, "gather", 1, "gather_end"),
                                      (1, "quan", 1, "phase_start")])
             plan = events(rows, "day_plan")[0]["data"]
             self.assertEqual(plan, {"dishes": T["day_plan"][0]["dishes"], "ingredients": T["day_plan"][0]["ingredients"]})

@@ -43,4 +43,7 @@ if [[ -z "$GODOT_BIN" ]]; then
 fi
 
 mkdir -p "$(dirname "$OUT")"
+if [[ ! -d "$ROOT_DIR/godot/.godot/imported" ]]; then
+  "$GODOT_BIN" --headless --editor --path "$ROOT_DIR/godot" --import
+fi
 exec "$GODOT_BIN" --path "$ROOT_DIR/godot" --resolution 1280x720 --windowed res://scenes/Bench.tscn -- --seed "$SEED" --duration "$DURATION" --out "$OUT"

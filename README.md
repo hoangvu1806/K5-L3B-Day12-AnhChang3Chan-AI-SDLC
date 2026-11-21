@@ -18,22 +18,23 @@ Cách làm việc kỹ thuật là **tự do** (push thẳng, nhánh + PR, pair,
 
 ```bash
 git clone <fork-của-nhóm> && cd <fork-của-nhóm>
-PYTHONPATH=tests:. python3 -m unittest discover -s tests -v        # smoke test
-python3 -m chonoi.live --mode gather --port 8000                    # server mô phỏng cho Godot 3D, rồi mở godot/ và nhấn F5
+bash tools/play.sh
 ```
 
 Game cần chế độ **headless** theo Test Contract (`python3 -m chonoi.headless --mode gather|quan …`) để được chạy và chấm tự động. **Công nghệ không ràng buộc**: khung Python trong `chonoi/` chỉ là gợi ý, chi tiết ở [`docs/STARTER.md`](docs/STARTER.md).
 
 ## Chạy project Godot
 
-Yêu cầu Python 3 và [Godot 4.5.1 Standard](https://godotengine.org/download/archive/4.5.1-stable/) trên PATH. Từ gốc repo, chạy server và mở game trong hai terminal:
+Trên macOS hoặc Linux, cần Bash, Python 3 và [Godot 4.5.1 Standard](https://godotengine.org/download/archive/4.5.1-stable/) trên PATH. Có thể đặt `GODOT_BIN` thành đường dẫn tới Godot. Từ gốc repo, `bash tools/play.sh` import tài sản, chạy mô phỏng 5 Ngày và mở game. Đóng Godot sẽ dừng server mô phỏng.
+
+Khi phát triển, có thể mở hai tiến trình bằng hai terminal.
 
 ```bash
-python3 -m chonoi.live --mode day --days 5
+python3 -m chonoi.live --mode day --days 5 --presentation
 godot --path godot
 ```
 
-Server phải tiếp tục chạy trong lúc chơi; dừng bằng Ctrl+C. WASD hoặc phím mũi tên để di chuyển, E để hái/cập bến/nấu/bưng/phục vụ, Space để bắt cá, Esc hoặc P để tạm dừng, H để bật tương phản cao. Ở Shop dùng 1 hoặc 2 để mua nâng cấp và Enter để sang ngày tiếp theo; R chơi lại khi tạm dừng hoặc kết thúc. Có thể chạy riêng `--mode gather` hoặc `--mode quan` (quán nhận kho qua `--inventory <file>`).
+Server phải tiếp tục chạy trong lúc chơi và có thể dừng bằng Ctrl+C. Dùng WASD hoặc phím mũi tên để di chuyển, E để hái/cập bến/nấu/bưng/phục vụ, Space để bắt cá, Esc hoặc P để tạm dừng, H để bật tương phản cao và M để tắt tiếng cảnh báo. Phụ đề vẫn hoạt động khi tắt tiếng. Ở Shop dùng 1 hoặc 2 để mua nâng cấp và Enter để sang Ngày tiếp theo. R chơi lại khi tạm dừng hoặc kết thúc. Có thể chạy riêng `--mode gather` hoặc `--mode quan` (quán nhận kho qua `--inventory <file>`).
 
 Từ thư mục gốc của repo, dùng lệnh sau để kiểm tra project và tải scene với Godot trên PATH.
 
@@ -56,13 +57,25 @@ Benchmark cần cửa sổ đồ họa và Godot trên PATH (hoặc đặt `GODO
 
 Nhóm giữ nguyên 100% lõi mô phỏng Python tất định (`chonoi/`) tương thích Test Contract `v1.3` cho chấm tự động headless, đồng thời mở rộng các điểm sáng tạo sau:
 - **Lớp trình diễn Godot 3D bối cảnh Tây Nam Bộ (`godot/`):** Cảnh lặn 2.5D (`DiveUnderwater`) có nước shader, đàn cá bơi, cụm bông súng nở, thủy quái tuần tra/truy đuổi và quán bè nổi 3D (`FloatingShop`) với nhân vật có hoạt ảnh đi/ngồi, đèn lồng, tín hiệu bếp/khách 3D và xử lý va chạm hiển thị không xuyên bàn/bếp.
-- **Mở rộng cơ chế gameplay khai báo rõ trong manifest:** `extensions: ["burn", "snake"]` — **cháy món (`burn_s: 20`)** khi để món chín quá lâu trên bếp và **Rắn Hổ Mây (`M3`)** truy đuổi tốc độ cao dưới nước, cùng module mô phỏng dòng nước lũ (`current`).
+- **Mở rộng Phase 2:** Cháy món (`burn`) khi để món chín quá lâu trên bếp và Rắn Hổ Mây (`snake`, M3) truy đuổi dưới nước. Có bộ test trong `tests/test_p2_v11_suite.py`.
 - **Cảnh báo HUD cấu hình bằng dữ liệu & Khả năng tiếp cận:** Ngưỡng cảnh báo thủy quái gần (`detect_radius`), oxy thấp, khách sắp giận nằm trong `tuning.hud_alerts` gửi qua `meta.alerts` của `chonoi.live` (không ảnh hưởng JSONL headless), kèm chế độ **Tương phản cao** (phím `H`).
 - **Bộ công cụ QA tự động hóa (`tools/qa_stability_suite.py`):** Kiểm thử Fuzz + Invariant, so sánh SHA-256 từng byte cho Determinism và kiểm tải 100 request liên tục lên server `chonoi.live`.
 
 ## Mở rộng Phase 3
 
-Phần mô phỏng dòng nước lũ (`current`) được kiểm chứng bằng `PYTHONPATH=tests:. python3 -m unittest tests.test_gather_current -v`. Khi tích hợp manifest v1.2, khai `current` trong `extensions` và đặt `tuning.gather.current` thành `{"interval_ticks":1800,"duration_ticks":480,"warning_ticks":120,"min_depth":10,"speed":1.5}`. Godot có thể dùng `current_warning` để hiện cảnh báo trước khi dòng bắt đầu. [Bằng chứng Gather Phase 3](docs/proof/phase-3/gather-freshness.md)
+- **Dòng nước lũ (`current`)** báo trước 2 giây, hoạt động 8 giây mỗi 30 giây. Từ độ sâu 10 m, dòng đẩy Út Sen ngang 1,5 m/s. HUD hiện hướng dòng và báo trước bằng chữ, biểu tượng, âm thanh.
+- **Khách đặt trước (`reservations`)** công bố hai đơn mỗi Ngày. HUD báo bàn, món và thời điểm khách đến tính từ lúc mở quán. Đơn giao thành công nhân giá đã chốt theo độ tươi với 1,5 trước khi tính boa.
+
+```bash
+PYTHONPATH=tests:. python3 -m unittest test_gather_current test_reservations -v
+```
+
+## Mở rộng Phase 4
+
+- **Bảng xếp hạng (`leaderboard`)** lưu 10 kết quả cao nhất của các lượt chuẩn hoàn tất 5 Ngày. `bash tools/play.sh --player-name "Út Sen"` đặt tên cho lượt chơi. Xuất bằng `bash tools/play.sh --export-leaderboard top.json` và thêm `--leaderboard store.json` nếu dùng file riêng. Headless mode day nhận cặp `--leaderboard store.json --player-name "Út Sen"`.
+- **Phụ đề hiệu ứng âm thanh** hiện khi thủy quái đến gần, oxy thấp, khách sắp giận hoặc dòng lũ sắp tới. Thử bằng phím H và M để bật tương phản cao và tắt tiếng.
+
+Xem cách chạy test và kết quả tại [kiểm chứng Phase 4](docs/verification/phase-4.md).
 
 ## Tự do sáng tạo
 

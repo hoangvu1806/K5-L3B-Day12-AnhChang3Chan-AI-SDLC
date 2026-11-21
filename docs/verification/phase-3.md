@@ -15,3 +15,13 @@
 ## Đánh giá ngắn
 - **Yêu cầu đạt:** Hoàn thành 100% yêu cầu lõi TICKET-03 (kho cá thể `{id, kind, fresh}`, độ tươi ở cả Gather và Quán, sự kiện `spoiled` ngưỡng 30, giữ chỗ theo `item_id`, tính `base_price` & boa theo độ tươi, từ chối kho đếm bằng mã thoát `2`) cùng toàn bộ **133/133 bài test PASS** và **QA Stability Suite 100% PASS** trên Contract v1.3.
 - **Lý do sửa test P1–P2:** Ghi rõ từng file (9 file, 19 test) trong bảng migration của [`CHANGELOG.md`](../../CHANGELOG.md).
+
+## Kiểm chứng hai mở rộng cho nhóm 6
+
+| AC | Bằng chứng | Kết quả |
+|---|---|---|
+| AC-P3-08 Dòng lũ | `tests/test_gather_current.py`, [JSONL Gather seed 42](../proof/phase-3/extensions-gather.log), [HUD](../proof/phase-4/extensions-gather-high-contrast.png) | Cảnh báo tick 1680, bắt đầu tick 1800, kết thúc tick 2280. Có lực ngang theo độ sâu, biểu tượng, chữ, âm báo và phụ đề. |
+| AC-P3-09 Đặt trước | `tests/test_reservations.py`, [JSONL Quán seed 42](../proof/phase-3/extensions-quan.log) | Hai đơn theo seed. Kiểm giữ bàn tại tick 0, thứ tự đến, lấy hàng tươi, trễ hoặc thiếu hàng, cháy, giao đúng tick đóng ca và hệ số giá. |
+| AC-P3-03/06 Bàn giao | `tests/test_p3_freshness_qa.py`, `tests/test_day_mode.py`, [regression mới](../proof/phase-4/extensions-check.log) | Kho file và day giữ đúng cá thể. Fixture giữ chỗ theo ID mới ở Ngày kế. Sai tham chiếu sau màn lặn trả mã 2 và giữ file đích. |
+
+Hai lần chạy `python3 -m chonoi.headless --mode <gather|quan> --seed 42 --ticks 2400 --snapshot-every 600 --out <file>` cho JSONL giống từng byte trong mỗi mode. Đầu vào `--ticks -1` trả mã 2 và không sinh file.

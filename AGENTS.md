@@ -5,8 +5,9 @@
 ## Lệnh
 - Mở Godot 4.5.1: `godot --editor --path godot`. Kiểm tra scene: `godot --headless --path godot --quit-after 5`.
 - Test: `PYTHONPATH=tests:. python3 -m unittest discover -s tests -v`
-- Headless: `python3 -m chonoi.headless --mode gather|quan --seed 1 --ticks 600 --out out.jsonl`
-- Chơi (Godot 3D): chạy server `python3 -m chonoi.live --mode gather|quan --port 8000`, rồi `godot --path godot` và nhấn F5. Không còn giao diện 2D trên trình duyệt.
+- Headless: `python3 -m chonoi.headless --mode gather --seed 1 --ticks 600 --out out.jsonl`.
+- Chơi Godot 3D: `bash tools/play.sh` chạy Godot và server mô phỏng 5 Ngày với menu.
+- Phase 4: `python3 -m chonoi.soak --seed 7 --days 10 --out soak.json` và `bash tools/bench.sh --seed 42 --duration 30 --out bench.json`.
 
 ## Cấu trúc & quy ước
 - (Starter Python là TÙY CHỌN; nhóm có thể dùng ngôn ngữ khác nếu giữ Test Contract.) Khung do giảng viên cấp: `chonoi/{headless,inputs,scenario,contract,rng,ids,jsonl,inventory,runner,live}.py` (đã bỏ `chonoi/web/` 2D). Hạn chế sửa; nếu phải sửa thì báo cả nhóm và ghi lại lý do.

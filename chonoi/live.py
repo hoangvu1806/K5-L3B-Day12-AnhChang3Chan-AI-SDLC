@@ -24,14 +24,16 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 from .contract import load_contract
 from .errors import BadInput
-from .inputs import BUTTONS_V11, LiveInputs
+from .inputs import BUTTONS_V11, InputState, LiveInputs
 from .inventory import read_inventory
+from .leaderboard import default_store, export_entries, player_name, read_entries, record_completed
 from .runner import Session
 from .scenario import load_scenario
 
 TICK_S = 1.0 / 60.0
 MAX_BODY = 4096
 RECENT_EVENTS = 40
+INTRO_TICKS = 4 * 60
 
 
 def hud_alerts(tuning) -> dict:
@@ -49,22 +51,69 @@ def hud_alerts(tuning) -> dict:
 class LiveGame:
     """Một lượt chơi + luồng nền bước 60 tick/s. Mọi truy cập trạng thái đi qua khóa."""
 
-    def __init__(self, mode, tuning, scenario, seed, inventory=None, inventory_out=None, days=1):
+    def __init__(self, mode, tuning, scenario, seed, inventory=None, inventory_out=None, days=1,
+                 *, presentation=False, leaderboard=None, name="Út Sen"):
         self._args = (mode, tuning, scenario, seed, inventory, days)
         self.mode = mode
         self.tuning = tuning
         self.inventory_out = inventory_out
+        self.leaderboard = leaderboard
+        self.name = name
+        self.seed = seed
+        self.presentation_enabled = presentation and mode == "day"
+        self.run_id = 0
         self._lock = threading.Lock()
         self._stop = threading.Event()
         self._thread = None
-        self._reset()
+        self._reset(menu=True)
 
-    def _reset(self):
+    def _reset(self, *, menu=False):
+        self.run_id += 1
         self.session = Session(*self._args)
         self.inputs = LiveInputs()
         self.events = self.session.initial_events()  # day: day_start, day_plan, phase_start ở tick 0
         self._saved = False
         self.error = None
+        self.screen = None
+        self._resume_requested = False
+        self.dish_sales = {}
+        self.shift_summary = {}
+        self.waiting_reservations = set()
+        if self.presentation_enabled:
+            self._show_screen("menu" if menu else "day_intro")
+
+    def _show_screen(self, name):
+        self.screen = {"name": name, "ticks_left": None if name == "menu" else INTRO_TICKS}
+
+    def _update_presentation(self, rows):
+        for row in rows:
+            name, data = row["name"], row["data"]
+            if name == "phase_start":
+                if row["phase"] == "gather":
+                    self._show_screen("day_intro")
+                elif row["phase"] == "quan":
+                    self.shift_summary = dict(served=0, left=0, earned=0, tips=0,
+                                              reputation_start=self.session.sim.reputation)
+                    self.waiting_reservations.clear()
+                    self._show_screen("evening_intro")
+                else:
+                    self._show_screen("day_result")
+            elif name == "served":
+                self.shift_summary["served"] += 1
+            elif name == "customer_left":
+                self.shift_summary["left"] += 1
+            elif name == "reservation_arrived":
+                self.waiting_reservations.add(data["reservation_id"])
+            elif name == "reservation_served":
+                self.waiting_reservations.discard(data["reservation_id"])
+            elif name == "reservation_failed" and data["reservation_id"] in self.waiting_reservations:
+                self.waiting_reservations.remove(data["reservation_id"])
+                self.shift_summary["left"] += 1
+            elif name == "paid":
+                self.shift_summary["earned"] += data["price"] + data["tip"]
+                self.shift_summary["tips"] += data["tip"]
+                dish = data["dish_id"]
+                self.dish_sales[dish] = self.dish_sales.get(dish, 0) + 1
 
     # --- luồng nền ----------------------------------------------------------------
     def start(self):
@@ -98,8 +147,23 @@ class LiveGame:
         s = self.session
         if s.done:
             return
-        for row in s.step(self.inputs.advance()):
-            self.events.append(row)
+        inp = self.inputs.advance()
+        if self.screen is not None:
+            remaining = self.screen["ticks_left"]
+            if remaining is not None:
+                if remaining == 1:
+                    self.screen = None
+                else:
+                    self.screen["ticks_left"] = remaining - 1
+            return
+        if self._resume_requested:
+            self._resume_requested = False
+            if s.paused:
+                inp = InputState(inp.move, inp.held, {"pause"})
+        rows = s.step(inp)
+        self.events.extend(rows)
+        if self.presentation_enabled:
+            self._update_presentation(rows)
         del self.events[:-RECENT_EVENTS]
         if s.done and not self._saved:
             self._saved = True
@@ -108,6 +172,11 @@ class LiveGame:
                     s.write_inventory_if_done(self.inventory_out)
                 except OSError as e:
                     sys.stderr.write(f"lỗi ghi kho: {e}\n")
+            if self.leaderboard:
+                try:
+                    record_completed(self.leaderboard, self.name, self.seed, s.sim, self.tuning)
+                except (OSError, BadInput) as e:
+                    sys.stderr.write(f"lỗi ghi bảng xếp hạng: {e}\n")
 
     # --- API cho handler -----------------------------------------------------------
     def state_json(self) -> bytes:
@@ -120,6 +189,11 @@ class LiveGame:
             snap["finished"] = self.session.done
             snap["reason"] = self.session.sim.reason if self.session.done else None
             snap["error"] = self.error
+            snap["run_id"] = self.run_id
+            if self.presentation_enabled:
+                snap["presentation"] = self.screen
+                snap["shift_summary"] = self.shift_summary
+                snap["dish_sales"] = self.dish_sales
             return json.dumps(snap, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
 
     def set_input(self, body: dict):
@@ -146,6 +220,21 @@ class LiveGame:
     def restart(self):
         with self._lock:
             self._reset()
+
+    def go_to_menu(self):
+        with self._lock:
+            if self.presentation_enabled:
+                self._reset(menu=True)
+
+    def continue_playing(self):
+        with self._lock:
+            if self.screen is not None:
+                if self.screen["name"] == "menu":
+                    self._show_screen("day_intro")
+                else:
+                    self.screen = None
+            elif self.session.paused:
+                self._resume_requested = True
 
 
 class _Handler(BaseHTTPRequestHandler):
@@ -188,6 +277,10 @@ class _Handler(BaseHTTPRequestHandler):
                 self.game.set_input(body)
             elif path == "/restart":
                 self.game.restart()
+            elif path == "/menu":
+                self.game.go_to_menu()
+            elif path == "/continue":
+                self.game.continue_playing()
             else:
                 self._send(404, b'{"error":"khong co"}')
                 return
@@ -236,10 +329,21 @@ def main(argv=None) -> int:
     p.add_argument("--port", type=int, default=8000, help="0 = cổng ngẫu nhiên")
     p.add_argument("--host", default="127.0.0.1")
     p.add_argument("--scenario")
+    p.add_argument("--presentation", action="store_true")
+    p.add_argument("--leaderboard")
+    p.add_argument("--player-name")
+    p.add_argument("--export-leaderboard")
     p.add_argument("--inventory", help="chỉ với quan: nạp kho từ file")
     p.add_argument("--inventory-out", dest="inventory_out", help="chỉ với gather: ghi kho khi kết thúc buổi")
     a = p.parse_args(argv)
     try:
+        if a.leaderboard == "" or a.export_leaderboard == "":
+            raise BadInput("bảng xếp hạng cần đường dẫn")
+        name = player_name(a.player_name) if a.player_name is not None else "Út Sen"
+        store = a.leaderboard or default_store()
+        if a.export_leaderboard is not None:
+            export_entries(store, a.export_leaderboard)
+            return 0
         if a.inventory and a.mode != "quan":
             raise BadInput("--inventory chỉ dùng với quan")
         if a.inventory_out and a.mode != "gather":
@@ -252,14 +356,18 @@ def main(argv=None) -> int:
             raise BadInput("vừa có quan.stock vừa có --inventory")
         if not 1 <= a.days <= 5:
             raise BadInput("--days phải từ 1 đến 5")
+        leaderboard = store if a.mode == "day" and a.days == 5 and a.scenario is None else None
+        if leaderboard:
+            read_entries(leaderboard)
         game = LiveGame(a.mode, tuning, scenario, a.seed, inventory, a.inventory_out,
-                        days=a.days if a.mode == "day" else 1)
+                        days=a.days if a.mode == "day" else 1, presentation=a.presentation,
+                        leaderboard=leaderboard, name=name)
         server = LiveServer(game, a.host, a.port)
     except BadInput as e:
         sys.stderr.write(f"đầu vào sai: {e}\n")
         return 2
     except OSError as e:
-        sys.stderr.write(f"không mở được cổng {a.port}: {e}\n")
+        sys.stderr.write(f"không khởi động được: {e}\n")
         return 1
     server.start()
     print(f"Server mô phỏng tại {server.url}  (chế độ {a.mode}, seed {a.seed}). Mở Godot (godot/) rồi nhấn F5. "

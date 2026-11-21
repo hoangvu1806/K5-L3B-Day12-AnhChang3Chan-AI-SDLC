@@ -13,7 +13,9 @@ var out_path: String = "bench.json"
 
 var t_init_ms: int = 0
 var load_ms: int = 0
-var warmup_elapsed: float = 0.0
+var scene_ready_usec := 0
+var sample_start_usec := 0
+var last_frame_usec := 0
 var measured_s: float = 0.0
 var frames: int = 0
 var frame_dts: Array[float] = []
@@ -37,9 +39,8 @@ func _ready() -> void:
 
 	var world: Node3D = scene_res.instantiate()
 	world.set("diver_pos", Vector2(2.0, 0.0))
+	world.set("scene_seed", seed_val)
 	add_child(world)
-	if world.get("rng") is RandomNumberGenerator:
-		world.rng.seed = seed_val
 	# Út Sen tự đứng yên ở bến [2, 0] khi không có phím; KHÔNG tắt _physics_process của cảnh lặn
 	# vì nó còn chạy đàn cá, tia nắng, bọt khí và hoạt ảnh bơi -> tắt đi sẽ đo FPS trên cảnh đóng băng.
 	if world.get("diver_root") is Node3D:
@@ -60,6 +61,7 @@ func _ready() -> void:
 	canvas.add_child(status_label)
 
 	load_ms = Time.get_ticks_msec() - t_init_ms
+	scene_ready_usec = Time.get_ticks_usec()
 
 
 func _parse_args() -> void:
@@ -80,17 +82,22 @@ func _parse_args() -> void:
 			i += 1
 
 
-func _process(delta: float) -> void:
+func _process(_delta: float) -> void:
 	if finished:
 		return
-	if warmup_elapsed < WARMUP_S:
-		warmup_elapsed += delta
+	var now := Time.get_ticks_usec()
+	if sample_start_usec == 0:
+		var warmup_elapsed := float(now - scene_ready_usec) / 1000000.0
+		if warmup_elapsed >= WARMUP_S:
+			sample_start_usec = now
+			last_frame_usec = now
 		status_label.text = "BENCH WARMUP: %.1f / %.1f s (1280x720, seed=%d)" % [warmup_elapsed, WARMUP_S, seed_val]
 		return
 
-	measured_s += delta
+	measured_s = float(now - sample_start_usec) / 1000000.0
 	frames += 1
-	frame_dts.append(delta)
+	frame_dts.append(float(now - last_frame_usec) / 1000000.0)
+	last_frame_usec = now
 	status_label.text = "BENCH MEASURING: %.1f / %.1f s | frames=%d | fps=%.1f" % [
 		measured_s, duration_s, frames, float(frames) / maxf(0.001, measured_s)]
 
@@ -111,9 +118,6 @@ func _write_report_and_quit() -> void:
 	var p1_low_fps := 1.0 / maxf(0.0001, mean_slow_dt)
 
 	var report := {
-		"seed": seed_val,
-		"resolution": "1280x720",
-		"warmup_s": WARMUP_S,
 		"avg_fps": snapped(avg_fps, 0.01),
 		"p1_low_fps": snapped(p1_low_fps, 0.01),
 		"frames": frames,
@@ -132,6 +136,9 @@ func _write_report_and_quit() -> void:
 		return
 	f.store_string(JSON.stringify(report, "  ") + "\n")
 	f.close()
-	DirAccess.rename_absolute(tmp_path, out_path)
+	if DirAccess.rename_absolute(tmp_path, out_path) != OK:
+		push_error("Bench: cannot replace output file: " + out_path)
+		get_tree().quit(1)
+		return
 	print("BENCH_OK ", JSON.stringify(report))
 	get_tree().quit(0)

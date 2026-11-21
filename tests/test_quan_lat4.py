@@ -149,7 +149,7 @@ class Lat4(unittest.TestCase):
     def test_full_loop_deterministic(self):
         with Workdir() as w:
             sc = {"player": {"pos": NEAR_STOVE}, "stock": [{"id": "I1", "kind": "ca_loc", "fresh": 100}],
-                  "customers": [customer()]}
+                  "customers": [customer()], "random_reservations": False}
             outs = []
             for i in (1, 2):
                 code, err, out = run(w, sc, COOK_TICKS + 20, presses=[0, COOK_TICKS + 5], name=f"d{i}")

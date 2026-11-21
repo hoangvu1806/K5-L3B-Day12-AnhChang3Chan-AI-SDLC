@@ -28,13 +28,16 @@ def build_sim(mode, tuning, scenario, seed, inventory, days=1):
     return QuanSim(tuning, scenario, streams, ids, inventory=inventory)
 
 
+def score_of(sim, tuning):
+    return sim.earned + tuning["score"]["reputation_multiplier"] * math.floor(sim.reputation)
+
+
 def _common(sim, tick, sim_tick, phase_tick, tuning, state):
-    mult = tuning["score"]["reputation_multiplier"]
     return {
         "type": "snapshot", "tick": tick, "sim_tick": sim_tick, "mode": sim.mode, "phase": sim.phase,
         "phase_tick": phase_tick, "state": state, "time_left_ticks": sim.time_left_ticks,
         "money": sim.money, "earned": sim.earned, "reputation": sim.reputation,
-        "score": sim.earned + mult * math.floor(sim.reputation),
+        "score": score_of(sim, tuning),
     }
 
 
@@ -104,7 +107,7 @@ class Session:
 
     def end_row(self) -> dict:
         sim = self.sim
-        score = _common(sim, self.tick, self.tick, self.tick, self.tuning, "")["score"]
+        score = score_of(sim, self.tuning)
         row = {"type": "end", "ticks": self.tick, "sim_tick": self.sim_tick, "mode": sim.mode,
                "state": "finished" if sim.done else "playing",
                "reason": sim.reason if sim.done else "tick_limit",
@@ -123,8 +126,7 @@ def run(mode, tuning, scenario, seed, frames, ticks, out_path, snapshot_every, i
         days=1):
     sess = Session(mode, tuning, scenario, seed, inventory, days)
     player = InputPlayer(frames)
-    w = JsonlWriter(out_path)
-    try:
+    with JsonlWriter(out_path) as w:
         for row in sess.initial_events():  # day: day_start, day_plan, phase_start(gather) ở tick 0
             w.write(row)
         sess.consume_phase_change()
@@ -141,7 +143,5 @@ def run(mode, tuning, scenario, seed, frames, ticks, out_path, snapshot_every, i
         if last_snapped != sess.tick:
             w.write(sess.snapshot())
         w.write(sess.end_row())
-    finally:
-        w.close()
     sess.write_inventory_if_done(inventory_out)
     return sess.sim

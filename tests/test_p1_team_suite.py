@@ -106,7 +106,8 @@ class Phase1GatherAndQuanVerification(unittest.TestCase):
         """Chế độ quan chạy hết time_left_ticks phải phát quan_end và tính đúng score = earned + 100 * floor(rep)."""
         with Workdir() as w:
             stock = [{"id": "I1", "kind": "ca_loc", "fresh": 100}, {"id": "I2", "kind": "ca_loc", "fresh": 100}]
-            sc = write_json(w.path("sc.json"), {"quan": {"time_left_ticks": 2, "reputation": 3.5, "stock": stock}})
+            sc = write_json(w.path("sc.json"), {"quan": {"time_left_ticks": 2, "reputation": 3.5,
+                                                        "stock": stock, "random_reservations": False}})
             code, err = run_headless("--mode", "quan", "--seed", "5", "--ticks", "10", "--scenario", sc,
                                      "--out", w.path("q.jsonl"))
             self.assertEqual(code, 0, err)

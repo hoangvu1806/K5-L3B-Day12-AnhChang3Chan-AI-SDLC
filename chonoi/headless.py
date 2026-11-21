@@ -11,6 +11,7 @@ from .contract import load_contract
 from .errors import BadInput
 from .inputs import load_frames
 from .inventory import read_inventory
+from .leaderboard import player_name, read_entries, record_completed
 from .runner import run
 from .scenario import load_scenario
 
@@ -42,6 +43,8 @@ def main(argv=None) -> int:
     p.add_argument("--inventory")
     p.add_argument("--inventory-out", dest="inventory_out")
     p.add_argument("--days", type=_int("days"))
+    p.add_argument("--leaderboard")
+    p.add_argument("--player-name")
     p.add_argument("--snapshot-every", dest="snapshot_every", type=_int("snapshot-every"), default=10)
     a = p.parse_args(argv)
     try:
@@ -58,9 +61,15 @@ def main(argv=None) -> int:
             raise BadInput("--inventory chỉ dùng với quan")
         if a.inventory_out and a.mode != "gather":
             raise BadInput("--inventory-out chỉ dùng với gather")
-        outs = [x for x in (a.out, a.inventory_out) if x]
+        if (a.leaderboard is None) != (a.player_name is None) or (a.leaderboard is not None and a.mode != "day"):
+            raise BadInput("--leaderboard và --player-name phải đi cùng nhau trong mode day")
+        if a.leaderboard == "":
+            raise BadInput("--leaderboard cần đường dẫn")
+        if a.player_name is not None:
+            a.player_name = player_name(a.player_name)
+        outs = [x for x in (a.out, a.inventory_out, a.leaderboard) if x]
         ins = [x for x in (a.scenario, a.inputs, a.inventory) if x]
-        paths = [os.path.abspath(x) for x in outs + ins]
+        paths = [os.path.realpath(x) for x in outs + ins]
         if len(set(paths)) != len(paths):
             raise BadInput("các đường dẫn đầu vào/đầu ra phải khác nhau")
         contract = load_contract()
@@ -74,8 +83,12 @@ def main(argv=None) -> int:
         sys.stderr.write(f"đầu vào sai: {e}\n")
         return 2
     try:
-        run(a.mode, tuning, scenario, a.seed, frames, a.ticks, a.out, a.snapshot_every,
-            inventory=inventory, inventory_out=a.inventory_out, days=days)
+        if a.leaderboard and a.scenario is None and days == 5:
+            read_entries(a.leaderboard)
+        sim = run(a.mode, tuning, scenario, a.seed, frames, a.ticks, a.out, a.snapshot_every,
+                  inventory=inventory, inventory_out=a.inventory_out, days=days)
+        if a.leaderboard and a.scenario is None:
+            record_completed(a.leaderboard, a.player_name, a.seed, sim, tuning)
     except BadInput as e:  # lỗi mức luật phát hiện lúc dựng sim
         sys.stderr.write(f"đầu vào sai: {e}\n")
         return 2
