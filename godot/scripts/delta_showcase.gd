@@ -16,11 +16,13 @@ var rng := RandomNumberGenerator.new()
 var link = null
 var live: Dictionary = {}  # key -> Node3D
 var player_node: Node3D
+var player_anim: AnimationPlayer
 var player_world := Vector3.ZERO
+var walkers: Array = []
 
 const WATER_LEVEL := 0.30
-const MUD := "#82694a"
-const BANK := "#958054"
+const MUD := "#635036"
+const BANK := "#566b3d"
 const WOOD := "#6a442c"
 const WOOD_LIGHT := "#b58b5b"
 const ROOF := "#8f7549"
@@ -108,32 +110,33 @@ func _lighting_and_sky() -> void:
     var sky := Sky.new()
     var sky_mat := ProceduralSkyMaterial.new()
     if stage == "gather":
-        sky_mat.sky_top_color = Color("#7eacc1")
-        sky_mat.sky_horizon_color = Color("#f3c99d")
-        sky_mat.ground_bottom_color = Color("#4a6861")
-        sky_mat.ground_horizon_color = Color("#ebc6a1")
+        sky_mat.sky_top_color = Color("#5a8fb0")
+        sky_mat.sky_horizon_color = Color("#c8bfa4")
+        sky_mat.ground_bottom_color = Color("#3a5236")
+        sky_mat.ground_horizon_color = Color("#8ea88a")
     else:
-        sky_mat.sky_top_color = Color("#1a3452")
-        sky_mat.sky_horizon_color = Color("#9c6d7a")
-        sky_mat.ground_bottom_color = Color("#253847")
-        sky_mat.ground_horizon_color = Color("#735a67")
+        sky_mat.sky_top_color = Color("#162c47")
+        sky_mat.sky_horizon_color = Color("#6f5266")
+        sky_mat.ground_bottom_color = Color("#1d2c38")
+        sky_mat.ground_horizon_color = Color("#4c4050")
     sky.sky_material = sky_mat
     env.background_mode = Environment.BG_SKY
     env.sky = sky
     env.ambient_light_source = Environment.AMBIENT_SOURCE_SKY
     env.reflected_light_source = Environment.REFLECTION_SOURCE_BG
-    env.ambient_light_energy = 0.84 if stage == "gather" else 0.50
+    env.ambient_light_energy = 0.36 if stage == "gather" else 0.34
     env.tonemap_mode = Environment.TONE_MAPPER_FILMIC
+    env.tonemap_exposure = 0.78 if stage == "gather" else 0.88
     env.fog_enabled = true
-    env.fog_light_color = Color("#c9ac92") if stage == "gather" else Color("#7d6b81")
-    env.fog_density = 0.0045 if stage == "gather" else 0.0060
+    env.fog_light_color = Color("#8fb09c") if stage == "gather" else Color("#364156")
+    env.fog_density = 0.0022 if stage == "gather" else 0.0042
     world.environment = env
     add_child(world)
     var sun := DirectionalLight3D.new()
     sun.name = "SunsetSun"
     sun.rotation_degrees = Vector3(-48.0, -42.0, 0.0)
-    sun.light_color = Color("#ffe0ab") if stage == "gather" else Color("#caa3a0")
-    sun.light_energy = 1.35 if stage == "gather" else 0.68
+    sun.light_color = Color("#ffcf91") if stage == "gather" else Color("#b89496")
+    sun.light_energy = 0.78 if stage == "gather" else 0.55
     sun.shadow_enabled = true
     add_child(sun)
     if stage == "quan":
@@ -146,14 +149,14 @@ func _lighting_and_sky() -> void:
             add_child(lamp)
 
 func _landscape() -> void:
-    _box(Vector3(0.0, -2.50, 0.0), Vector3(34.5, 0.50, 176.0), MUD)
+    _box(Vector3(0.0, -2.50, 0.0), Vector3(36.0, 0.50, 460.0), MUD)
     _river_banks()
     var water := MeshInstance3D.new()
     water.name = "MekongRiver_3D_DepthWater"
     var m := PlaneMesh.new()
-    m.size = Vector2(34.0, 176.0)
+    m.size = Vector2(36.0, 460.0)
     m.subdivide_width = 135
-    m.subdivide_depth = 200
+    m.subdivide_depth = 260
     water.mesh = m
     water.position.y = WATER_LEVEL
     var water_mat := ShaderMaterial.new()
@@ -161,42 +164,80 @@ func _landscape() -> void:
     water.material_override = water_mat
     add_child(water)
     _vegetation()
+    _outer_scenery()
     # River particles (floating plant and ripples) kept at the edges.
     for j in range(35):
         var z := rng.randf_range(-76, 76)
         var x: float = (1.0 if j % 2 == 0 else -1.0) * rng.randf_range(11.6, 16.0)
-        var duckweed := _cylinder(Vector3(x, WATER_LEVEL+0.035, z), rng.randf_range(.25,.58), .025, "#5f9456")
+        var duckweed := _cylinder(Vector3(x, WATER_LEVEL+0.035, z), rng.randf_range(.25,.58), .025, "#4e7c47")
         duckweed.rotation.y = rng.randf_range(-3.14,3.14)
 
 func _river_banks() -> void:
-    # Actual sloping 3D riverbed banks rather than a side-view background image.
+    # Continuous 3D riverbed banks stretching all the way to the horizon (correct winding on both sides).
     for side in [-1.0, 1.0]:
         var surface := SurfaceTool.new()
         surface.begin(Mesh.PRIMITIVE_TRIANGLES)
-        for i in range(128):
-            var z0 := -88.0 + i * 1.38
-            var z1 := z0 + 1.38
+        for i in range(230):
+            var z0 := -230.0 + i * 2.0
+            var z1 := z0 + 2.0
             for a in [0.0, 1.0]:
                 var za: float = z0 if a == 0.0 else z1
                 var curve: float = 0.75 * sin(za*0.047) + 0.5*cos(za*0.097)
                 var inner := Vector3(side*(16.6+curve), -1.9, za)
                 var shore := Vector3(side*(17.6+curve), 0.33, za)
                 var high := Vector3(side*(22.0+curve), 1.25, za)
-                var outer := Vector3(side*(42.0+curve), 1.60, za)
+                var outer := Vector3(side*(280.0+curve), 1.65, za)
                 if a == 0.0:
                     _bank_strip_a = [inner, shore, high, outer]
                 else:
                     var next := [inner, shore, high, outer]
                     for n in range(3):
                         surface.set_color(Color(BANK) if n>0 else Color(MUD))
-                        surface.add_vertex(_bank_strip_a[n]); surface.add_vertex(next[n]); surface.add_vertex(_bank_strip_a[n+1])
-                        surface.add_vertex(_bank_strip_a[n+1]); surface.add_vertex(next[n]); surface.add_vertex(next[n+1])
+                        if side < 0.0:
+                            surface.add_vertex(_bank_strip_a[n]); surface.add_vertex(next[n]); surface.add_vertex(_bank_strip_a[n+1])
+                            surface.add_vertex(_bank_strip_a[n+1]); surface.add_vertex(next[n]); surface.add_vertex(next[n+1])
+                        else:
+                            surface.add_vertex(_bank_strip_a[n]); surface.add_vertex(_bank_strip_a[n+1]); surface.add_vertex(next[n])
+                            surface.add_vertex(_bank_strip_a[n+1]); surface.add_vertex(next[n+1]); surface.add_vertex(next[n])
         surface.generate_normals()
         var mesh_instance := MeshInstance3D.new()
         mesh_instance.mesh = surface.commit()
         mesh_instance.material_override = _material(BANK)
         mesh_instance.name = "Natural3DShoreLeft" if side<0 else "Natural3DShoreRight"
         add_child(mesh_instance)
+
+func _outer_scenery() -> void:
+    # Full Mekong Delta rice paddies, earthen dikes, distant orchards & stilt villages to the horizon.
+    var paddy_colors := ["#4c6e38", "#597b3f", "#456433", "#647f42", "#51703a"]
+    for side in [-1.0, 1.0]:
+        for ix in range(4):
+            for iz in range(9):
+                var px: float = side * (56.0 + ix * 38.0)
+                var pz: float = -180.0 + iz * 44.0
+                var col: String = paddy_colors[(ix + iz) % paddy_colors.size()]
+                _box(Vector3(px, 1.56, pz), Vector3(35.0, 0.22, 41.0), col)
+                _box(Vector3(px, 1.62, pz + 21.5), Vector3(36.0, 0.25, 1.2), "#665238")
+    for i in range(110):
+        var side := -1.0 if i % 2 == 0 else 1.0
+        var z := rng.randf_range(-190.0, 190.0)
+        var x := side * rng.randf_range(40.0, 135.0)
+        var pick := i % 5
+        if pick == 0:
+            _asset("tropical", "coconut_tall", Vector3(x, 1.68, z), rng.randf_range(0.95, 1.45), rng.randf_range(-3.14, 3.14))
+        elif pick == 1:
+            _asset("tropical", "coconut_lean", Vector3(x, 1.68, z), rng.randf_range(0.9, 1.3), rng.randf_range(-3.14, 3.14))
+        elif pick == 2:
+            _asset("tropical", "banana_clump", Vector3(x, 1.68, z), rng.randf_range(1.1, 1.6), rng.randf_range(-3.14, 3.14))
+        elif pick == 3:
+            _asset("tropical", "mangrove_small", Vector3(x, 1.68, z), rng.randf_range(1.0, 1.5), rng.randf_range(-3.14, 3.14))
+        else:
+            _asset("tropical", "nipa_palm", Vector3(x, 1.68, z), rng.randf_range(1.0, 1.4), rng.randf_range(-3.14, 3.14))
+    for z_end in [-160.0, -130.0, -102.0, 102.0, 130.0, 160.0]:
+        for side in [-1.0, 1.0]:
+            _asset("river_delta", "stilt_houses", Vector3(side * 25.0, 0.25, z_end), 1.05, 1.57 if side < 0 else -1.57)
+            _asset("tropical", "coconut_tall", Vector3(side * 33.0, 1.55, z_end + 6.0), 1.2, rng.randf_range(-3.14, 3.14))
+            _asset("tropical", "nipa_palm", Vector3(side * 19.5, 0.55, z_end - 6.0), 1.15, rng.randf_range(-3.14, 3.14))
+            _asset("river_delta", "sampans", Vector3(side * 7.0, 0.21, z_end), 0.68, rng.randf_range(-0.5, 0.5))
 
 var _bank_strip_a := []
 
@@ -265,10 +306,10 @@ func _gather_scene() -> void:
         var fz := -45.0 + i * 8.0
         var fish_id := "fish_carp" if i % 2 == 0 else "fish_perch"
         _asset("aquatic", fish_id, Vector3(fx, WATER_LEVEL - 0.18, fz), rng.randf_range(0.7, 1.05), rng.randf_range(-3.14, 3.14))
-    # Characters on docks (Ut Sen 3D girl + fisherman).
-    _asset("characters", "ut_sen_girl", Vector3(-13.2, 0.55, -2.0), 0.42, 1.57)
-    _asset("river_delta", "conical_hats", Vector3(-13.2, 2.55, -2.0), 0.55, 0.0)
-    _asset("characters", "tidal_navigator", Vector3(13.2, 0.55, 6.0), 1.15, -1.57)
+    # Characters on docks (animated Ut Sen walking along dock).
+    var dock_ut := _asset("characters", "ut_sen_girl", Vector3(-13.2, 0.55, -2.0), 0.32, 0.0)
+    if dock_ut != null:
+        _add_walker(dock_ut, [Vector3(-13.2, 0.55, -4.8), Vector3(-13.2, 0.55, 2.2)], 1.6, 1.5)
 
 func _restaurant_scene() -> void:
     # Restaurant raft is an actual elevated timber floor with a readable 16 x 10m play area.
@@ -287,31 +328,36 @@ func _restaurant_scene() -> void:
     for i in range(22):
         var x := -7.8+i*.30
         _box(Vector3(x,5.22,2.45),Vector3(.055,.055,3.62),"#cab374")
+    # Wooden lantern beam with clean round paper lanterns (visible in both live & showcase modes).
+    _box(Vector3(0.0,5.5,-3.85),Vector3(15.3,.10,.10),WOOD)
+    for i in range(9):
+        var x := -6.4 + i * 1.6
+        _asset("props", "lantern_paper", Vector3(x, 4.95, -3.85), 0.72, 0.0)
     if link != null:
         return  # trong game: bếp, bàn, khách, Út Sen đặt theo logic ở _process
-    # Kitchen B1 and table T1 with 3D KayKit CC0 kitchenware, dishes & characters.
+    # Kitchen B1, wooden prep counter, and table T1 with 3D KayKit CC0 kitchenware, dishes & animated NPCs.
     _asset("kitchen", "stove_single", Vector3(-4.9, 1.18, 2.9), 1.15, 3.14)
     _asset("kitchen", "pot_A_stew", Vector3(-5.15, 2.15, 2.85), 1.1, 0.4)
     _asset("kitchen", "pan_A", Vector3(-4.6, 2.15, 2.95), 1.05, -0.5)
-    _asset("kitchen", "cuttingboard", Vector3(-3.3, 1.20, 2.9), 1.2, 0.2)
-    _asset("aquatic", "fish_whole_raw", Vector3(-3.3, 1.32, 2.9), 0.85, 0.6)
+    _box(Vector3(-3.3, 1.62, 3.0), Vector3(1.15, 0.88, 1.15), WOOD)
+    _asset("kitchen", "cuttingboard", Vector3(-3.3, 2.08, 3.0), 1.15, 0.2)
+    _asset("aquatic", "fish_whole_raw", Vector3(-3.3, 2.18, 3.0), 0.8, 0.6)
     _asset("kitchen", "table_round_A", Vector3(2.0, 1.18, -1.6), 1.15, 0.0)
     _asset("kitchen", "stew_bowl", Vector3(1.75, 2.08, -1.5), 1.15, 0.0)
     _asset("kitchen", "food_dinner", Vector3(2.30, 2.08, -1.7), 1.15, 0.4)
     _asset("kitchen", "plate", Vector3(2.0, 2.08, -1.15), 1.1, 0.0)
-    for p in [Vector2(0.85, -1.6), Vector2(3.15, -1.6), Vector2(2.0, -2.75)]:
+    for p in [Vector2(0.05, -1.6), Vector2(3.95, -1.6), Vector2(2.0, -3.55)]:
         _asset("kitchen", "chair_stool", Vector3(p.x, 1.18, p.y), 1.1, 0.0)
-    # Ut Sen 3D girl at kitchen B1 and customers at table T1 / raft.
-    _asset("characters", "ut_sen_girl", Vector3(-4.8, 1.18, 1.5), 0.42, 0.2)
-    _asset("river_delta", "conical_hats", Vector3(-4.8, 3.18, 1.5), 0.55, 0.0)
-    _asset("characters", "customer_girl", Vector3(0.75, 1.18, -1.6), 0.42, 1.57)
-    _asset("characters", "tidal_navigator", Vector3(3.25, 1.18, -1.6), 1.15, -1.57)
-    # Wooden lantern beam with 3D hanging silk/paper lanterns.
-    _box(Vector3(0.0,5.5,-3.85),Vector3(15.3,.10,.10),WOOD)
-    for i in range(9):
-        var x := -6.4 + i * 1.6
-        var lantern_id := "lantern_silk" if i % 2 == 0 else "lantern_paper"
-        _asset("props", lantern_id, Vector3(x, 4.95, -3.85), 0.75, 0.0)
+    # Animated Ut Sen walking between kitchen B1 and table T1 + seated/walking customers.
+    var ut_sen := _asset("characters", "ut_sen_girl", Vector3(-3.0, 1.18, 2.0), 0.30, 0.0)
+    if ut_sen != null:
+        _add_walker(ut_sen, [Vector3(-3.0, 1.18, 2.0), Vector3(-1.2, 1.18, -1.2), Vector3(-0.35, 1.18, -1.6)], 2.2, 1.6)
+    var guest_sit := _asset("characters", "customer_girl", Vector3(-0.08, 1.18, -1.6), 0.34, 1.57)
+    if guest_sit != null:
+        _play_anim(guest_sit, "Female_Sitting")
+    var guest_walk := _asset("characters", "customer_girl", Vector3(5.6, 1.18, 2.0), 0.34, 3.14)
+    if guest_walk != null:
+        _add_walker(guest_walk, [Vector3(5.6, 1.18, 2.2), Vector3(5.6, 1.18, -2.8)], 1.5, 1.8)
     # Aquatic lotus & lily pads around the floating restaurant.
     for p in [Vector2(-10.5, -6.5), Vector2(10.8, -5.5), Vector2(-11.0, 6.2), Vector2(10.2, 6.8)]:
         _asset("aquatic", "lotus_clump", Vector3(p.x, WATER_LEVEL + 0.02, p.y), 1.15, rng.randf_range(-3.14, 3.14))
@@ -401,8 +447,70 @@ func _live_node(key: String, family: String, id: String, at: Vector3, sc: float,
         live[key] = n
     return n
 
+func _play_anim(node: Node3D, preferred: String) -> AnimationPlayer:
+    var ap := node.find_child("AnimationPlayer", true, false)
+    if ap is AnimationPlayer:
+        var player: AnimationPlayer = ap
+        for aname in player.get_animation_list():
+            var a: Animation = player.get_animation(aname)
+            if a != null:
+                a.loop_mode = Animation.LOOP_LINEAR
+        if player.has_animation(preferred):
+            player.play(preferred, 0.2)
+        elif player.get_animation_list().size() > 0:
+            player.play(player.get_animation_list()[0])
+        return player
+    return null
+
+func _add_walker(node: Node3D, waypoints: Array, speed: float, pause_s: float) -> void:
+    var player := _play_anim(node, "Female_Walk")
+    walkers.append({
+        "node": node,
+        "player": player,
+        "waypoints": waypoints,
+        "idx": 1,
+        "dir": 1,
+        "speed": speed,
+        "pause_s": pause_s,
+        "wait": 0.0,
+    })
+
+func _step_walkers(delta: float) -> void:
+    for w in walkers:
+        var n: Node3D = w["node"]
+        if not is_instance_valid(n):
+            continue
+        var player: AnimationPlayer = w["player"]
+        if w["wait"] > 0.0:
+            w["wait"] -= delta
+            if player != null and player.has_animation("Female_Idle") and player.current_animation != "Female_Idle":
+                player.play("Female_Idle", 0.2)
+            continue
+        var pts: Array = w["waypoints"]
+        var target: Vector3 = pts[w["idx"]]
+        var diff := target - n.position
+        diff.y = 0.0
+        var dist := diff.length()
+        if dist < 0.12:
+            w["wait"] = w["pause_s"]
+            if w["idx"] >= pts.size() - 1:
+                w["dir"] = -1
+            elif w["idx"] <= 0:
+                w["dir"] = 1
+            w["idx"] += w["dir"]
+        else:
+            var step_dir := diff / dist
+            n.position += step_dir * minf(dist, w["speed"] * delta)
+            var target_yaw := atan2(step_dir.x, step_dir.z)
+            n.rotation.y = lerp_angle(n.rotation.y, target_yaw, minf(1.0, delta * 8.0))
+            if player != null and player.has_animation("Female_Walk") and player.current_animation != "Female_Walk":
+                player.play("Female_Walk", 0.2)
+
 func _process(delta: float) -> void:
-    if link == null or stage != "quan" or not link.connected:
+    if link == null:
+        _step_walkers(delta)
+        return
+    if stage != "quan" or not link.connected:
         return
     var s: Dictionary = link.state
     if not s.has("stoves"):
@@ -420,8 +528,12 @@ func _process(delta: float) -> void:
         var tid := str(tb["id"])
         var at := _q2w(tb.get("pos", [9, 2]))
         _live_node("table_" + tid, "kitchen", "table_round_A", at, 1.15)
-        _live_node("stool_" + tid, "kitchen", "chair_stool", at + Vector3(-1.15, 0, 0), 1.1)
-        var guest := _live_node("guest_" + tid, "characters", "customer_girl", at + Vector3(-1.25, 0, 0), 0.42, PI * 0.5)
+        _live_node("stool_" + tid, "kitchen", "chair_stool", at + Vector3(-1.85, 0, 0), 1.1)
+        var guest_key := "guest_" + tid
+        var was_new := not live.has(guest_key)
+        var guest := _live_node(guest_key, "characters", "customer_girl", at + Vector3(-1.90, 0, 0), 0.34, PI * 0.5)
+        if was_new and guest != null:
+            _play_anim(guest, "Female_Sitting")
         var food := _live_node("food_" + tid, "kitchen", "food_dinner", at + Vector3(0, 0.9, 0), 1.15)
         var c = seated.get(tid)
         if guest != null:
@@ -432,14 +544,22 @@ func _process(delta: float) -> void:
     if p.has("pos"):
         var target := _q2w(p["pos"])
         if player_node == null:
-            player_node = _live_node("player", "characters", "ut_sen_girl", target, 0.42)
+            player_node = _live_node("player", "characters", "ut_sen_girl", target, 0.30)
             player_world = target
+            if player_node != null:
+                player_anim = _play_anim(player_node, "Female_Idle")
         var moved := target - player_world
         player_world = player_world.lerp(target, minf(1.0, delta * 15.0))
+        var move_len := Vector2(moved.x, moved.z).length()
         if player_node != null:
             player_node.position = player_world
-            if Vector2(moved.x, moved.z).length() > 0.01:
-                player_node.rotation.y = atan2(moved.x, moved.z)
+            if move_len > 0.015:
+                var target_yaw := atan2(moved.x, moved.z)
+                player_node.rotation.y = lerp_angle(player_node.rotation.y, target_yaw, minf(1.0, delta * 12.0))
+            if is_instance_valid(player_anim):
+                var want_anim := "Female_Walk" if move_len > 0.015 else "Female_Idle"
+                if player_anim.has_animation(want_anim) and player_anim.current_animation != want_anim:
+                    player_anim.play(want_anim, 0.15)
         # góc nhìn thứ 3: camera sau lưng, hơi cao, nhìn về phía bếp
         if is_instance_valid(cam):
             var want := player_world + Vector3(0.0, 5.5, 7.5)
