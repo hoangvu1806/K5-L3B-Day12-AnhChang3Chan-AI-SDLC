@@ -231,9 +231,10 @@ def main(argv=None) -> int:
             raise BadInput("--inventory chỉ dùng với quan")
         if a.inventory_out and a.mode != "gather":
             raise BadInput("--inventory-out chỉ dùng với gather")
-        tuning = load_contract()["tuning"]
+        contract = load_contract()
+        tuning = contract["tuning"]
         scenario = load_scenario(a.scenario, a.mode, tuning)
-        inventory = read_inventory(a.inventory) if a.inventory else None
+        inventory = read_inventory(a.inventory, version=contract.get("contract_version", "1.0")) if a.inventory else None
         if inventory is not None and "stock" in scenario:
             raise BadInput("vừa có quan.stock vừa có --inventory")
         if not 1 <= a.days <= 5:

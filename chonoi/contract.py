@@ -120,6 +120,19 @@ def validate_tuning(t, version="1.1", extensions=None):
     if not isinstance(g, dict) or not isinstance(q, dict) or not isinstance(menu, dict):
         raise BadInput("tuning phải có gather, quan, menu")
     _validate_gather(g, version)
+    current = g.get("current")
+    if current is not None or "current" in (extensions or []):
+        if not isinstance(current, dict):
+            raise BadInput("tuning.gather.current phải là object")
+        interval = current.get("interval_ticks")
+        if type(interval) is not int or interval < 2:
+            raise BadInput("tuning.gather.current.interval_ticks phải là số nguyên >= 2")
+        _int_between("gather.current.duration_ticks", current.get("duration_ticks"), 1, interval)
+        _int_between("gather.current.warning_ticks", current.get("warning_ticks"), 1, interval - 1)
+        _between("gather.current.min_depth", current.get("min_depth"), *g["bounds"]["d"])
+        speed = current.get("speed")
+        if not (_num(speed) and 0 < speed < float("inf")):
+            raise BadInput("tuning.gather.current.speed phải là số hữu hạn > 0")
     _between("quan.duration_s", q.get("duration_s"), 60, 600)
     _bounds("quan", q.get("bounds"), ("x", "z"))
     _between("quan.patience_s", q.get("patience_s"), 20, 180)
