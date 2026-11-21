@@ -2,12 +2,15 @@
 
 DaySim điều phối, KHÔNG nhân đôi luật: buổi sáng là GatherSim, buổi tối là QuanSim, Shop ở ShopSim.
 - Đổi pha trong cùng tick: event kết thúc mang pha cũ, `phase_start` mang pha mới; pha mới chạy từ bước sau.
-- Kho bàn giao trong bộ nhớ theo schema kho đếm v1.0 (hold -> items).
+- Kho bàn giao trong bộ nhớ, cùng tick đổi pha, không hao thêm: kho đếm (v1.1) hoặc kho cá thể (v1.2,
+  giữ nguyên id và fresh). Ngày đầu giữ id trong mẫu gather.hold, các Ngày kế cấp id mới theo thứ tự mảng.
 - Tiền, earned, uy tín, cấp đã mua giữ qua Ngày; cấp mua ở Shop chỉ áp dụng khi dựng Ngày mới.
 - Pause do Session (runner) xử lý chung cho mọi mode.
 """
 
 import copy
+
+from ..ids import sort_by_id
 
 from .gather import GatherSim
 from .quan import QuanSim
@@ -30,12 +33,15 @@ class ShopSim:
 
     def __init__(self, day, stock):
         self.day = day
-        self.stock = dict(stock)  # kho dư từ ca tối, bỏ sau Shop
+        # kho dư từ ca tối (đếm hoặc cá thể), bỏ sau Shop; hàng thô ở Shop không hao tươi
+        self.stock = [dict(it) for it in stock] if isinstance(stock, list) else dict(stock)
         self.time_left_ticks = int(day.tuning["shop"]["max_ticks"])
         self.done = False
         self.reason = None
 
     def snapshot(self) -> dict:
+        if isinstance(self.stock, list):
+            return {"stock": sort_by_id(self.stock)}
         return {"stock": {k: self.stock[k] for k in sorted(self.stock) if self.stock[k] > 0}}
 
     def step(self, inp):
@@ -93,7 +99,8 @@ class DaySim:
 
     @property
     def plan(self):
-        return self.plans[self.day]
+        # v1.3 soak: kế hoạch D1–D5 lặp ở Ngày 6–10
+        return self.plans.get(self.day) or self.plans[(self.day - 1) % 5 + 1]
 
     def snapshot(self) -> dict:
         s = {"day": self.day, "day_plan": {"dishes": self.plan["dishes"], "ingredients": self.plan["ingredients"]},
@@ -145,12 +152,21 @@ class DaySim:
             lvl = self.active_upgrades.get(kind, 0)
             if lvl > 0:
                 t["gather"][field] = shop[kind][lvl - 1][field]
-        sim = GatherSim(t, self.gather_tpl, self.rng, self.ids, day=self.day)
+        sim = GatherSim(t, self._gather_template(), self.rng, self.ids, day=self.day)
         sim.money, sim.earned, sim.reputation = self.money, self.earned, self.reputation
         self._set_phase("gather", sim, out)
 
+    def _gather_template(self):
+        """P3: Ngày 1 giữ id cá thể trong gather.hold; Ngày kế cấp id mới theo thứ tự mảng (kind/fresh gốc)."""
+        tpl = self.gather_tpl
+        hold = tpl.get("hold")
+        if self.day == 1 or not hold or not isinstance(hold[0], dict):
+            return tpl
+        return dict(tpl, hold=[{"id": self.ids.new("I"), "kind": it["kind"], "fresh": it["fresh"]} for it in hold])
+
     def _to_quan(self, out):
-        items = self.cur.inventory_items()  # ngất: giỏ đã rỗng
+        # cùng tick gather_end: kho đếm (v1.1) hoặc mảng cá thể giữ id/fresh (v1.2); ngất: giỏ đã rỗng
+        items = self.cur.inventory_items()
         sim = QuanSim(self.tuning, self.quan_tpl, self.rng, self.ids, inventory=items)
         sim.money, sim.earned, sim.reputation = self.money, self.earned, self.reputation
         sim.menu_filter = set(self.plan["dishes"])  # khách chọn trong kế hoạch Ngày

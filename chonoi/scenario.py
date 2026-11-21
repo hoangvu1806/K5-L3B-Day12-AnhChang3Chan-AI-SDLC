@@ -4,7 +4,7 @@ import json
 import math
 
 from .errors import BadInput
-from .inventory import KINDS_P1, validate_items
+from .inventory import KINDS_P1, validate_item_list, validate_items
 
 GATHER_KEYS = {"player", "hold", "nodes", "fish", "random_fish", "monsters", "ca_ho", "random_ho", "time_left_ticks"}
 GATHER_PLAYER_KEYS = {"pos", "vel", "heading_deg", "hp", "oxygen_ticks", "zero_oxy_ticks",
@@ -240,7 +240,12 @@ def _validate_quan(b, tuning, in_day=False):
     for arr in ("stoves", "tables", "customers"):
         if arr in b:
             _check_ids(arr, b[arr])
-    if "stock" in b:
+    item_mode = isinstance(b.get("stock"), list)
+    if "freshness" in tuning and "stock" in b and not item_mode:
+        raise BadInput("contract v1.2: quan.stock phải là mảng cá thể {id, kind, fresh}")
+    if item_mode:
+        validate_item_list(b["stock"], name="quan.stock")
+    elif "stock" in b:
         validate_items(b["stock"])
     p = b.get("player", {})
     if not isinstance(p, dict) or set(p) - QUAN_PLAYER_KEYS:
@@ -260,6 +265,8 @@ def _validate_quan(b, tuning, in_day=False):
     menu = tuning["menu"]
     stock = b.get("stock", {})
     reserved = {}
+    if item_mode:
+        _validate_reserved_ids(b, tuning)
     if "random_customers" in b and not isinstance(b["random_customers"], bool):
         raise BadInput("random_customers phải là boolean")
     for c in b.get("customers", []):
@@ -271,6 +278,8 @@ def _validate_quan(b, tuning, in_day=False):
             _nonneg_int(f"customers.{c['id']}.patience_ticks_left", c["patience_ticks_left"])
         if "order_tick" in c:
             _nonneg_int(f"customers.{c['id']}.order_tick", c["order_tick"])
+        if item_mode:
+            continue
         r = c.get("reserved", menu[c["dish_id"]]["recipe"] if c.get("state", "waiting") == "waiting" else {})
         validate_items(r)
         for k, n in r.items():
@@ -280,6 +289,35 @@ def _validate_quan(b, tuning, in_day=False):
             if n > stock.get(k, 0):
                 raise BadInput(f"khách giữ chỗ {k} vượt kho")
     _validate_quan_lat4(b, tuning)
+
+
+def _validate_reserved_ids(b, tuning):
+    """P3: customers[].reserved là mảng id cá thể: trỏ tới cá thể chưa ươn trong kho, đủ đúng công thức,
+    không dùng chung giữa các đơn. Bỏ reserved thì sim tự cấp theo order_tick rồi id bàn."""
+    menu = tuning["menu"]
+    below = tuning.get("freshness", {}).get("spoiled_below", 30)
+    by_id = {it["id"]: it for it in b["stock"]}
+    used = set()
+    for c in b.get("customers", []):
+        if "reserved" not in c:
+            continue
+        r = c["reserved"]
+        if not isinstance(r, list) or not all(isinstance(i, str) for i in r):
+            raise BadInput(f"customers.{c['id']}.reserved phải là mảng id cá thể")
+        need = dict(menu[c["dish_id"]]["recipe"]) if c.get("state", "waiting") == "waiting" else {}
+        have = {}
+        for i in r:
+            it = by_id.get(i)
+            if it is None:
+                raise BadInput(f"customers.{c['id']}.reserved: không có cá thể {i} trong kho")
+            if it["fresh"] < below:
+                raise BadInput(f"customers.{c['id']}.reserved: cá thể {i} đã ươn")
+            if i in used:
+                raise BadInput(f"customers.{c['id']}.reserved: cá thể {i} đã giữ cho đơn khác")
+            used.add(i)
+            have[it["kind"]] = have.get(it["kind"], 0) + 1
+        if r and have != need:
+            raise BadInput(f"customers.{c['id']}.reserved không khớp công thức {c['dish_id']}")
 
 
 STOVE_STATES = ("idle", "cooking", "ready")
