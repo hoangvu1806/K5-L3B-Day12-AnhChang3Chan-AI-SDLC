@@ -14,8 +14,8 @@ var missing_models := {}
 var rng := RandomNumberGenerator.new()
 
 const WATER_LEVEL := 0.30
-const MUD := "#82694a"
-const BANK := "#958054"
+const MUD := "#635036"
+const BANK := "#566b3d"
 const WOOD := "#6a442c"
 const WOOD_LIGHT := "#b58b5b"
 const ROOF := "#8f7549"
@@ -103,32 +103,33 @@ func _lighting_and_sky() -> void:
     var sky := Sky.new()
     var sky_mat := ProceduralSkyMaterial.new()
     if stage == "gather":
-        sky_mat.sky_top_color = Color("#7eacc1")
-        sky_mat.sky_horizon_color = Color("#f3c99d")
-        sky_mat.ground_bottom_color = Color("#4a6861")
-        sky_mat.ground_horizon_color = Color("#ebc6a1")
+        sky_mat.sky_top_color = Color("#5a8fb0")
+        sky_mat.sky_horizon_color = Color("#c8bfa4")
+        sky_mat.ground_bottom_color = Color("#3a5236")
+        sky_mat.ground_horizon_color = Color("#8ea88a")
     else:
-        sky_mat.sky_top_color = Color("#1a3452")
-        sky_mat.sky_horizon_color = Color("#9c6d7a")
-        sky_mat.ground_bottom_color = Color("#253847")
-        sky_mat.ground_horizon_color = Color("#735a67")
+        sky_mat.sky_top_color = Color("#162c47")
+        sky_mat.sky_horizon_color = Color("#6f5266")
+        sky_mat.ground_bottom_color = Color("#1d2c38")
+        sky_mat.ground_horizon_color = Color("#4c4050")
     sky.sky_material = sky_mat
     env.background_mode = Environment.BG_SKY
     env.sky = sky
     env.ambient_light_source = Environment.AMBIENT_SOURCE_SKY
     env.reflected_light_source = Environment.REFLECTION_SOURCE_BG
-    env.ambient_light_energy = 0.84 if stage == "gather" else 0.50
+    env.ambient_light_energy = 0.36 if stage == "gather" else 0.34
     env.tonemap_mode = Environment.TONE_MAPPER_FILMIC
+    env.tonemap_exposure = 0.78 if stage == "gather" else 0.88
     env.fog_enabled = true
-    env.fog_light_color = Color("#c9ac92") if stage == "gather" else Color("#7d6b81")
-    env.fog_density = 0.0045 if stage == "gather" else 0.0060
+    env.fog_light_color = Color("#8fb09c") if stage == "gather" else Color("#364156")
+    env.fog_density = 0.0022 if stage == "gather" else 0.0042
     world.environment = env
     add_child(world)
     var sun := DirectionalLight3D.new()
     sun.name = "SunsetSun"
     sun.rotation_degrees = Vector3(-48.0, -42.0, 0.0)
-    sun.light_color = Color("#ffe0ab") if stage == "gather" else Color("#caa3a0")
-    sun.light_energy = 1.35 if stage == "gather" else 0.68
+    sun.light_color = Color("#ffcf91") if stage == "gather" else Color("#b89496")
+    sun.light_energy = 0.78 if stage == "gather" else 0.55
     sun.shadow_enabled = true
     add_child(sun)
     if stage == "quan":
@@ -141,14 +142,14 @@ func _lighting_and_sky() -> void:
             add_child(lamp)
 
 func _landscape() -> void:
-    _box(Vector3(0.0, -2.50, 0.0), Vector3(34.5, 0.50, 176.0), MUD)
+    _box(Vector3(0.0, -2.50, 0.0), Vector3(36.0, 0.50, 460.0), MUD)
     _river_banks()
     var water := MeshInstance3D.new()
     water.name = "MekongRiver_3D_DepthWater"
     var m := PlaneMesh.new()
-    m.size = Vector2(34.0, 176.0)
+    m.size = Vector2(36.0, 460.0)
     m.subdivide_width = 135
-    m.subdivide_depth = 200
+    m.subdivide_depth = 260
     water.mesh = m
     water.position.y = WATER_LEVEL
     var water_mat := ShaderMaterial.new()
@@ -156,28 +157,29 @@ func _landscape() -> void:
     water.material_override = water_mat
     add_child(water)
     _vegetation()
+    _outer_scenery()
     # River particles (floating plant and ripples) kept at the edges.
     for j in range(35):
         var z := rng.randf_range(-76, 76)
         var x: float = (1.0 if j % 2 == 0 else -1.0) * rng.randf_range(11.6, 16.0)
-        var duckweed := _cylinder(Vector3(x, WATER_LEVEL+0.035, z), rng.randf_range(.25,.58), .025, "#5f9456")
+        var duckweed := _cylinder(Vector3(x, WATER_LEVEL+0.035, z), rng.randf_range(.25,.58), .025, "#4e7c47")
         duckweed.rotation.y = rng.randf_range(-3.14,3.14)
 
 func _river_banks() -> void:
-    # Actual sloping 3D riverbed banks rather than a side-view background image.
+    # Continuous 3D riverbed banks stretching all the way to the horizon (no empty void).
     for side in [-1.0, 1.0]:
         var surface := SurfaceTool.new()
         surface.begin(Mesh.PRIMITIVE_TRIANGLES)
-        for i in range(128):
-            var z0 := -88.0 + i * 1.38
-            var z1 := z0 + 1.38
+        for i in range(230):
+            var z0 := -230.0 + i * 2.0
+            var z1 := z0 + 2.0
             for a in [0.0, 1.0]:
                 var za: float = z0 if a == 0.0 else z1
                 var curve: float = 0.75 * sin(za*0.047) + 0.5*cos(za*0.097)
                 var inner := Vector3(side*(16.6+curve), -1.9, za)
                 var shore := Vector3(side*(17.6+curve), 0.33, za)
                 var high := Vector3(side*(22.0+curve), 1.25, za)
-                var outer := Vector3(side*(42.0+curve), 1.60, za)
+                var outer := Vector3(side*(280.0+curve), 1.65, za)
                 if a == 0.0:
                     _bank_strip_a = [inner, shore, high, outer]
                 else:
@@ -192,6 +194,41 @@ func _river_banks() -> void:
         mesh_instance.material_override = _material(BANK)
         mesh_instance.name = "Natural3DShoreLeft" if side<0 else "Natural3DShoreRight"
         add_child(mesh_instance)
+
+func _outer_scenery() -> void:
+    # Full Mekong Delta rice paddies, earthen dikes, distant orchards & stilt villages to the horizon.
+    var paddy_colors := ["#4c6e38", "#597b3f", "#456433", "#647f42", "#51703a"]
+    for side in [-1.0, 1.0]:
+        for ix in range(4):
+            for iz in range(9):
+                var px: float = side * (56.0 + ix * 38.0)
+                var pz: float = -180.0 + iz * 44.0
+                var col: String = paddy_colors[(ix + iz) % paddy_colors.size()]
+                _box(Vector3(px, 1.56, pz), Vector3(35.0, 0.22, 41.0), col)
+                _box(Vector3(px, 1.62, pz + 21.5), Vector3(36.0, 0.25, 1.2), "#665238")
+    # Distant tropical tree groves & orchards beyond the main riverbank
+    for i in range(110):
+        var side := -1.0 if i % 2 == 0 else 1.0
+        var z := rng.randf_range(-190.0, 190.0)
+        var x := side * rng.randf_range(40.0, 135.0)
+        var pick := i % 5
+        if pick == 0:
+            _asset("tropical", "coconut_tall", Vector3(x, 1.68, z), rng.randf_range(0.95, 1.45), rng.randf_range(-3.14, 3.14))
+        elif pick == 1:
+            _asset("tropical", "coconut_lean", Vector3(x, 1.68, z), rng.randf_range(0.9, 1.3), rng.randf_range(-3.14, 3.14))
+        elif pick == 2:
+            _asset("tropical", "banana_clump", Vector3(x, 1.68, z), rng.randf_range(1.1, 1.6), rng.randf_range(-3.14, 3.14))
+        elif pick == 3:
+            _asset("tropical", "mangrove_small", Vector3(x, 1.68, z), rng.randf_range(1.0, 1.5), rng.randf_range(-3.14, 3.14))
+        else:
+            _asset("tropical", "nipa_palm", Vector3(x, 1.68, z), rng.randf_range(1.0, 1.4), rng.randf_range(-3.14, 3.14))
+    # Extended riverbank houses & trees along both far ends of the river (z = ±95..±175)
+    for z_end in [-160.0, -130.0, -102.0, 102.0, 130.0, 160.0]:
+        for side in [-1.0, 1.0]:
+            _asset("river_delta", "stilt_houses", Vector3(side * 25.0, 0.25, z_end), 1.05, 1.57 if side < 0 else -1.57)
+            _asset("tropical", "coconut_tall", Vector3(side * 33.0, 1.55, z_end + 6.0), 1.2, rng.randf_range(-3.14, 3.14))
+            _asset("tropical", "nipa_palm", Vector3(side * 19.5, 0.55, z_end - 6.0), 1.15, rng.randf_range(-3.14, 3.14))
+            _asset("river_delta", "sampans", Vector3(side * 7.0, 0.21, z_end), 0.68, rng.randf_range(-0.5, 0.5))
 
 var _bank_strip_a := []
 
