@@ -1,0 +1,25 @@
+[remap]
+
+importer="wavefront_obj"
+importer_version=1
+type="Mesh"
+uid="uid://cxllw50b1yffk"
+path="res://.godot/imported/food_ingredient_onion_rings.obj-5bc992009e12509013f3dd78e00da641.mesh"
+
+[deps]
+
+files=["res://.godot/imported/food_ingredient_onion_rings.obj-5bc992009e12509013f3dd78e00da641.mesh"]
+
+source_file="res://assets/downloaded_packs/kaykit_restaurant/addons/kaykit_restaurant_bits/Assets/obj/food_ingredient_onion_rings.obj"
+dest_files=["res://.godot/imported/food_ingredient_onion_rings.obj-5bc992009e12509013f3dd78e00da641.mesh", "res://.godot/imported/food_ingredient_onion_rings.obj-5bc992009e12509013f3dd78e00da641.mesh"]
+
+[params]
+
+generate_tangents=true
+generate_lods=true
+generate_shadow_mesh=true
+generate_lightmap_uv2=false
+generate_lightmap_uv2_texel_size=0.2
+scale_mesh=Vector3(1, 1, 1)
+offset_mesh=Vector3(0, 0, 0)
+force_disable_mesh_compression=false

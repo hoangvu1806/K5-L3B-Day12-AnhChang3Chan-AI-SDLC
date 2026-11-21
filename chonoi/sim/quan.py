@@ -45,15 +45,88 @@ class QuanSim:
                             cook_ticks_left=s.get("cook_ticks_left", 0), ready_ticks=s.get("ready_ticks", 0))
                        for s in self._merge(t["stoves"], scenario.get("stoves", []))]
         self.tables = self._merge(t["tables"], scenario.get("tables", []))
-        # TODO(nhóm): khách dựng sẵn từ scenario (customers[]) và suy ra giữ chỗ (reserved).
-        self.customers = [dict(c, reserved=c.get("reserved", {})) for c in scenario.get("customers", [])]
+        # Lát 3: khách dựng sẵn từ scenario; khách chưa có món thì suy ra giữ chỗ từ công thức.
+        self.patience_ticks = int(round(t["patience_s"] * 60))
+        self.customers = [self._load_customer(c) for c in scenario.get("customers", [])]
         for e in self.customers:
             ids.reserve(e["id"])
+        self.random_customers = scenario.get("random_customers", True)
+        self.elapsed = 0
+        self.next_customer_tick = int(t["first_customer_tick"])
+        self.customer_interval_ticks = max(1, int(round(t["customer_interval_s"] * 60)))
         self.money = 0
         self.earned = 0
         self.shift_earned = 0
         self.done = False
         self.reason = None
+
+    def _load_customer(self, c):
+        c = dict(c)
+        c.setdefault("state", "waiting")
+        c.setdefault("patience_ticks_left", self.patience_ticks)
+        if "reserved" not in c:
+            dish = self.menu.get(c.get("dish_id"))
+            c["reserved"] = dict(dish["recipe"]) if dish and c["state"] == "waiting" else {}
+        return c
+
+    # ---- Lát 3: giữ chỗ nguyên liệu (Lát 4 dùng available()/release() khi nấu) ----
+    def reserved_total(self) -> dict:
+        tot = {}
+        for c in self.customers:
+            for k, n in c.get("reserved", {}).items():
+                tot[k] = tot.get(k, 0) + n
+        return tot
+
+    def available(self) -> dict:
+        """Kho còn dùng được = kho - phần đã giữ chỗ cho khách."""
+        res = self.reserved_total()
+        return {k: self.stock.get(k, 0) - res.get(k, 0) for k in set(self.stock) | set(res)}
+
+    def cookable_dishes(self) -> list:
+        avail = self.available()
+        return sorted(d for d, m in self.menu.items()
+                      if all(avail.get(k, 0) >= n for k, n in m["recipe"].items()))
+
+    def release(self, customer):
+        customer["reserved"] = {}
+
+    def _free_table(self):
+        taken = {c["table_id"] for c in self.customers}
+        for tb in self.tables:  # đã sắp theo id
+            if tb["id"] not in taken:
+                return tb["id"]
+        return None
+
+    def _tick_patience(self, events):
+        for c in sort_by_id(list(self.customers)):
+            if c["state"] != "waiting":
+                continue
+            c["patience_ticks_left"] = max(0, c["patience_ticks_left"] - 1)
+            if c["patience_ticks_left"] == 0:
+                self.release(c)
+                self.customers.remove(c)
+                q = self.t
+                self.reputation = min(q["reputation_max"],
+                                      max(q["reputation_min"], self.reputation + q["left_reputation_delta"]))
+                events.append(("customer_left", {"customer_id": c["id"], "table_id": c["table_id"],
+                                                 "dish_id": c.get("dish_id"), "reputation": self.reputation}))
+
+    def _spawn_customer(self, events):
+        if not self.random_customers or self.elapsed < self.next_customer_tick:
+            return
+        self.next_customer_tick += self.customer_interval_ticks
+        table_id = self._free_table()
+        if table_id is None:
+            return
+        dishes = self.cookable_dishes()
+        if not dishes:
+            events.append(("no_dish", {"table_id": table_id}))
+            return
+        dish_id = self.rng.get("customer_dish").choice(dishes)
+        c = {"id": self.ids.new("C"), "table_id": table_id, "dish_id": dish_id, "state": "waiting",
+             "patience_ticks_left": self.patience_ticks, "reserved": dict(self.menu[dish_id]["recipe"])}
+        self.customers.append(c)
+        events.append(("customer_arrived", {"customer_id": c["id"], "table_id": table_id, "dish_id": dish_id}))
 
     @staticmethod
     def _merge(defaults, updates):
@@ -80,13 +153,14 @@ class QuanSim:
     def step(self, inp):
         events = []
         self.time_left_ticks = max(0, self.time_left_ticks - 1)
-        self._tick_stoves(events)   # lát 4: nấu -> chín (dish_ready)
-        self._tick_eating(events)   # lát 4: ăn xong -> trả tiền (paid)
-        # TODO(nhóm, lát 3): giảm kiên nhẫn khách "waiting", bỏ đi (customer_left) — mục 4.2 docs/contracts.
+        self.elapsed += 1
+        self._tick_stoves(events)     # lát 4: nấu -> chín (dish_ready)
+        self._tick_eating(events)     # lát 4: ăn xong -> trả tiền (paid)
+        self._tick_patience(events)   # lát 3: giảm kiên nhẫn khách "waiting", bỏ đi (customer_left)
         self._move(inp)
         if inp.pressed("interact"):
-            self._interact(events)  # lát 4: tối đa MỘT interact
-        # TODO(nhóm): khách mới theo lịch (first_customer_tick, customer_interval_s), no_dish.
+            self._interact(events)    # lát 4: tối đa MỘT interact
+        self._spawn_customer(events)  # lát 3: khách mới theo lịch, no_dish
         if self.time_left_ticks <= 0:
             self.done = True
             self.reason = "time"
@@ -160,6 +234,8 @@ class QuanSim:
             if need <= 0:
                 continue
             recipe = self.menu[dish]["recipe"]
+            if not all(self.stock.get(k, 0) >= n for k, n in recipe.items()):
+                continue
             holder = next((w for w in waiting if w["dish_id"] == dish and w.get("reserved")
                            and all(w["reserved"].get(k, 0) >= n for k, n in recipe.items())), None)
             if holder is not None or all(free.get(k, 0) >= n for k, n in recipe.items()):

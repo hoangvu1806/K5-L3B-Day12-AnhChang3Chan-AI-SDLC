@@ -1,0 +1,120 @@
+{
+  "CC0_auto": [
+    [
+      "Tropical Island and Palm Trees",
+      "https://3dassets.dev/packs/tropical-island-ecology",
+      "https://3dassets.dev/api/v1/packs/tropical-island-ecology",
+      "Cây dừa, dừa nước, chuối, đước; 70 model",
+      "CC0"
+    ],
+    [
+      "Swamp and Mangrove",
+      "https://3dassets.dev/packs/swamp-and-mangrove",
+      "https://3dassets.dev/api/v1/packs/swamp-and-mangrove",
+      "Rễ cây, bờ bùn, đầm lầy, cây nước; 76 model",
+      "CC0"
+    ],
+    [
+      "Quiet Lake Fishing",
+      "https://3dassets.dev/packs/quiet-lake-fishing",
+      "https://3dassets.dev/api/v1/packs/quiet-lake-fishing",
+      "Thuyền, bến, cá nước ngọt, hoa súng, đồ câu; 26 model",
+      "CC0"
+    ],
+    [
+      "Kenney Watercraft Kit",
+      "https://kenney-assets.itch.io/watercraft-kit",
+      "https://kenney-assets.itch.io/watercraft-kit",
+      "40+ thuyền/ghe phong cách cơ bản",
+      "CC0"
+    ],
+    [
+      "KayKit Restaurant Bits",
+      "https://github.com/KayKit-Game-Assets/KayKit-Restaurant-Bits-1.0",
+      "https://codeload.github.com/KayKit-Game-Assets/KayKit-Restaurant-Bits-1.0/zip/refs/heads/main",
+      "Bếp, đồ ăn, nguyên liệu, dụng cụ nấu; 140+ model",
+      "CC0"
+    ],
+    [
+      "KayKit Furniture Bits",
+      "https://github.com/KayKit-Game-Assets/KayKit-Furniture-Bits-1.0",
+      "https://codeload.github.com/KayKit-Game-Assets/KayKit-Furniture-Bits-1.0/zip/refs/heads/main",
+      "Bàn ghế, kệ, tủ; 50+ model",
+      "CC0"
+    ],
+    [
+      "Gobkit Characters Vol.1",
+      "https://gobkit.itch.io/gobkit-free-character-pack-vol-1",
+      "https://gobkit.com/api/free",
+      "NPC có rig, animation (office lady, grandma, cashier...)",
+      "CC0"
+    ],
+    [
+      "Flat-Bottomed Boat",
+      "https://tevy.dev/models/flat-bottom-boat",
+      "https://tevy.dev/models/flat-bottom-boat/v1/lod0.glb",
+      "Xuồng gỗ có lòng, ván, ghế; 3 LOD",
+      "CC0"
+    ]
+  ],
+  "Licensed_local_only": [
+    [
+      "River Delta: 19 models",
+      "https://1designtool.com/3d/collections/river-delta",
+      "https://1designtool.com/3d/license",
+      "Ghe chợ nổi, nhà sàn, cầu khỉ, người bán, lưới, hàng hóa",
+      "Game-use, không redistrib raw"
+    ]
+  ],
+  "Manual_or_edit": [
+    [
+      "Út Sen (người nữ)",
+      "https://1camou.itch.io/cozy-farm-blockimagine",
+      "https://1camou.itch.io/cozy-farm-blockimagine",
+      "Farmer Woman/Farm Kid/Grandma, rig và animation; cần tạo áo bà ba/khăn rằn",
+      "CC0"
+    ],
+    [
+      "Swimming animation",
+      "https://kinemiq.app/animations/move-swimming/",
+      "https://kinemiq.app/animations/move-swimming/",
+      "Animation bơi; cần retarget cho rig của Út Sen",
+      "CC0"
+    ],
+    [
+      "Snakehead fish (cá lóc gần đúng)",
+      "https://sketchfab.com/3d-models/cc0-spotted-snakehead-channa-argus-f00d3f9e6f59431e9a438f5d7571645d",
+      "https://sketchfab.com/3d-models/cc0-spotted-snakehead-channa-argus-f00d3f9e6f59431e9a438f5d7571645d",
+      "Cùng họ cá lóc, không phải xác định là giống địa phương. Tải thủ công",
+      "CC0 theo tác giả"
+    ],
+    [
+      "Fish sampler",
+      "https://aletheiamask.itch.io/stylized-fish-pack-free-sampler-3-fish",
+      "https://aletheiamask.itch.io/stylized-fish-pack-free-sampler-3-fish",
+      "3 cá rig/animated, có Creek Barb nước ngọt, không phải cá linh",
+      "Kiểm tra điều khoản"
+    ],
+    [
+      "Stylized Water Shader",
+      "https://godotlearning.com/shaders/stylized-water",
+      "https://godotlearning.com/shaders/stylized-water",
+      "Màu nước theo độ sâu, sóng, foam; Godot 4.7",
+      "CC0"
+    ],
+    [
+      "Nature MegaKit",
+      "https://quaternius.itch.io/stylized-nature-megakit",
+      "https://quaternius.itch.io/stylized-nature-megakit",
+      "116 cây/đá/cỏ chất lượng khá hơn; bản free ~99MB",
+      "CC0 ghi trên trang pack"
+    ],
+    [
+      "River Dawn HDRI",
+      "https://polyhaven.com/a/spruit_dawn",
+      "https://polyhaven.com/a/spruit_dawn",
+      "Ánh sáng buổi sáng thực",
+      "CC0"
+    ]
+  ]
+}

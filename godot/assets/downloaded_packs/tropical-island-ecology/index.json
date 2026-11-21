@@ -1,0 +1,497 @@
+{
+  "source": "https://3dassets.dev/api/v1/packs/tropical-island-ecology",
+  "license": "CC0 1.0",
+  "assets": [
+    {
+      "id": "6797",
+      "title": "Tall coconut palm (Tropical Island and Palm Trees)",
+      "file": "tall_coconut_palm_tropical_island_and_palm_trees_6797.glb",
+      "source": "https://3dassets.dev/assets/tropical-island-ecology-coconut-palm-tall-7b181376",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/6797/v1/model.glb"
+    },
+    {
+      "id": "6796",
+      "title": "Leaning shore coconut palm (Tropical Island and Palm Trees)",
+      "file": "leaning_shore_coconut_palm_tropical_island_and_palm_trees_6796.glb",
+      "source": "https://3dassets.dev/assets/tropical-island-ecology-coconut-palm-leaning-5caeaac8",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/6796/v1/model.glb"
+    },
+    {
+      "id": "6798",
+      "title": "Young coconut palm (Tropical Island and Palm Trees)",
+      "file": "young_coconut_palm_tropical_island_and_palm_trees_6798.glb",
+      "source": "https://3dassets.dev/assets/tropical-island-ecology-coconut-palm-young-20e8a037",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/6798/v1/model.glb"
+    },
+    {
+      "id": "6799",
+      "title": "Storm-broken coconut palm (Tropical Island and Palm Trees)",
+      "file": "storm_broken_coconut_palm_tropical_island_and_palm_trees_6799.glb",
+      "source": "https://3dassets.dev/assets/tropical-island-ecology-storm-broken-palm-39963d3a",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/6799/v1/model.glb"
+    },
+    {
+      "id": "6801",
+      "title": "Coconut palm stump (Tropical Island and Palm Trees)",
+      "file": "coconut_palm_stump_tropical_island_and_palm_trees_6801.glb",
+      "source": "https://3dassets.dev/assets/tropical-island-ecology-palm-stump-341f5918",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/6801/v1/model.glb"
+    },
+    {
+      "id": "6800",
+      "title": "Costapalmate fan palm (Tropical Island and Palm Trees)",
+      "file": "costapalmate_fan_palm_tropical_island_and_palm_trees_6800.glb",
+      "source": "https://3dassets.dev/assets/tropical-island-ecology-fan-palm-46b2af14",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/6800/v1/model.glb"
+    },
+    {
+      "id": "6802",
+      "title": "Trunkless nipa palm (Tropical Island and Palm Trees)",
+      "file": "trunkless_nipa_palm_tropical_island_and_palm_trees_6802.glb",
+      "source": "https://3dassets.dev/assets/tropical-island-ecology-nipa-palm-0c623e68",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/6802/v1/model.glb"
+    },
+    {
+      "id": "6803",
+      "title": "Travellers paddle fan (Tropical Island and Palm Trees)",
+      "file": "travellers_paddle_fan_tropical_island_and_palm_trees_6803.glb",
+      "source": "https://3dassets.dev/assets/tropical-island-ecology-travellers-fan-c56ad4fe",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/6803/v1/model.glb"
+    },
+    {
+      "id": "6804",
+      "title": "Branched screwpine (Tropical Island and Palm Trees)",
+      "file": "branched_screwpine_tropical_island_and_palm_trees_6804.glb",
+      "source": "https://3dassets.dev/assets/tropical-island-ecology-pandanus-fc8c388b",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/6804/v1/model.glb"
+    },
+    {
+      "id": "6805",
+      "title": "Palm seedling (Tropical Island and Palm Trees)",
+      "file": "palm_seedling_tropical_island_and_palm_trees_6805.glb",
+      "source": "https://3dassets.dev/assets/tropical-island-ecology-palm-seedling-d9afa15b",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/6805/v1/model.glb"
+    },
+    {
+      "id": "6806",
+      "title": "Fallen palm trunk (Tropical Island and Palm Trees)",
+      "file": "fallen_palm_trunk_tropical_island_and_palm_trees_6806.glb",
+      "source": "https://3dassets.dev/assets/tropical-island-ecology-fallen-palm-trunk-68ef6e9a",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/6806/v1/model.glb"
+    },
+    {
+      "id": "6807",
+      "title": "Shed palm frond (Tropical Island and Palm Trees)",
+      "file": "shed_palm_frond_tropical_island_and_palm_trees_6807.glb",
+      "source": "https://3dassets.dev/assets/tropical-island-ecology-shed-frond-53da9b76",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/6807/v1/model.glb"
+    },
+    {
+      "id": "6808",
+      "title": "Split coconut shell (Tropical Island and Palm Trees)",
+      "file": "split_coconut_shell_tropical_island_and_palm_trees_6808.glb",
+      "source": "https://3dassets.dev/assets/tropical-island-ecology-coconut-open-2c3781ab",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/6808/v1/model.glb"
+    },
+    {
+      "id": "6809",
+      "title": "Small red mangrove (Tropical Island and Palm Trees)",
+      "file": "small_red_mangrove_tropical_island_and_palm_trees_6809.glb",
+      "source": "https://3dassets.dev/assets/tropical-island-ecology-red-mangrove-small-a7d00ae9",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/6809/v1/model.glb"
+    },
+    {
+      "id": "6810",
+      "title": "Large red mangrove (Tropical Island and Palm Trees)",
+      "file": "large_red_mangrove_tropical_island_and_palm_trees_6810.glb",
+      "source": "https://3dassets.dev/assets/tropical-island-ecology-red-mangrove-large-432f081d",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/6810/v1/model.glb"
+    },
+    {
+      "id": "6811",
+      "title": "Black mangrove (Tropical Island and Palm Trees)",
+      "file": "black_mangrove_tropical_island_and_palm_trees_6811.glb",
+      "source": "https://3dassets.dev/assets/tropical-island-ecology-black-mangrove-d76da4b3",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/6811/v1/model.glb"
+    },
+    {
+      "id": "6812",
+      "title": "Rooted mangrove propagule (Tropical Island and Palm Trees)",
+      "file": "rooted_mangrove_propagule_tropical_island_and_palm_trees_6812.glb",
+      "source": "https://3dassets.dev/assets/tropical-island-ecology-mangrove-propagule-375f38ab",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/6812/v1/model.glb"
+    },
+    {
+      "id": "6813",
+      "title": "Mangrove root tangle module (Tropical Island and Palm Trees)",
+      "file": "mangrove_root_tangle_module_tropical_island_and_palm_trees_6813.glb",
+      "source": "https://3dassets.dev/assets/tropical-island-ecology-mangrove-root-module-487089e9",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/6813/v1/model.glb"
+    },
+    {
+      "id": "6814",
+      "title": "Mangrove islet bank (Tropical Island and Palm Trees)",
+      "file": "mangrove_islet_bank_tropical_island_and_palm_trees_6814.glb",
+      "source": "https://3dassets.dev/assets/tropical-island-ecology-mangrove-islet-77aa931a",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/6814/v1/model.glb"
+    },
+    {
+      "id": "6815",
+      "title": "Buttonwood shrub (Tropical Island and Palm Trees)",
+      "file": "buttonwood_shrub_tropical_island_and_palm_trees_6815.glb",
+      "source": "https://3dassets.dev/assets/tropical-island-ecology-buttonwood-4500772b",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/6815/v1/model.glb"
+    },
+    {
+      "id": "6816",
+      "title": "Strangler fig (Tropical Island and Palm Trees)",
+      "file": "strangler_fig_tropical_island_and_palm_trees_6816.glb",
+      "source": "https://3dassets.dev/assets/tropical-island-ecology-strangler-fig-b580814d",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/6816/v1/model.glb"
+    },
+    {
+      "id": "6818",
+      "title": "Buttressed emergent tree (Tropical Island and Palm Trees)",
+      "file": "buttressed_emergent_tree_tropical_island_and_palm_trees_6818.glb",
+      "source": "https://3dassets.dev/assets/tropical-island-ecology-buttressed-emergent-68f09c03",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/6818/v1/model.glb"
+    },
+    {
+      "id": "6817",
+      "title": "Layered sea almond (Tropical Island and Palm Trees)",
+      "file": "layered_sea_almond_tropical_island_and_palm_trees_6817.glb",
+      "source": "https://3dassets.dev/assets/tropical-island-ecology-sea-almond-e854048c",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/6817/v1/model.glb"
+    },
+    {
+      "id": "6819",
+      "title": "Sea grape shrub (Tropical Island and Palm Trees)",
+      "file": "sea_grape_shrub_tropical_island_and_palm_trees_6819.glb",
+      "source": "https://3dassets.dev/assets/tropical-island-ecology-sea-grape-1a272ba5",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/6819/v1/model.glb"
+    },
+    {
+      "id": "6820",
+      "title": "Flowering hibiscus (Tropical Island and Palm Trees)",
+      "file": "flowering_hibiscus_tropical_island_and_palm_trees_6820.glb",
+      "source": "https://3dassets.dev/assets/tropical-island-ecology-hibiscus-3fbeec87",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/6820/v1/model.glb"
+    },
+    {
+      "id": "6821",
+      "title": "Forked frangipani (Tropical Island and Palm Trees)",
+      "file": "forked_frangipani_tropical_island_and_palm_trees_6821.glb",
+      "source": "https://3dassets.dev/assets/tropical-island-ecology-frangipani-3b6c594b",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/6821/v1/model.glb"
+    },
+    {
+      "id": "6822",
+      "title": "Banana clump (Tropical Island and Palm Trees)",
+      "file": "banana_clump_tropical_island_and_palm_trees_6822.glb",
+      "source": "https://3dassets.dev/assets/tropical-island-ecology-banana-clump-4c90f975",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/6822/v1/model.glb"
+    },
+    {
+      "id": "6823",
+      "title": "Heliconia clump (Tropical Island and Palm Trees)",
+      "file": "heliconia_clump_tropical_island_and_palm_trees_6823.glb",
+      "source": "https://3dassets.dev/assets/tropical-island-ecology-heliconia-d7a5774f",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/6823/v1/model.glb"
+    },
+    {
+      "id": "6824",
+      "title": "Bird of paradise (Tropical Island and Palm Trees)",
+      "file": "bird_of_paradise_tropical_island_and_palm_trees_6824.glb",
+      "source": "https://3dassets.dev/assets/tropical-island-ecology-bird-of-paradise-49664fa6",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/6824/v1/model.glb"
+    },
+    {
+      "id": "6825",
+      "title": "Giant taro (Tropical Island and Palm Trees)",
+      "file": "giant_taro_tropical_island_and_palm_trees_6825.glb",
+      "source": "https://3dassets.dev/assets/tropical-island-ecology-giant-taro-12d39790",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/6825/v1/model.glb"
+    },
+    {
+      "id": "6826",
+      "title": "Wild ginger (Tropical Island and Palm Trees)",
+      "file": "wild_ginger_tropical_island_and_palm_trees_6826.glb",
+      "source": "https://3dassets.dev/assets/tropical-island-ecology-wild-ginger-979f1d29",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/6826/v1/model.glb"
+    },
+    {
+      "id": "6827",
+      "title": "Tree fern (Tropical Island and Palm Trees)",
+      "file": "tree_fern_tropical_island_and_palm_trees_6827.glb",
+      "source": "https://3dassets.dev/assets/tropical-island-ecology-tree-fern-874c11da",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/6827/v1/model.glb"
+    },
+    {
+      "id": "6828",
+      "title": "Thick bamboo stand (Tropical Island and Palm Trees)",
+      "file": "thick_bamboo_stand_tropical_island_and_palm_trees_6828.glb",
+      "source": "https://3dassets.dev/assets/tropical-island-ecology-thick-bamboo-610c3ec0",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/6828/v1/model.glb"
+    },
+    {
+      "id": "6829",
+      "title": "Thin bamboo stand (Tropical Island and Palm Trees)",
+      "file": "thin_bamboo_stand_tropical_island_and_palm_trees_6829.glb",
+      "source": "https://3dassets.dev/assets/tropical-island-ecology-thin-bamboo-7364fd77",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/6829/v1/model.glb"
+    },
+    {
+      "id": "6830",
+      "title": "Beach dune with grass (Tropical Island and Palm Trees)",
+      "file": "beach_dune_with_grass_tropical_island_and_palm_trees_6830.glb",
+      "source": "https://3dassets.dev/assets/tropical-island-ecology-dune-grass-mound-f59d42fd",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/6830/v1/model.glb"
+    },
+    {
+      "id": "6831",
+      "title": "Beach morning glory runner (Tropical Island and Palm Trees)",
+      "file": "beach_morning_glory_runner_tropical_island_and_palm_trees_6831.glb",
+      "source": "https://3dassets.dev/assets/tropical-island-ecology-morning-glory-runner-a13be759",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/6831/v1/model.glb"
+    },
+    {
+      "id": "6832",
+      "title": "Sea purslane mat (Tropical Island and Palm Trees)",
+      "file": "sea_purslane_mat_tropical_island_and_palm_trees_6832.glb",
+      "source": "https://3dassets.dev/assets/tropical-island-ecology-sea-purslane-ff1aa954",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/6832/v1/model.glb"
+    },
+    {
+      "id": "6833",
+      "title": "Island sand ripple tile (Tropical Island and Palm Trees)",
+      "file": "island_sand_ripple_tile_tropical_island_and_palm_trees_6833.glb",
+      "source": "https://3dassets.dev/assets/tropical-island-ecology-sand-ripple-tile-0a88387c",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/6833/v1/model.glb"
+    },
+    {
+      "id": "6834",
+      "title": "Wet shoreline sand tile (Tropical Island and Palm Trees)",
+      "file": "wet_shoreline_sand_tile_tropical_island_and_palm_trees_6834.glb",
+      "source": "https://3dassets.dev/assets/tropical-island-ecology-wet-sand-tile-15ca159e",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/6834/v1/model.glb"
+    },
+    {
+      "id": "6835",
+      "title": "Beach shell scatter (Tropical Island and Palm Trees)",
+      "file": "beach_shell_scatter_tropical_island_and_palm_trees_6835.glb",
+      "source": "https://3dassets.dev/assets/tropical-island-ecology-shell-scatter-a55528d8",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/6835/v1/model.glb"
+    },
+    {
+      "id": "6836",
+      "title": "Coconut husk debris (Tropical Island and Palm Trees)",
+      "file": "coconut_husk_debris_tropical_island_and_palm_trees_6836.glb",
+      "source": "https://3dassets.dev/assets/tropical-island-ecology-coconut-husk-6921b1b3",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/6836/v1/model.glb"
+    },
+    {
+      "id": "6837",
+      "title": "Driftwood log (Tropical Island and Palm Trees)",
+      "file": "driftwood_log_tropical_island_and_palm_trees_6837.glb",
+      "source": "https://3dassets.dev/assets/tropical-island-ecology-driftwood-log-e94178b1",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/6837/v1/model.glb"
+    },
+    {
+      "id": "6838",
+      "title": "Driftwood root ball (Tropical Island and Palm Trees)",
+      "file": "driftwood_root_ball_tropical_island_and_palm_trees_6838.glb",
+      "source": "https://3dassets.dev/assets/tropical-island-ecology-driftwood-rootball-4c16249d",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/6838/v1/model.glb"
+    },
+    {
+      "id": "6839",
+      "title": "Seaweed strand line (Tropical Island and Palm Trees)",
+      "file": "seaweed_strand_line_tropical_island_and_palm_trees_6839.glb",
+      "source": "https://3dassets.dev/assets/tropical-island-ecology-strand-line-9f294f6a",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/6839/v1/model.glb"
+    },
+    {
+      "id": "6840",
+      "title": "Columnar basalt stack (Tropical Island and Palm Trees)",
+      "file": "columnar_basalt_stack_tropical_island_and_palm_trees_6840.glb",
+      "source": "https://3dassets.dev/assets/tropical-island-ecology-basalt-columns-10897b07",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/6840/v1/model.glb"
+    },
+    {
+      "id": "6841",
+      "title": "Wave-cut platform tile (Tropical Island and Palm Trees)",
+      "file": "wave_cut_platform_tile_tropical_island_and_palm_trees_6841.glb",
+      "source": "https://3dassets.dev/assets/tropical-island-ecology-wave-cut-platform-f75d90b9",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/6841/v1/model.glb"
+    },
+    {
+      "id": "6842",
+      "title": "Tide pool block (Tropical Island and Palm Trees)",
+      "file": "tide_pool_block_tropical_island_and_palm_trees_6842.glb",
+      "source": "https://3dassets.dev/assets/tropical-island-ecology-tide-pool-block-e6ef29a0",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/6842/v1/model.glb"
+    },
+    {
+      "id": "6843",
+      "title": "Coastal blowhole rock (Tropical Island and Palm Trees)",
+      "file": "coastal_blowhole_rock_tropical_island_and_palm_trees_6843.glb",
+      "source": "https://3dassets.dev/assets/tropical-island-ecology-blowhole-rock-0a89a189",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/6843/v1/model.glb"
+    },
+    {
+      "id": "6844",
+      "title": "Coastal sea arch (Tropical Island and Palm Trees)",
+      "file": "coastal_sea_arch_tropical_island_and_palm_trees_6844.glb",
+      "source": "https://3dassets.dev/assets/tropical-island-ecology-sea-arch-8a339681",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/6844/v1/model.glb"
+    },
+    {
+      "id": "6845",
+      "title": "Rounded coastal boulder cluster (Tropical Island and Palm Trees)",
+      "file": "rounded_coastal_boulder_cluster_tropical_island_and_palm_trees_6845.glb",
+      "source": "https://3dassets.dev/assets/tropical-island-ecology-boulder-cluster-cba7babb",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/6845/v1/model.glb"
+    },
+    {
+      "id": "6846",
+      "title": "Coral rubble bank (Tropical Island and Palm Trees)",
+      "file": "coral_rubble_bank_tropical_island_and_palm_trees_6846.glb",
+      "source": "https://3dassets.dev/assets/tropical-island-ecology-coral-rubble-bank-067489a7",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/6846/v1/model.glb"
+    },
+    {
+      "id": "6847",
+      "title": "Volcanic scoria mound (Tropical Island and Palm Trees)",
+      "file": "volcanic_scoria_mound_tropical_island_and_palm_trees_6847.glb",
+      "source": "https://3dassets.dev/assets/tropical-island-ecology-volcanic-scoria-5674b3e0",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/6847/v1/model.glb"
+    },
+    {
+      "id": "6848",
+      "title": "Lava tube mouth (Tropical Island and Palm Trees)",
+      "file": "lava_tube_mouth_tropical_island_and_palm_trees_6848.glb",
+      "source": "https://3dassets.dev/assets/tropical-island-ecology-lava-tube-mouth-ddda1ad9",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/6848/v1/model.glb"
+    },
+    {
+      "id": "6850",
+      "title": "Intertidal coral rubble patch (Tropical Island and Palm Trees)",
+      "file": "intertidal_coral_rubble_patch_tropical_island_and_palm_trees_6850.glb",
+      "source": "https://3dassets.dev/assets/tropical-island-ecology-coral-rubble-patch-ec8f6010",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/6850/v1/model.glb"
+    },
+    {
+      "id": "6849",
+      "title": "Intertidal coral boulder (Tropical Island and Palm Trees)",
+      "file": "intertidal_coral_boulder_tropical_island_and_palm_trees_6849.glb",
+      "source": "https://3dassets.dev/assets/tropical-island-ecology-intertidal-coral-boulder-a0bac059",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/6849/v1/model.glb"
+    },
+    {
+      "id": "6851",
+      "title": "Rock-pool anemone (Tropical Island and Palm Trees)",
+      "file": "rock_pool_anemone_tropical_island_and_palm_trees_6851.glb",
+      "source": "https://3dassets.dev/assets/tropical-island-ecology-rockpool-anemone-9441c9a9",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/6851/v1/model.glb"
+    },
+    {
+      "id": "6852",
+      "title": "Seaweed on shore rock (Tropical Island and Palm Trees)",
+      "file": "seaweed_on_shore_rock_tropical_island_and_palm_trees_6852.glb",
+      "source": "https://3dassets.dev/assets/tropical-island-ecology-seaweed-on-rock-fa7f323d",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/6852/v1/model.glb"
+    },
+    {
+      "id": "6853",
+      "title": "Barnacle-crusted rock (Tropical Island and Palm Trees)",
+      "file": "barnacle_crusted_rock_tropical_island_and_palm_trees_6853.glb",
+      "source": "https://3dassets.dev/assets/tropical-island-ecology-barnacle-rock-de9780c6",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/6853/v1/model.glb"
+    },
+    {
+      "id": "6854",
+      "title": "Rock overhang shelter (Tropical Island and Palm Trees)",
+      "file": "rock_overhang_shelter_tropical_island_and_palm_trees_6854.glb",
+      "source": "https://3dassets.dev/assets/tropical-island-ecology-rock-overhang-cc7e6dcb",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/6854/v1/model.glb"
+    },
+    {
+      "id": "6855",
+      "title": "Sea cave mouth (Tropical Island and Palm Trees)",
+      "file": "sea_cave_mouth_tropical_island_and_palm_trees_6855.glb",
+      "source": "https://3dassets.dev/assets/tropical-island-ecology-sea-cave-mouth-f5e9ae8d",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/6855/v1/model.glb"
+    },
+    {
+      "id": "6856",
+      "title": "Hollow banyan shelter (Tropical Island and Palm Trees)",
+      "file": "hollow_banyan_shelter_tropical_island_and_palm_trees_6856.glb",
+      "source": "https://3dassets.dev/assets/tropical-island-ecology-hollow-banyan-0b1307fc",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/6856/v1/model.glb"
+    },
+    {
+      "id": "6857",
+      "title": "Fallen-tree shelter (Tropical Island and Palm Trees)",
+      "file": "fallen_tree_shelter_tropical_island_and_palm_trees_6857.glb",
+      "source": "https://3dassets.dev/assets/tropical-island-ecology-fallen-tree-shelter-99f08649",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/6857/v1/model.glb"
+    },
+    {
+      "id": "6858",
+      "title": "Palm-frond lean-to (Tropical Island and Palm Trees)",
+      "file": "palm_frond_lean_to_tropical_island_and_palm_trees_6858.glb",
+      "source": "https://3dassets.dev/assets/tropical-island-ecology-palm-frond-leanto-fbf832ee",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/6858/v1/model.glb"
+    },
+    {
+      "id": "6860",
+      "title": "Freshwater spring pool (Tropical Island and Palm Trees)",
+      "file": "freshwater_spring_pool_tropical_island_and_palm_trees_6860.glb",
+      "source": "https://3dassets.dev/assets/tropical-island-ecology-freshwater-spring-fce0da9e",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/6860/v1/model.glb"
+    },
+    {
+      "id": "6859",
+      "title": "Shallow lagoon tile (Tropical Island and Palm Trees)",
+      "file": "shallow_lagoon_tile_tropical_island_and_palm_trees_6859.glb",
+      "source": "https://3dassets.dev/assets/tropical-island-ecology-lagoon-shallow-tile-46914b0f",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/6859/v1/model.glb"
+    },
+    {
+      "id": "6861",
+      "title": "Stream over rock tile (Tropical Island and Palm Trees)",
+      "file": "stream_over_rock_tile_tropical_island_and_palm_trees_6861.glb",
+      "source": "https://3dassets.dev/assets/tropical-island-ecology-stream-over-rock-819f3c27",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/6861/v1/model.glb"
+    },
+    {
+      "id": "6862",
+      "title": "Lagoon beach (Tropical Island and Palm Trees)",
+      "file": "lagoon_beach_tropical_island_and_palm_trees_6862.glb",
+      "source": "https://3dassets.dev/assets/tropical-island-ecology-lagoon-beach-122c3ee3-starter-scene",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/6862/v1/model.glb"
+    },
+    {
+      "id": "6863",
+      "title": "Mangrove fringe (Tropical Island and Palm Trees)",
+      "file": "mangrove_fringe_tropical_island_and_palm_trees_6863.glb",
+      "source": "https://3dassets.dev/assets/tropical-island-ecology-mangrove-fringe-f4426b85",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/6863/v1/model.glb"
+    },
+    {
+      "id": "6866",
+      "title": "Island interior clearing (Tropical Island and Palm Trees)",
+      "file": "island_interior_clearing_tropical_island_and_palm_trees_6866.glb",
+      "source": "https://3dassets.dev/assets/tropical-island-ecology-island-clearing-3910ceac",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/6866/v1/model.glb"
+    },
+    {
+      "id": "6865",
+      "title": "Rocky headland (Tropical Island and Palm Trees)",
+      "file": "rocky_headland_tropical_island_and_palm_trees_6865.glb",
+      "source": "https://3dassets.dev/assets/tropical-island-ecology-rocky-headland-d7c23539",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/6865/v1/model.glb"
+    }
+  ],
+  "errors": []
+}

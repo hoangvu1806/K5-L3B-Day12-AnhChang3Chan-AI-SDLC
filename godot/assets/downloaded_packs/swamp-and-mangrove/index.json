@@ -1,0 +1,539 @@
+{
+  "source": "https://3dassets.dev/api/v1/packs/swamp-and-mangrove",
+  "license": "CC0 1.0",
+  "assets": [
+    {
+      "id": "22598",
+      "title": "Bald cypress with knees (Swamp and Mangrove)",
+      "file": "bald_cypress_with_knees_swamp_and_mangrove_22598.glb",
+      "source": "https://3dassets.dev/assets/swamp-and-mangrove-bald-cypress-848c164f",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/22598/v1/model.glb"
+    },
+    {
+      "id": "22603",
+      "title": "Young bald cypress (Swamp and Mangrove)",
+      "file": "young_bald_cypress_swamp_and_mangrove_22603.glb",
+      "source": "https://3dassets.dev/assets/swamp-and-mangrove-young-cypress-b0deb0d4",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/22603/v1/model.glb"
+    },
+    {
+      "id": "22599",
+      "title": "Swamp tupelo (Swamp and Mangrove)",
+      "file": "swamp_tupelo_swamp_and_mangrove_22599.glb",
+      "source": "https://3dassets.dev/assets/swamp-and-mangrove-swamp-tupelo-9d6ddaba",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/22599/v1/model.glb"
+    },
+    {
+      "id": "22600",
+      "title": "Moss-hung swamp oak (Swamp and Mangrove)",
+      "file": "moss_hung_swamp_oak_swamp_and_mangrove_22600.glb",
+      "source": "https://3dassets.dev/assets/swamp-and-mangrove-mossy-swamp-oak-10f149e2",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/22600/v1/model.glb"
+    },
+    {
+      "id": "22601",
+      "title": "Leaning swamp willow (Swamp and Mangrove)",
+      "file": "leaning_swamp_willow_swamp_and_mangrove_22601.glb",
+      "source": "https://3dassets.dev/assets/swamp-and-mangrove-leaning-willow-209b7a6b",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/22601/v1/model.glb"
+    },
+    {
+      "id": "22605",
+      "title": "Red mangrove on stilt roots (Swamp and Mangrove)",
+      "file": "red_mangrove_on_stilt_roots_swamp_and_mangrove_22605.glb",
+      "source": "https://3dassets.dev/assets/swamp-and-mangrove-red-mangrove-7e6bd30c",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/22605/v1/model.glb"
+    },
+    {
+      "id": "22604",
+      "title": "Black mangrove with breathing roots (Swamp and Mangrove)",
+      "file": "black_mangrove_with_breathing_roots_swamp_and_mangrove_22604.glb",
+      "source": "https://3dassets.dev/assets/swamp-and-mangrove-black-mangrove-6759f4f7",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/22604/v1/model.glb"
+    },
+    {
+      "id": "22602",
+      "title": "Swamp buttonwood (Swamp and Mangrove)",
+      "file": "swamp_buttonwood_swamp_and_mangrove_22602.glb",
+      "source": "https://3dassets.dev/assets/swamp-and-mangrove-buttonwood-cdad00ef",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/22602/v1/model.glb"
+    },
+    {
+      "id": "22607",
+      "title": "Drowned standing snag (Swamp and Mangrove)",
+      "file": "drowned_standing_snag_swamp_and_mangrove_22607.glb",
+      "source": "https://3dassets.dev/assets/swamp-and-mangrove-drowned-snag-12fc3403",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/22607/v1/model.glb"
+    },
+    {
+      "id": "22609",
+      "title": "Hollow gum trunk (Swamp and Mangrove)",
+      "file": "hollow_gum_trunk_swamp_and_mangrove_22609.glb",
+      "source": "https://3dassets.dev/assets/swamp-and-mangrove-hollow-gum-eafb2004",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/22609/v1/model.glb"
+    },
+    {
+      "id": "22606",
+      "title": "Leaning half-fallen trunk (Swamp and Mangrove)",
+      "file": "leaning_half_fallen_trunk_swamp_and_mangrove_22606.glb",
+      "source": "https://3dassets.dev/assets/swamp-and-mangrove-half-fallen-trunk-ae9bb9e7",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/22606/v1/model.glb"
+    },
+    {
+      "id": "22608",
+      "title": "Twin-trunk swamp tree (Swamp and Mangrove)",
+      "file": "twin_trunk_swamp_tree_swamp_and_mangrove_22608.glb",
+      "source": "https://3dassets.dev/assets/swamp-and-mangrove-twin-trunk-tree-ce46ffeb",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/22608/v1/model.glb"
+    },
+    {
+      "id": "22611",
+      "title": "Root-arch swamp tree (Swamp and Mangrove)",
+      "file": "root_arch_swamp_tree_swamp_and_mangrove_22611.glb",
+      "source": "https://3dassets.dev/assets/swamp-and-mangrove-root-arch-tree-f5f2194f",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/22611/v1/model.glb"
+    },
+    {
+      "id": "22610",
+      "title": "Dead swamp palm trunk (Swamp and Mangrove)",
+      "file": "dead_swamp_palm_trunk_swamp_and_mangrove_22610.glb",
+      "source": "https://3dassets.dev/assets/swamp-and-mangrove-dead-swamp-palm-326372d9",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/22610/v1/model.glb"
+    },
+    {
+      "id": "22612",
+      "title": "Strangler-vine-covered trunk (Swamp and Mangrove)",
+      "file": "strangler_vine_covered_trunk_swamp_and_mangrove_22612.glb",
+      "source": "https://3dassets.dev/assets/swamp-and-mangrove-strangler-vine-trunk-f3d0a257",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/22612/v1/model.glb"
+    },
+    {
+      "id": "22614",
+      "title": "Small cypress knee cluster (Swamp and Mangrove)",
+      "file": "small_cypress_knee_cluster_swamp_and_mangrove_22614.glb",
+      "source": "https://3dassets.dev/assets/swamp-and-mangrove-cypress-knees-1-be2d54d4",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/22614/v1/model.glb"
+    },
+    {
+      "id": "22613",
+      "title": "Medium cypress knee cluster (Swamp and Mangrove)",
+      "file": "medium_cypress_knee_cluster_swamp_and_mangrove_22613.glb",
+      "source": "https://3dassets.dev/assets/swamp-and-mangrove-cypress-knees-2-79dcbc58",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/22613/v1/model.glb"
+    },
+    {
+      "id": "22615",
+      "title": "Large cypress knee cluster (Swamp and Mangrove)",
+      "file": "large_cypress_knee_cluster_swamp_and_mangrove_22615.glb",
+      "source": "https://3dassets.dev/assets/swamp-and-mangrove-cypress-knees-3-e545292c",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/22615/v1/model.glb"
+    },
+    {
+      "id": "22616",
+      "title": "Stilt-root tangle module (Swamp and Mangrove)",
+      "file": "stilt_root_tangle_module_swamp_and_mangrove_22616.glb",
+      "source": "https://3dassets.dev/assets/swamp-and-mangrove-stilt-root-module-ec37d7d8",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/22616/v1/model.glb"
+    },
+    {
+      "id": "22617",
+      "title": "Pneumatophore field tile (Swamp and Mangrove)",
+      "file": "pneumatophore_field_tile_swamp_and_mangrove_22617.glb",
+      "source": "https://3dassets.dev/assets/swamp-and-mangrove-pneumatophore-tile-f9879fa5",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/22617/v1/model.glb"
+    },
+    {
+      "id": "22619",
+      "title": "Root arch bridge (Swamp and Mangrove)",
+      "file": "root_arch_bridge_swamp_and_mangrove_22619.glb",
+      "source": "https://3dassets.dev/assets/swamp-and-mangrove-root-arch-bridge-f6208884",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/22619/v1/model.glb"
+    },
+    {
+      "id": "22618",
+      "title": "Root mat bank (Swamp and Mangrove)",
+      "file": "root_mat_bank_swamp_and_mangrove_22618.glb",
+      "source": "https://3dassets.dev/assets/swamp-and-mangrove-root-mat-bank-fd0b25d7",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/22618/v1/model.glb"
+    },
+    {
+      "id": "22620",
+      "title": "Exposed root wall section (Swamp and Mangrove)",
+      "file": "exposed_root_wall_section_swamp_and_mangrove_22620.glb",
+      "source": "https://3dassets.dev/assets/swamp-and-mangrove-exposed-root-wall-133ebf66",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/22620/v1/model.glb"
+    },
+    {
+      "id": "22621",
+      "title": "Submerged root snarl (Swamp and Mangrove)",
+      "file": "submerged_root_snarl_swamp_and_mangrove_22621.glb",
+      "source": "https://3dassets.dev/assets/swamp-and-mangrove-submerged-root-snarl-75ee9ae8",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/22621/v1/model.glb"
+    },
+    {
+      "id": "22622",
+      "title": "Lily pad cluster (Swamp and Mangrove)",
+      "file": "lily_pad_cluster_swamp_and_mangrove_22622.glb",
+      "source": "https://3dassets.dev/assets/swamp-and-mangrove-lily-pads-a7bfaa90",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/22622/v1/model.glb"
+    },
+    {
+      "id": "22623",
+      "title": "Lily pads with flowers (Swamp and Mangrove)",
+      "file": "lily_pads_with_flowers_swamp_and_mangrove_22623.glb",
+      "source": "https://3dassets.dev/assets/swamp-and-mangrove-flowering-lily-pads-9b78c011",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/22623/v1/model.glb"
+    },
+    {
+      "id": "22624",
+      "title": "Lotus clump (Swamp and Mangrove)",
+      "file": "lotus_clump_swamp_and_mangrove_22624.glb",
+      "source": "https://3dassets.dev/assets/swamp-and-mangrove-lotus-clump-3e8471a8",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/22624/v1/model.glb"
+    },
+    {
+      "id": "22625",
+      "title": "Water hyacinth mat (Swamp and Mangrove)",
+      "file": "water_hyacinth_mat_swamp_and_mangrove_22625.glb",
+      "source": "https://3dassets.dev/assets/swamp-and-mangrove-water-hyacinth-7ee2249b",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/22625/v1/model.glb"
+    },
+    {
+      "id": "22626",
+      "title": "Duckweed tile (Swamp and Mangrove)",
+      "file": "duckweed_tile_swamp_and_mangrove_22626.glb",
+      "source": "https://3dassets.dev/assets/swamp-and-mangrove-duckweed-tile-37f99d56",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/22626/v1/model.glb"
+    },
+    {
+      "id": "22627",
+      "title": "Reed bed (Swamp and Mangrove)",
+      "file": "reed_bed_swamp_and_mangrove_22627.glb",
+      "source": "https://3dassets.dev/assets/swamp-and-mangrove-reed-bed-a8b0dcdb",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/22627/v1/model.glb"
+    },
+    {
+      "id": "22628",
+      "title": "Cattail clump (Swamp and Mangrove)",
+      "file": "cattail_clump_swamp_and_mangrove_22628.glb",
+      "source": "https://3dassets.dev/assets/swamp-and-mangrove-cattails-06ab7c51",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/22628/v1/model.glb"
+    },
+    {
+      "id": "22629",
+      "title": "Papyrus clump (Swamp and Mangrove)",
+      "file": "papyrus_clump_swamp_and_mangrove_22629.glb",
+      "source": "https://3dassets.dev/assets/swamp-and-mangrove-papyrus-438bc46d",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/22629/v1/model.glb"
+    },
+    {
+      "id": "22630",
+      "title": "Sedge tussock (Swamp and Mangrove)",
+      "file": "sedge_tussock_swamp_and_mangrove_22630.glb",
+      "source": "https://3dassets.dev/assets/swamp-and-mangrove-sedge-tussock-cf1bf762",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/22630/v1/model.glb"
+    },
+    {
+      "id": "22631",
+      "title": "Arrowhead clump (Swamp and Mangrove)",
+      "file": "arrowhead_clump_swamp_and_mangrove_22631.glb",
+      "source": "https://3dassets.dev/assets/swamp-and-mangrove-arrowhead-3a948865",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/22631/v1/model.glb"
+    },
+    {
+      "id": "22633",
+      "title": "Pickerelweed clump (Swamp and Mangrove)",
+      "file": "pickerelweed_clump_swamp_and_mangrove_22633.glb",
+      "source": "https://3dassets.dev/assets/swamp-and-mangrove-pickerelweed-def4c04b",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/22633/v1/model.glb"
+    },
+    {
+      "id": "22632",
+      "title": "Floating algae mat (Swamp and Mangrove)",
+      "file": "floating_algae_mat_swamp_and_mangrove_22632.glb",
+      "source": "https://3dassets.dev/assets/swamp-and-mangrove-floating-algae-647b222f",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/22632/v1/model.glb"
+    },
+    {
+      "id": "22634",
+      "title": "Water lettuce cluster (Swamp and Mangrove)",
+      "file": "water_lettuce_cluster_swamp_and_mangrove_22634.glb",
+      "source": "https://3dassets.dev/assets/swamp-and-mangrove-water-lettuce-bdb78f89",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/22634/v1/model.glb"
+    },
+    {
+      "id": "22636",
+      "title": "Water fern mat (Swamp and Mangrove)",
+      "file": "water_fern_mat_swamp_and_mangrove_22636.glb",
+      "source": "https://3dassets.dev/assets/swamp-and-mangrove-water-fern-293a67a4",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/22636/v1/model.glb"
+    },
+    {
+      "id": "22635",
+      "title": "Bladderwort tangle (Swamp and Mangrove)",
+      "file": "bladderwort_tangle_swamp_and_mangrove_22635.glb",
+      "source": "https://3dassets.dev/assets/swamp-and-mangrove-bladderwort-4e1e00e8",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/22635/v1/model.glb"
+    },
+    {
+      "id": "22637",
+      "title": "Mud bank tile (Swamp and Mangrove)",
+      "file": "mud_bank_tile_swamp_and_mangrove_22637.glb",
+      "source": "https://3dassets.dev/assets/swamp-and-mangrove-mud-bank-tile-d1341d2a",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/22637/v1/model.glb"
+    },
+    {
+      "id": "22638",
+      "title": "Peat hummock (Swamp and Mangrove)",
+      "file": "peat_hummock_swamp_and_mangrove_22638.glb",
+      "source": "https://3dassets.dev/assets/swamp-and-mangrove-peat-hummock-e8b18fbc",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/22638/v1/model.glb"
+    },
+    {
+      "id": "22639",
+      "title": "Sphagnum mound (Swamp and Mangrove)",
+      "file": "sphagnum_mound_swamp_and_mangrove_22639.glb",
+      "source": "https://3dassets.dev/assets/swamp-and-mangrove-sphagnum-mound-df8002b4",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/22639/v1/model.glb"
+    },
+    {
+      "id": "22640",
+      "title": "Quaking bog tile (Swamp and Mangrove)",
+      "file": "quaking_bog_tile_swamp_and_mangrove_22640.glb",
+      "source": "https://3dassets.dev/assets/swamp-and-mangrove-quaking-bog-tile-99ca7681",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/22640/v1/model.glb"
+    },
+    {
+      "id": "22642",
+      "title": "Cracked mud flat tile (Swamp and Mangrove)",
+      "file": "cracked_mud_flat_tile_swamp_and_mangrove_22642.glb",
+      "source": "https://3dassets.dev/assets/swamp-and-mangrove-cracked-mud-tile-7faf932d",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/22642/v1/model.glb"
+    },
+    {
+      "id": "22641",
+      "title": "Silt bar (Swamp and Mangrove)",
+      "file": "silt_bar_swamp_and_mangrove_22641.glb",
+      "source": "https://3dassets.dev/assets/swamp-and-mangrove-silt-bar-da74bf43",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/22641/v1/model.glb"
+    },
+    {
+      "id": "22643",
+      "title": "Open swamp water tile (Swamp and Mangrove)",
+      "file": "open_swamp_water_tile_swamp_and_mangrove_22643.glb",
+      "source": "https://3dassets.dev/assets/swamp-and-mangrove-open-water-tile-646edc0f",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/22643/v1/model.glb"
+    },
+    {
+      "id": "22644",
+      "title": "Swamp channel straight (Swamp and Mangrove)",
+      "file": "swamp_channel_straight_swamp_and_mangrove_22644.glb",
+      "source": "https://3dassets.dev/assets/swamp-and-mangrove-channel-straight-cb3b27e3",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/22644/v1/model.glb"
+    },
+    {
+      "id": "22645",
+      "title": "Swamp channel bend (Swamp and Mangrove)",
+      "file": "swamp_channel_bend_swamp_and_mangrove_22645.glb",
+      "source": "https://3dassets.dev/assets/swamp-and-mangrove-channel-bend-320b4180",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/22645/v1/model.glb"
+    },
+    {
+      "id": "22646",
+      "title": "Shallow swamp ford (Swamp and Mangrove)",
+      "file": "shallow_swamp_ford_swamp_and_mangrove_22646.glb",
+      "source": "https://3dassets.dev/assets/swamp-and-mangrove-shallow-ford-91669dc9",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/22646/v1/model.glb"
+    },
+    {
+      "id": "22647",
+      "title": "Channel debris dam (Swamp and Mangrove)",
+      "file": "channel_debris_dam_swamp_and_mangrove_22647.glb",
+      "source": "https://3dassets.dev/assets/swamp-and-mangrove-debris-dam-46184dea",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/22647/v1/model.glb"
+    },
+    {
+      "id": "22648",
+      "title": "Half-sunk log (Swamp and Mangrove)",
+      "file": "half_sunk_log_swamp_and_mangrove_22648.glb",
+      "source": "https://3dassets.dev/assets/swamp-and-mangrove-half-sunk-log-64182c16",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/22648/v1/model.glb"
+    },
+    {
+      "id": "22649",
+      "title": "Floating log study (Swamp and Mangrove)",
+      "file": "floating_log_study_swamp_and_mangrove_22649.glb",
+      "source": "https://3dassets.dev/assets/swamp-and-mangrove-floating-log-f3727f6c",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/22649/v1/model.glb"
+    },
+    {
+      "id": "22650",
+      "title": "Drifting branch tangle (Swamp and Mangrove)",
+      "file": "drifting_branch_tangle_swamp_and_mangrove_22650.glb",
+      "source": "https://3dassets.dev/assets/swamp-and-mangrove-branch-tangle-c6737ffb",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/22650/v1/model.glb"
+    },
+    {
+      "id": "22651",
+      "title": "Stump standing in water (Swamp and Mangrove)",
+      "file": "stump_standing_in_water_swamp_and_mangrove_22651.glb",
+      "source": "https://3dassets.dev/assets/swamp-and-mangrove-stump-in-water-6e4e7a69",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/22651/v1/model.glb"
+    },
+    {
+      "id": "22652",
+      "title": "Driftwood snarl (Swamp and Mangrove)",
+      "file": "driftwood_snarl_swamp_and_mangrove_22652.glb",
+      "source": "https://3dassets.dev/assets/swamp-and-mangrove-driftwood-snarl-35f262b8",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/22652/v1/model.glb"
+    },
+    {
+      "id": "22653",
+      "title": "Bark raft (Swamp and Mangrove)",
+      "file": "bark_raft_swamp_and_mangrove_22653.glb",
+      "source": "https://3dassets.dev/assets/swamp-and-mangrove-bark-raft-e2079251",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/22653/v1/model.glb"
+    },
+    {
+      "id": "22654",
+      "title": "Swamp log jam (Swamp and Mangrove)",
+      "file": "swamp_log_jam_swamp_and_mangrove_22654.glb",
+      "source": "https://3dassets.dev/assets/swamp-and-mangrove-log-jam-d16c63ad",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/22654/v1/model.glb"
+    },
+    {
+      "id": "22655",
+      "title": "Sunken timber pile (Swamp and Mangrove)",
+      "file": "sunken_timber_pile_swamp_and_mangrove_22655.glb",
+      "source": "https://3dassets.dev/assets/swamp-and-mangrove-sunken-timbers-33eb882e",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/22655/v1/model.glb"
+    },
+    {
+      "id": "22656",
+      "title": "Hanging-moss curtain arch (Swamp and Mangrove)",
+      "file": "hanging_moss_curtain_arch_swamp_and_mangrove_22656.glb",
+      "source": "https://3dassets.dev/assets/swamp-and-mangrove-hanging-moss-arch-f779c38e",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/22656/v1/model.glb"
+    },
+    {
+      "id": "22657",
+      "title": "Giant hollow stump (Swamp and Mangrove)",
+      "file": "giant_hollow_stump_swamp_and_mangrove_22657.glb",
+      "source": "https://3dassets.dev/assets/swamp-and-mangrove-giant-hollow-stump-85ca3c3e",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/22657/v1/model.glb"
+    },
+    {
+      "id": "22659",
+      "title": "Cypress dome clump (Swamp and Mangrove)",
+      "file": "cypress_dome_clump_swamp_and_mangrove_22659.glb",
+      "source": "https://3dassets.dev/assets/swamp-and-mangrove-cypress-dome-clump-8bcd3df8",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/22659/v1/model.glb"
+    },
+    {
+      "id": "22658",
+      "title": "Fallen giant with root wall (Swamp and Mangrove)",
+      "file": "fallen_giant_with_root_wall_swamp_and_mangrove_22658.glb",
+      "source": "https://3dassets.dev/assets/swamp-and-mangrove-upended-root-giant-ea513148",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/22658/v1/model.glb"
+    },
+    {
+      "id": "22660",
+      "title": "Swamp insect mound (Swamp and Mangrove)",
+      "file": "swamp_insect_mound_swamp_and_mangrove_22660.glb",
+      "source": "https://3dassets.dev/assets/swamp-and-mangrove-insect-mound-0d63a527",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/22660/v1/model.glb"
+    },
+    {
+      "id": "22661",
+      "title": "Ancient trunk with hollow doorway (Swamp and Mangrove)",
+      "file": "ancient_trunk_with_hollow_doorway_swamp_and_mangrove_22661.glb",
+      "source": "https://3dassets.dev/assets/swamp-and-mangrove-ancient-doorway-trunk-f86e091e",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/22661/v1/model.glb"
+    },
+    {
+      "id": "22662",
+      "title": "Vine-curtain screen (Swamp and Mangrove)",
+      "file": "vine_curtain_screen_swamp_and_mangrove_22662.glb",
+      "source": "https://3dassets.dev/assets/swamp-and-mangrove-vine-curtain-b7dab918",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/22662/v1/model.glb"
+    },
+    {
+      "id": "22663",
+      "title": "Swamp bracket fungus on trunk (Swamp and Mangrove)",
+      "file": "swamp_bracket_fungus_on_trunk_swamp_and_mangrove_22663.glb",
+      "source": "https://3dassets.dev/assets/swamp-and-mangrove-bracket-fungus-cd02ab85",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/22663/v1/model.glb"
+    },
+    {
+      "id": "22664",
+      "title": "Slime mound (Swamp and Mangrove)",
+      "file": "slime_mound_swamp_and_mangrove_22664.glb",
+      "source": "https://3dassets.dev/assets/swamp-and-mangrove-slime-mound-1afa542f",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/22664/v1/model.glb"
+    },
+    {
+      "id": "22665",
+      "title": "Pale glowing cap cluster (Swamp and Mangrove)",
+      "file": "pale_glowing_cap_cluster_swamp_and_mangrove_22665.glb",
+      "source": "https://3dassets.dev/assets/swamp-and-mangrove-glowing-caps-c9cd578d",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/22665/v1/model.glb"
+    },
+    {
+      "id": "22666",
+      "title": "Mushroom ring on hummock (Swamp and Mangrove)",
+      "file": "mushroom_ring_on_hummock_swamp_and_mangrove_22666.glb",
+      "source": "https://3dassets.dev/assets/swamp-and-mangrove-mushroom-ring-c9da541a",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/22666/v1/model.glb"
+    },
+    {
+      "id": "22667",
+      "title": "Lichen-crusted branch (Swamp and Mangrove)",
+      "file": "lichen_crusted_branch_swamp_and_mangrove_22667.glb",
+      "source": "https://3dassets.dev/assets/swamp-and-mangrove-lichen-branch-f8aecd66",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/22667/v1/model.glb"
+    },
+    {
+      "id": "22668",
+      "title": "Carnivorous pitcher clump (Swamp and Mangrove)",
+      "file": "carnivorous_pitcher_clump_swamp_and_mangrove_22668.glb",
+      "source": "https://3dassets.dev/assets/swamp-and-mangrove-pitcher-plants-a01779c7",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/22668/v1/model.glb"
+    },
+    {
+      "id": "22669",
+      "title": "Sundew patch (Swamp and Mangrove)",
+      "file": "sundew_patch_swamp_and_mangrove_22669.glb",
+      "source": "https://3dassets.dev/assets/swamp-and-mangrove-sundew-patch-ab9dad81",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/22669/v1/model.glb"
+    },
+    {
+      "id": "22670",
+      "title": "Cypress swamp (Swamp and Mangrove)",
+      "file": "cypress_swamp_swamp_and_mangrove_22670.glb",
+      "source": "https://3dassets.dev/assets/swamp-and-mangrove-cypress-swamp-7d5e1765-starter-scene",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/22670/v1/model.glb"
+    },
+    {
+      "id": "22671",
+      "title": "Mangrove channel (Swamp and Mangrove)",
+      "file": "mangrove_channel_swamp_and_mangrove_22671.glb",
+      "source": "https://3dassets.dev/assets/swamp-and-mangrove-mangrove-channel-7f029f36",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/22671/v1/model.glb"
+    },
+    {
+      "id": "22672",
+      "title": "Bog margin (Swamp and Mangrove)",
+      "file": "bog_margin_swamp_and_mangrove_22672.glb",
+      "source": "https://3dassets.dev/assets/swamp-and-mangrove-bog-margin-68d043aa",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/22672/v1/model.glb"
+    },
+    {
+      "id": "22673",
+      "title": "Drowned forest (Swamp and Mangrove)",
+      "file": "drowned_forest_swamp_and_mangrove_22673.glb",
+      "source": "https://3dassets.dev/assets/swamp-and-mangrove-drowned-forest-113c5804",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/22673/v1/model.glb"
+    }
+  ],
+  "errors": []
+}

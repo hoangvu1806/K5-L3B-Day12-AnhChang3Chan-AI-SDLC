@@ -1,0 +1,26 @@
+{
+  "notes": "All downloads go directly from creator/CDN to the user's computer. The ZIP does not redistribute third-party models. Licence URLs in docs/SOURCES.md.",
+  "items": [
+    {"id":"coconut_tall", "family":"tropical", "license":"CC0", "url":"https://cdn.3dassets.dev/assets/6797/v1/model.glb"},
+    {"id":"coconut_lean", "family":"tropical", "license":"CC0", "url":"https://cdn.3dassets.dev/assets/6796/v1/model.glb"},
+    {"id":"nipa_palm", "family":"tropical", "license":"CC0", "url":"https://cdn.3dassets.dev/assets/6802/v1/model.glb"},
+    {"id":"mangrove_small", "family":"tropical", "license":"CC0", "url":"https://cdn.3dassets.dev/assets/6809/v1/model.glb"},
+    {"id":"mangrove_large", "family":"tropical", "license":"CC0", "url":"https://cdn.3dassets.dev/assets/6810/v1/model.glb"},
+    {"id":"banana_clump", "family":"tropical", "license":"CC0", "url":"https://cdn.3dassets.dev/assets/6822/v1/model.glb"},
+    {"id":"taro", "family":"tropical", "license":"CC0", "url":"https://cdn.3dassets.dev/assets/6825/v1/model.glb"},
+    {"id":"mangrove_red", "family":"tropical", "license":"CC0", "url":"https://cdn.3dassets.dev/assets/22605/v1/model.glb"},
+    {"id":"flat_boat", "family":"boats", "license":"CC0", "url":"https://tevy.dev/models/flat-bottom-boat/v1/lod0.glb"},
+    {"id":"sampans", "family":"river_delta", "license":"1DesignTool-GameUse", "url":"https://assets.stoicsoft.com/1designtool/3d/models/river-delta-sampans/57e25388c1/model.glb", "page":"https://1designtool.com/3d/models/river-delta-sampans"},
+    {"id":"long_tail_boat", "family":"river_delta", "license":"1DesignTool-GameUse", "url":"https://assets.stoicsoft.com/1designtool/3d/models/river-delta-long-tail-boat/dd5460b722/model.glb", "page":"https://1designtool.com/3d/models/river-delta-long-tail-boat"},
+    {"id":"stilt_houses", "family":"river_delta", "license":"1DesignTool-GameUse", "url":"https://assets.stoicsoft.com/1designtool/3d/models/river-delta-stilt-houses/9653ae0ce2/model.glb", "page":"https://1designtool.com/3d/models/river-delta-stilt-houses"},
+    {"id":"floating_docks", "family":"river_delta", "license":"1DesignTool-GameUse", "url":"https://assets.stoicsoft.com/1designtool/3d/models/river-delta-floating-docks/1cbe61b8a7/model.glb", "page":"https://1designtool.com/3d/models/river-delta-floating-docks"},
+    {"id":"rice_store", "family":"river_delta", "license":"1DesignTool-GameUse", "url":"https://assets.stoicsoft.com/1designtool/3d/models/river-delta-rice-store/2ef653690b/model.glb", "page":"https://1designtool.com/3d/models/river-delta-rice-store"},
+    {"id":"nets", "family":"river_delta", "license":"1DesignTool-GameUse", "page":"https://1designtool.com/3d/models/river-delta-nets"},
+    {"id":"fruit_baskets", "family":"river_delta", "license":"1DesignTool-GameUse", "page":"https://1designtool.com/3d/models/river-delta-fruit-baskets"},
+    {"id":"fish_traps", "family":"river_delta", "license":"1DesignTool-GameUse", "page":"https://1designtool.com/3d/models/river-delta-fish-traps"},
+    {"id":"monkey_bridge", "family":"river_delta", "license":"1DesignTool-GameUse", "page":"https://1designtool.com/3d/models/river-delta-monkey-bridge"},
+    {"id":"delta_fisher", "family":"river_delta", "license":"1DesignTool-GameUse", "page":"https://1designtool.com/3d/models/river-delta-delta-fisher"},
+    {"id":"delta_boat_seller", "family":"river_delta", "license":"1DesignTool-GameUse", "page":"https://1designtool.com/3d/models/river-delta-delta-boat-seller"},
+    {"id":"conical_hats", "family":"river_delta", "license":"1DesignTool-GameUse", "page":"https://1designtool.com/3d/models/river-delta-conical-hats"}
+  ]
+}

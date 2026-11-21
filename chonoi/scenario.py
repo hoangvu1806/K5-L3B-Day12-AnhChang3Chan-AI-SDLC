@@ -161,6 +161,27 @@ def _validate_quan(b, tuning):
             raise BadInput(f"customers.{c['id']}: table_id phải là bàn có thật")
     if len(table_ids) != len(set(table_ids)):
         raise BadInput("hai khách cùng bàn")
+    # Lát 3: mâu thuẫn mức luật của khách -> mã 2
+    menu = tuning["menu"]
+    stock = b.get("stock", {})
+    reserved = {}
+    if "random_customers" in b and not isinstance(b["random_customers"], bool):
+        raise BadInput("random_customers phải là boolean")
+    for c in b.get("customers", []):
+        if c.get("dish_id") not in menu:
+            raise BadInput(f"customers.{c['id']}: dish_id phải có trong menu")
+        if c.get("state", "waiting") not in ("waiting", "eating"):
+            raise BadInput(f"customers.{c['id']}: state phải là waiting hoặc eating")
+        if "patience_ticks_left" in c:
+            _nonneg_int(f"customers.{c['id']}.patience_ticks_left", c["patience_ticks_left"])
+        r = c.get("reserved", menu[c["dish_id"]]["recipe"] if c.get("state", "waiting") == "waiting" else {})
+        validate_items(r)
+        for k, n in r.items():
+            reserved[k] = reserved.get(k, 0) + n
+    if "stock" in b:
+        for k, n in reserved.items():
+            if n > stock.get(k, 0):
+                raise BadInput(f"khách giữ chỗ {k} vượt kho")
     _validate_quan_lat4(b, tuning)
 
 

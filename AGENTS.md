@@ -29,9 +29,16 @@
 ## Skills / hooks của nhóm
 - `.agents/skills/headless-contract-check/` — chạy test + headless + so byte cùng seed + lưu proof. Dùng sau mỗi lần sửa luật và trước khi push.
 - `.agents/skills/phase-gate-audit/` — checklist trước khi gắn tag (team, test, commit mỗi người, hồ sơ, bí mật). Dùng cuối mỗi phase.
+- [chonoi-sim](.agents/skills/chonoi-sim/SKILL.md) — sửa luật Gather hoặc Quán, thứ tự tick, sự kiện và kho.
+- [chonoi-headless](.agents/skills/chonoi-headless/SKILL.md) — kiểm thử Test Contract, tái hiện lỗi và ghi bằng chứng.
+- [chonoi-godot](.agents/skills/chonoi-godot/SKILL.md) — dựng scene 3D third-person, camera, HUD và nối với mô phỏng.
+- `python tools/qa_stability_suite.py` — chạy fuzz, kiểm tra bất biến, determinism SHA-256, benchmark 10,800 ticks và stress HTTP server `chonoi.live`.
 
 ## Chia việc không đụng nhau (6 người)
-- Lát 1 (An) và Lát 2 (Bảo) cùng file `chonoi/sim/gather.py`: mỗi người viết helper riêng, `step()` chỉ thêm 1 dòng gọi helper. Lát 1: `_step_oxygen_and_hp`. Lát 2: `_try_harvest_node`, `_try_catch_fish`.
-- Lát 3 (Vũ) và Lát 4 (Hà Anh) cùng file `chonoi/sim/quan.py`: Lát 3: `_init_customers`, `_spawn_customer`, `_step_customer_patience`. Lát 4: `_step_stoves_and_eating`, `_handle_interact`.
+- Lát 1 (An) và Lát 2 (Bảo) cùng file `chonoi/sim/gather.py`: mỗi người viết helper riêng, `step()` chỉ thêm 1 dòng gọi helper. Lát 1: `_update_oxygen`. Lát 2: `_nearest`, harvest/catch.
+- Lát 3 (Vũ) và Lát 4 (Hà Anh) cùng file `chonoi/sim/quan.py`: Lát 3: `_load_customer`, `_tick_patience`, `_spawn_customer`. Lát 4: `_tick_stoves`, `_tick_eating`, `_interact`.
 - Pull trước khi sửa `step()`, commit nhỏ, push thường xuyên. Godot (`godot/`) chỉ đọc snapshot, không nhân đôi luật sim.
 - Số liệu thật chỉ từ PRD của phase trên lab board; chưa rõ thì ghi `docs/clarify.md`, không đoán.
+- [chonoi-sim](.agents/skills/chonoi-sim/SKILL.md) — sửa luật Gather hoặc Quán, thứ tự tick, sự kiện và kho.
+- [chonoi-headless](.agents/skills/chonoi-headless/SKILL.md) — kiểm thử Test Contract, tái hiện lỗi và ghi bằng chứng.
+- [chonoi-godot](.agents/skills/chonoi-godot/SKILL.md) — dựng scene 3D third-person, camera, HUD và nối với mô phỏng.

@@ -1,0 +1,189 @@
+{
+  "source": "https://3dassets.dev/api/v1/packs/quiet-lake-fishing",
+  "license": "CC0 1.0",
+  "assets": [
+    {
+      "id": "22404",
+      "title": "Teal Rowboat (Quiet Lake Fishing)",
+      "file": "teal_rowboat_quiet_lake_fishing_22404.glb",
+      "source": "https://3dassets.dev/assets/quiet-lake-fishing-rowboat-9a38d085",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/22404/v1/model.glb"
+    },
+    {
+      "id": "22403",
+      "title": "Wooden Oar (Quiet Lake Fishing)",
+      "file": "wooden_oar_quiet_lake_fishing_22403.glb",
+      "source": "https://3dassets.dev/assets/quiet-lake-fishing-wooden-oar-396aaaa9",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/22403/v1/model.glb"
+    },
+    {
+      "id": "22399",
+      "title": "Dock Platform (Quiet Lake Fishing)",
+      "file": "dock_platform_quiet_lake_fishing_22399.glb",
+      "source": "https://3dassets.dev/assets/quiet-lake-fishing-dock-platform-a467764f",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/22399/v1/model.glb"
+    },
+    {
+      "id": "22401",
+      "title": "Dock Railing (Quiet Lake Fishing)",
+      "file": "dock_railing_quiet_lake_fishing_22401.glb",
+      "source": "https://3dassets.dev/assets/quiet-lake-fishing-dock-railing-f0b26a45",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/22401/v1/model.glb"
+    },
+    {
+      "id": "22402",
+      "title": "Dock Ladder (Quiet Lake Fishing)",
+      "file": "dock_ladder_quiet_lake_fishing_22402.glb",
+      "source": "https://3dassets.dev/assets/quiet-lake-fishing-dock-ladder-be5e4734",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/22402/v1/model.glb"
+    },
+    {
+      "id": "22405",
+      "title": "Mooring Bollard (Quiet Lake Fishing)",
+      "file": "mooring_bollard_quiet_lake_fishing_22405.glb",
+      "source": "https://3dassets.dev/assets/quiet-lake-fishing-mooring-bollard-9cc68784",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/22405/v1/model.glb"
+    },
+    {
+      "id": "22406",
+      "title": "Fishing Rod and Reel (Quiet Lake Fishing)",
+      "file": "fishing_rod_and_reel_quiet_lake_fishing_22406.glb",
+      "source": "https://3dassets.dev/assets/quiet-lake-fishing-fishing-rod-25b95ce5",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/22406/v1/model.glb"
+    },
+    {
+      "id": "22400",
+      "title": "Landing Net (Quiet Lake Fishing)",
+      "file": "landing_net_quiet_lake_fishing_22400.glb",
+      "source": "https://3dassets.dev/assets/quiet-lake-fishing-landing-net-0162897e",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/22400/v1/model.glb"
+    },
+    {
+      "id": "22412",
+      "title": "Open Tackle Box (Quiet Lake Fishing)",
+      "file": "open_tackle_box_quiet_lake_fishing_22412.glb",
+      "source": "https://3dassets.dev/assets/quiet-lake-fishing-tackle-box-1de77b93",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/22412/v1/model.glb"
+    },
+    {
+      "id": "22407",
+      "title": "Catch Cooler (Quiet Lake Fishing)",
+      "file": "catch_cooler_quiet_lake_fishing_22407.glb",
+      "source": "https://3dassets.dev/assets/quiet-lake-fishing-cooler-09f93f26",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/22407/v1/model.glb"
+    },
+    {
+      "id": "22410",
+      "title": "Bait Bucket (Quiet Lake Fishing)",
+      "file": "bait_bucket_quiet_lake_fishing_22410.glb",
+      "source": "https://3dassets.dev/assets/quiet-lake-fishing-bait-bucket-c5e88532",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/22410/v1/model.glb"
+    },
+    {
+      "id": "22408",
+      "title": "Canvas Fishing Chair (Quiet Lake Fishing)",
+      "file": "canvas_fishing_chair_quiet_lake_fishing_22408.glb",
+      "source": "https://3dassets.dev/assets/quiet-lake-fishing-folding-chair-10d26c77",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/22408/v1/model.glb"
+    },
+    {
+      "id": "22409",
+      "title": "Life Ring (Quiet Lake Fishing)",
+      "file": "life_ring_quiet_lake_fishing_22409.glb",
+      "source": "https://3dassets.dev/assets/quiet-lake-fishing-life-ring-82f94e77",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/22409/v1/model.glb"
+    },
+    {
+      "id": "22411",
+      "title": "Fishing Float Set (Quiet Lake Fishing)",
+      "file": "fishing_float_set_quiet_lake_fishing_22411.glb",
+      "source": "https://3dassets.dev/assets/quiet-lake-fishing-float-set-92a195a7",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/22411/v1/model.glb"
+    },
+    {
+      "id": "22413",
+      "title": "Spinner Lure (Quiet Lake Fishing)",
+      "file": "spinner_lure_quiet_lake_fishing_22413.glb",
+      "source": "https://3dassets.dev/assets/quiet-lake-fishing-lure-1e987620",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/22413/v1/model.glb"
+    },
+    {
+      "id": "22414",
+      "title": "Trout Fish (Quiet Lake Fishing)",
+      "file": "trout_fish_quiet_lake_fishing_22414.glb",
+      "source": "https://3dassets.dev/assets/quiet-lake-fishing-trout-05fd5670",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/22414/v1/model.glb"
+    },
+    {
+      "id": "22416",
+      "title": "Perch Fish (Quiet Lake Fishing)",
+      "file": "perch_fish_quiet_lake_fishing_22416.glb",
+      "source": "https://3dassets.dev/assets/quiet-lake-fishing-perch-47319e72",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/22416/v1/model.glb"
+    },
+    {
+      "id": "22415",
+      "title": "Carp Fish (Quiet Lake Fishing)",
+      "file": "carp_fish_quiet_lake_fishing_22415.glb",
+      "source": "https://3dassets.dev/assets/quiet-lake-fishing-carp-6dc09cd8",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/22415/v1/model.glb"
+    },
+    {
+      "id": "22418",
+      "title": "Slatted Fish Crate (Quiet Lake Fishing)",
+      "file": "slatted_fish_crate_quiet_lake_fishing_22418.glb",
+      "source": "https://3dassets.dev/assets/quiet-lake-fishing-fish-crate-94ec0ed7",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/22418/v1/model.glb"
+    },
+    {
+      "id": "22417",
+      "title": "Cattail Reed Clump (Quiet Lake Fishing)",
+      "file": "cattail_reed_clump_quiet_lake_fishing_22417.glb",
+      "source": "https://3dassets.dev/assets/quiet-lake-fishing-reed-clump-d86f7970",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/22417/v1/model.glb"
+    },
+    {
+      "id": "22421",
+      "title": "Lily Pads and Blossom (Quiet Lake Fishing)",
+      "file": "lily_pads_and_blossom_quiet_lake_fishing_22421.glb",
+      "source": "https://3dassets.dev/assets/quiet-lake-fishing-lily-pads-b998ba2d",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/22421/v1/model.glb"
+    },
+    {
+      "id": "22420",
+      "title": "Shore Rock Cluster (Quiet Lake Fishing)",
+      "file": "shore_rock_cluster_quiet_lake_fishing_22420.glb",
+      "source": "https://3dassets.dev/assets/quiet-lake-fishing-shore-rocks-90e48942",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/22420/v1/model.glb"
+    },
+    {
+      "id": "22419",
+      "title": "Fishing Spot Sign (Quiet Lake Fishing)",
+      "file": "fishing_spot_sign_quiet_lake_fishing_22419.glb",
+      "source": "https://3dassets.dev/assets/quiet-lake-fishing-fishing-sign-4ac45c72",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/22419/v1/model.glb"
+    },
+    {
+      "id": "22422",
+      "title": "Lake Water Tile (Quiet Lake Fishing)",
+      "file": "lake_water_tile_quiet_lake_fishing_22422.glb",
+      "source": "https://3dassets.dev/assets/quiet-lake-fishing-lake-tile-c0466725",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/22422/v1/model.glb"
+    },
+    {
+      "id": "22423",
+      "title": "Quiet Lake: A Morning on the Dock (Quiet Lake Fishing)",
+      "file": "quiet_lake_a_morning_on_the_dock_quiet_lake_fishing_22423.glb",
+      "source": "https://3dassets.dev/assets/quiet-lake-fishing-quiet-lake-diorama-8ec3bcd6-starter-scene",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/22423/v1/model.glb"
+    },
+    {
+      "id": "22424",
+      "title": "Angler’s Corner (Quiet Lake Fishing)",
+      "file": "angler_s_corner_quiet_lake_fishing_22424.glb",
+      "source": "https://3dassets.dev/assets/quiet-lake-fishing-anglers-corner-661fc9a2",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/22424/v1/model.glb"
+    }
+  ],
+  "errors": []
+}

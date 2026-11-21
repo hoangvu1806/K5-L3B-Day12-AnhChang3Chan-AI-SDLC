@@ -5,3 +5,8 @@ __pycache__/
 .DS_Store
 /godot/.godot/
 /.local/
+
+# River Delta: giay phep cam phat tan model goc
+/godot/assets/external/river_delta/
+/godot/assets/downloaded_packs/river_delta/
+*.glb.part
