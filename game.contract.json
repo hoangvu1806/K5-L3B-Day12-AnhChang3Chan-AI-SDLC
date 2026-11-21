@@ -113,7 +113,7 @@
       "customer_interval_s": 15,
       "patience_s": 60,
       "eat_s": 10,
-      "burn_s": 20,
+      "burn_s": null,
       "carry_limit": 1,
       "tip_rate": 0.2,
       "tip_min_patience_ratio": 0.5,

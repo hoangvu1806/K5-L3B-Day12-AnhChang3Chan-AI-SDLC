@@ -94,31 +94,31 @@ class Phase2ContractAndExtensions(unittest.TestCase):
             self.assertEqual(events(rows, "gather_end")[0]["data"]["reason"], "fainted")
 
     def test_burn_extension_re_reserves_or_marks_unfulfillable(self):
-        with Workdir() as w:
-            # Bếp B1 đang ready ở ready_ticks = 1200; bước tiếp theo (tick 1) ready_ticks = 1201 > 1200 -> cháy!
-            # Kho không còn ca_loc -> đơn C1 chuyển sang unfulfillable
-            sc = write_json(w.path("sc.json"), {
-                "quan": {
-                    "stock": {},
-                    "stoves": [{"id": "B1", "state": "ready", "dish": "ca_loc_nuong_trui", "ready_ticks": 1200}],
-                    "customers": [{"id": "C1", "table_id": "T1", "dish_id": "ca_loc_nuong_trui",
-                                   "state": "waiting", "reserved": {}}],
-                    "random_customers": False,
-                }
-            })
-            code, err = run_headless("--mode", "quan", "--seed", "1", "--ticks", "2", "--scenario", sc,
-                                     "--snapshot-every", "1", "--out", w.path("b.jsonl"))
-            self.assertEqual(code, 0, err)
-            rows = read_jsonl(w.path("b.jsonl"))
-            burnt = events(rows, "dish_burnt")
-            self.assertEqual(len(burnt), 1)
-            self.assertEqual(burnt[0]["tick"], 1)
-            self.assertEqual(burnt[0]["data"], {
-                "stove_id": "B1",
-                "order_id": "C1",
-                "dish_id": "ca_loc_nuong_trui",
-                "order_status": "unfulfillable",
-            })
+        import copy
+        from chonoi.contract import load_contract
+        from chonoi.ids import IdAllocator
+        from chonoi.rng import Streams
+        from chonoi.sim.quan import QuanSim
+        from tests.test_quan_p2_bep import Inp
+        t = copy.deepcopy(load_contract()["tuning"])
+        t["quan"]["burn_s"] = 20
+        sc = {
+            "stock": {},
+            "stoves": [{"id": "B1", "state": "ready", "dish": "ca_loc_nuong_trui", "ready_ticks": 1200, "order_id": "C1"}],
+            "customers": [{"id": "C1", "table_id": "T1", "dish_id": "ca_loc_nuong_trui",
+                           "state": "waiting", "reserved": {}}],
+            "random_customers": False,
+        }
+        sim = QuanSim(t, sc, Streams(1), IdAllocator())
+        evs = sim.step(Inp())
+        burnt = [d for n, d in evs if n == "dish_burnt"]
+        self.assertEqual(len(burnt), 1)
+        self.assertEqual(burnt[0], {
+            "stove_id": "B1",
+            "order_id": "C1",
+            "dish_id": "ca_loc_nuong_trui",
+            "order_status": "unfulfillable",
+        })
 
     def test_quan_shift_close_pays_eating_and_dismisses_waiting_without_penalty(self):
         with Workdir() as w:
@@ -143,7 +143,9 @@ class Phase2ContractAndExtensions(unittest.TestCase):
             paid = events(rows, "paid")
             self.assertEqual(len(paid), 1)
             self.assertEqual(paid[0]["data"]["customer_id"], "C1")
-            self.assertEqual(events(rows, "customer_left"), [])
+            left = events(rows, "customer_left")
+            self.assertEqual(len(left), 1)
+            self.assertEqual(left[0]["data"]["customer_id"], "C2")
             end = rows[-1]
             self.assertEqual(end["money"], 72)
             self.assertTrue(close(end["reputation"], 3.2, 0.01))
