@@ -11,6 +11,7 @@ Thứ tự xử lý trong một tick (mục 4.5 TICKET-02):
 """
 
 import math
+from fractions import Fraction
 
 from ..ids import sort_by_id
 from ..inventory import hold_to_items
@@ -45,7 +46,23 @@ class GatherSim:
         self.zero_oxy_ticks = p.get("zero_oxy_ticks", 0)
         self.invuln_ticks = p.get("invuln_ticks", 0)
         self.catch_cd_ticks = p.get("catch_cd_ticks", 0)
+        self.freshness = tuning.get("freshness")
         self.hold = list(scenario.get("hold", []))  # thứ tự nhặt, cuối mảng là mới nhất
+        if self.freshness is not None:
+            self.hold = [item.copy() for item in self.hold]
+            for item in self.hold:
+                if day == 1:
+                    ids.reserve(item["id"])
+                else:
+                    item["id"] = ids.new("I")
+            self._fresh_decay = Fraction(str(self.freshness["gather_decay_per_s"])) / int(TICK)
+            self._spoiled_below = Fraction(str(self.freshness["spoiled_below"]))
+            self._fresh_by_id = {}
+        self.current_config = t.get("current")
+        self.random_current = scenario.get("random_current", True)
+        self.fixed_current_direction = scenario.get("current_direction")
+        self.current_direction = None
+        self.current_end_tick = 0
         self.time_left_ticks = scenario.get("time_left_ticks", int(round(t["duration_s"] * TICK)))
 
         src_nodes = scenario["nodes"] if "nodes" in scenario else t["nodes"]
@@ -163,17 +180,20 @@ class GatherSim:
         return chosen_kind, pt, heading
 
     # --- giao diện cho runner -------------------------------------------------
-    def inventory_items(self) -> dict:
+    def inventory_items(self) -> dict | list:
+        if self.freshness is not None:
+            return [item.copy() for item in sort_by_id(self.hold)]
         return hold_to_items(self.hold)
 
     def snapshot(self) -> dict:
-        return {
+        state = {
             "player": {"pos": self.pos, "vel": self.vel, "heading_deg": self.heading,
                        "oxygen_ticks": self.oxygen_ticks, "oxygen_max_ticks": self.oxygen_max,
                        "hp": self.hp, "hp_max": self.t["hp_max"], "zero_oxy_ticks": self.zero_oxy_ticks,
                        "invuln_ticks": self.invuln_ticks, "catch_cd_ticks": self.catch_cd_ticks,
                        "at_surface": self._at_surface()},
-            "hold": self.hold, "hold_count": len(self.hold),
+            "hold": self.hold if self.freshness is None else [item.copy() for item in self.hold],
+            "hold_count": len(self.hold),
             "hold_capacity": self.t["hold_capacity"],
             "nodes": [{"id": n["id"], "pos": n["pos"], "kind": n["kind"],
                        "ready": n["regrow_ticks"] == 0, "regrow_ticks": n["regrow_ticks"]}
@@ -183,6 +203,12 @@ class GatherSim:
                      for f in sort_by_id(self.fish)],
             "monsters": snapshot_monsters(self.monsters),
         }
+        if self.current_config is not None:
+            state["current"] = (
+                {"direction": self.current_direction, "ticks_left": self.current_end_tick - self.phase_tick}
+                if self.current_direction is not None else None
+            )
+        return state
 
     # --- một bước ---------------------------------------------------------------
     def step(self, inp):
@@ -197,6 +223,8 @@ class GatherSim:
                 n["regrow_ticks"] -= 1
                 if n["regrow_ticks"] == 0:
                     events.append(("node_regrown", {"node_id": n["id"]}))
+        self._age_hold(events)
+        self._update_current(events)
         # 2. bơi + chặn mép + oxy + ngạt
         was_at_surface = self._at_surface()
         self._move(inp)
@@ -206,6 +234,7 @@ class GatherSim:
         self._update_oxygen(at_surface, events)
         if self.hp == 0:
             lost = self._lose_lifo(len(self.hold))
+            self._end_current(events, "phase_end")
             events.append(("faint", {"pos": self.pos.copy(), "lost": lost, "hp": 0}))
             self._finish("fainted", events)
             return events
@@ -227,7 +256,7 @@ class GatherSim:
                         events.append(("hold_full", {"action": "gather", "node_id": node["id"],
                                                      "required": amount, "free": free}))
                     else:
-                        self.hold.extend([node["kind"]] * amount)
+                        self._collect(node["kind"], amount)
                         node["regrow_ticks"] = int(round(self.t["regrow_s"] * TICK))
                         events.append(("gather", {"node_id": node["id"], "kind": node["kind"],
                                                   "amount": amount}))
@@ -242,7 +271,7 @@ class GatherSim:
                         events.append(("hold_full", {"action": "catch", "fish_id": fish["id"],
                                                      "required": amount, "free": free}))
                     else:
-                        self.hold.extend([fish["kind"]] * amount)
+                        self._collect(fish["kind"], amount)
                         self.fish.remove(fish)
                         self.catch_cd_ticks = int(round(self.t["catch_cooldown_s"] * TICK))
                         events.append(("fish_caught", {"fish_id": fish["id"], "kind": fish["kind"],
@@ -328,6 +357,51 @@ class GatherSim:
         events.append(("fish_spawned", {"id": fid, "kind": kind, "pos": [float(pt[0]), float(pt[1])]}))
 
     # --- tiện ích ---------------------------------------------------------------
+    def _collect(self, kind, amount):
+        if self.freshness is None:
+            self.hold.extend([kind] * amount)
+            return
+        for _ in range(amount):
+            self.hold.append({"id": self.ids.new("I"), "kind": kind, "fresh": self.freshness["initial"]})
+
+    def _age_hold(self, events):
+        if self.freshness is None:
+            return
+        fresh_by_id = {}
+        for item in sort_by_id(self.hold):
+            ident = item["id"]
+            before = self._fresh_by_id.get(ident)
+            if before is None:
+                before = Fraction(str(item["fresh"]))
+            after = max(0, before - self._fresh_decay)
+            fresh_by_id[ident] = after
+            item["fresh"] = float(after)
+            if before >= self._spoiled_below > after:
+                events.append(("spoiled", {"item_id": ident, "kind": item["kind"], "location": "hold"}))
+        self._fresh_by_id = fresh_by_id
+
+    def _update_current(self, events):
+        cfg = self.current_config
+        if cfg is None or not self.random_current:
+            return
+        if self.current_direction is not None and self.phase_tick == self.current_end_tick:
+            self._end_current(events, "elapsed")
+        tick_in_interval = self.phase_tick % cfg["interval_ticks"]
+        if tick_in_interval == cfg["interval_ticks"] - cfg["warning_ticks"]:
+            events.append(("current_warning", {"starts_at_phase_tick": self.phase_tick + cfg["warning_ticks"]}))
+        if tick_in_interval == 0:
+            direction = self.fixed_current_direction
+            if direction is None:
+                direction = self.rng.get("current").choice((-1, 1))
+            self.current_direction = direction
+            self.current_end_tick = self.phase_tick + cfg["duration_ticks"]
+            events.append(("current_start", {"direction": direction, "duration_ticks": cfg["duration_ticks"]}))
+
+    def _end_current(self, events, reason):
+        if self.current_direction is not None:
+            events.append(("current_end", {"direction": self.current_direction, "reason": reason}))
+            self.current_direction = None
+
     def _nearest(self, entities, radius):
         candidates = [e for e in sort_by_id(entities) if math.dist(self.pos, e["pos"]) <= radius]
         return min(candidates, key=lambda e: math.dist(self.pos, e["pos"]), default=None)
@@ -372,6 +446,7 @@ class GatherSim:
         return math.dist(self.pos, self.t["dock_pos"]) <= self.t["dock_radius"]
 
     def _finish(self, reason, events):
+        self._end_current(events, "phase_end")
         self.done = True
         self.reason = reason
         events.append(("gather_end", {"reason": reason, "inventory": {"items": self.inventory_items()}}))
@@ -383,6 +458,8 @@ class GatherSim:
         if (mx, md) != (0.0, 0.0):
             self.heading = math.degrees(math.atan2(md, mx)) % 360
         b = self.t["bounds"]
+        if self.current_direction is not None and self.pos[1] >= self.current_config["min_depth"]:
+            self.pos[0] += self.current_direction * self.current_config["speed"] / TICK
         for i, axis in enumerate(AXES):
             self.pos[i] += self.vel[i] / TICK
             lo, hi = b[axis]

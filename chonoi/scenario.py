@@ -7,6 +7,7 @@ from .errors import BadInput
 from .inventory import KINDS_P1, validate_item_list, validate_items
 
 GATHER_KEYS = {"player", "hold", "nodes", "fish", "random_fish", "monsters", "ca_ho", "random_ho", "time_left_ticks"}
+CURRENT_KEYS = {"random_current", "current_direction"}
 GATHER_PLAYER_KEYS = {"pos", "vel", "heading_deg", "hp", "oxygen_ticks", "zero_oxy_ticks",
                       "invuln_ticks", "catch_cd_ticks", "attack_cd_ticks"}
 NODE_KINDS = ("bong_dien_dien", "bong_sung", "keo_neo")
@@ -108,6 +109,8 @@ def _check_block(block, mode, tuning, in_day=False):
     if not isinstance(block, dict):
         raise BadInput(f"khối {mode} phải là object")
     allowed = GATHER_KEYS if mode == "gather" else QUAN_KEYS
+    if mode == "gather" and tuning["gather"].get("current") is not None:
+        allowed = allowed | CURRENT_KEYS
     extra = set(block) - allowed
     if extra:
         raise BadInput(f"trường lạ/chưa hỗ trợ trong {mode}: {sorted(extra)}")
@@ -149,9 +152,15 @@ def _validate_gather(b, tuning):
             _check_ids(arr, b[arr])
     if "random_fish" in b and not isinstance(b["random_fish"], bool):
         raise BadInput("random_fish phải là boolean")
+    if "random_current" in b and not isinstance(b["random_current"], bool):
+        raise BadInput("random_current phải là boolean")
+    if "current_direction" in b and (type(b["current_direction"]) is not int or b["current_direction"] not in (-1, 1)):
+        raise BadInput("current_direction phải là -1 hoặc 1")
     if "hold" in b:
         h = b["hold"]
-        if not isinstance(h, list) or any(k not in KINDS_P1 for k in h):
+        if "freshness" in tuning:
+            validate_item_list(h, name="gather.hold")
+        elif not isinstance(h, list) or any(k not in KINDS_P1 for k in h):
             raise BadInput("hold phải là mảng id nguyên liệu hợp lệ")
         if len(h) > g["hold_capacity"]:
             raise BadInput("hold vượt sức chứa")

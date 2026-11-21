@@ -201,6 +201,7 @@ def step_monsters(sim, events: list):
         ))
         if sim.hp == 0:
             faint_lost = sim._lose_lifo(len(sim.hold))
+            sim._end_current(events, "phase_end")
             events.append((
                 "faint",
                 {

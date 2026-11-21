@@ -152,17 +152,9 @@ class DaySim:
             lvl = self.active_upgrades.get(kind, 0)
             if lvl > 0:
                 t["gather"][field] = shop[kind][lvl - 1][field]
-        sim = GatherSim(t, self._gather_template(), self.rng, self.ids, day=self.day)
+        sim = GatherSim(t, self.gather_tpl, self.rng, self.ids, day=self.day)
         sim.money, sim.earned, sim.reputation = self.money, self.earned, self.reputation
         self._set_phase("gather", sim, out)
-
-    def _gather_template(self):
-        """P3: Ngày 1 giữ id cá thể trong gather.hold; Ngày kế cấp id mới theo thứ tự mảng (kind/fresh gốc)."""
-        tpl = self.gather_tpl
-        hold = tpl.get("hold")
-        if self.day == 1 or not hold or not isinstance(hold[0], dict):
-            return tpl
-        return dict(tpl, hold=[{"id": self.ids.new("I"), "kind": it["kind"], "fresh": it["fresh"]} for it in hold])
 
     def _to_quan(self, out):
         # cùng tick gather_end: kho đếm (v1.1) hoặc mảng cá thể giữ id/fresh (v1.2); ngất: giỏ đã rỗng

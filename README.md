@@ -37,6 +37,10 @@ godot --headless --path godot --quit-after 5
 
 Scene Godot hiện là bản kiểm tra hiển thị và đầu vào. Khi tích hợp gameplay, dùng dữ liệu từ `game.contract.json` và duy trì lệnh `python3 -m chonoi.headless` theo Test Contract để chấm tự động.
 
+## Mở rộng Phase 3
+
+Phần mô phỏng dòng nước lũ (`current`) được kiểm chứng bằng `PYTHONPATH=tests:. python3 -m unittest tests.test_gather_current -v`. Khi tích hợp manifest v1.2, khai `current` trong `extensions` và đặt `tuning.gather.current` thành `{"interval_ticks":1800,"duration_ticks":480,"warning_ticks":120,"min_depth":10,"speed":1.5}`. Godot có thể dùng `current_warning` để hiện cảnh báo trước khi dòng bắt đầu. [Bằng chứng Gather Phase 3](docs/proof/phase-3/gather-freshness.md)
+
 ## Tự do sáng tạo
 
 Ngoài phần đề yêu cầu, nhóm được **thêm** nhân vật, loài cá/cây, sinh vật, món, bản đồ, cơ chế, câu chuyện, đồ họa, âm nhạc… với ba điều kiện: **không phá phần cố định** (tắt ở headless), ghi mục **"Sáng tạo của nhóm"** trong README của nhóm, và **làm lõi đúng trước**.
