@@ -180,7 +180,9 @@ class GatherSim:
         return chosen_kind, pt, heading
 
     # --- giao diện cho runner -------------------------------------------------
-    def inventory_items(self) -> dict:
+    def inventory_items(self) -> dict | list:
+        if self.freshness is not None:
+            return [item.copy() for item in sort_by_id(self.hold)]
         return hold_to_items(self.hold)
 
     def snapshot(self) -> dict:

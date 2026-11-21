@@ -7,6 +7,7 @@ from chonoi.ids import IdAllocator
 from chonoi.inputs import InputState
 from chonoi.rng import Streams
 from chonoi.runner import Session
+from chonoi.scenario import _check_block
 from chonoi.sim.gather import GatherSim
 
 
@@ -93,3 +94,21 @@ class GatherFreshness(unittest.TestCase):
         morning2 = GatherSim(tuning, scenario, Streams(1), ids, day=2)
         self.assertEqual(morning2.hold, [{"id": "I11", "kind": "ca_loc", "fresh": 87.5}])
         self.assertEqual(scenario["hold"][0]["id"], "I9")
+
+    def test_day_handoff_and_next_day_fixture_keep_exact_item_values(self):
+        tuning = gather_session().tuning
+        template = _check_block({
+            "hold": [{"id": "I9", "kind": "ca_loc", "fresh": 100}],
+            "random_fish": False, "monsters": [],
+        }, "gather", tuning, in_day=True)
+        session = Session("day", tuning, {"gather": template}, seed=1, days=2)
+        rows = session.step(input_state("interact"))
+        ending = next(row for row in rows if row["name"] == "gather_end")
+        items = ending["data"]["inventory"]["items"]
+        self.assertEqual(items, [{"id": "I9", "kind": "ca_loc", "fresh": 100 - 0.5 / 60}])
+        self.assertEqual(session.snapshot()["stock"], items)
+
+        # Bắt đầu ngày tiếp để kiểm tra chỉ có Gather cấp lại id cho mẫu.
+        session.sim.day = 2
+        session.sim._start_day([])
+        self.assertEqual(session.snapshot()["hold"], [{"id": "I10", "kind": "ca_loc", "fresh": 100}])
