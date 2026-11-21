@@ -13,6 +13,12 @@ var loaded_models := 0
 var missing_models := {}
 var rng := RandomNumberGenerator.new()
 var walkers: Array = []
+# Khi chạy trong game (scripts/game.gd) cảnh nhận `link` tới logic: bếp/bàn/khách/Út Sen theo snapshot.
+var link = null
+var live: Dictionary = {}  # key -> Node3D
+var player_node: Node3D
+var player_world := Vector3.ZERO
+var player_animation: AnimationPlayer
 
 const WATER_LEVEL := 0.30
 const MUD := "#635036"
@@ -324,29 +330,9 @@ func _restaurant_scene() -> void:
     for i in range(22):
         var x := -7.8+i*.30
         _box(Vector3(x,5.22,2.45),Vector3(.055,.055,3.62),"#cab374")
-    # Kitchen B1, wooden prep counter, and table T1 with 3D KayKit CC0 kitchenware, dishes & animated NPCs.
-    _asset("kitchen", "stove_single", Vector3(-4.9, 1.18, 2.9), 1.15, 3.14)
-    _asset("kitchen", "pot_A_stew", Vector3(-5.15, 2.15, 2.85), 1.1, 0.4)
-    _asset("kitchen", "pan_A", Vector3(-4.6, 2.15, 2.95), 1.05, -0.5)
     _box(Vector3(-3.3, 1.62, 3.0), Vector3(1.15, 0.88, 1.15), WOOD)
     _asset("kitchen", "cuttingboard", Vector3(-3.3, 2.08, 3.0), 1.15, 0.2)
     _asset("aquatic", "fish_whole_raw", Vector3(-3.3, 2.18, 3.0), 0.8, 0.6)
-    _asset("kitchen", "table_round_A", Vector3(2.0, 1.18, -1.6), 1.15, 0.0)
-    _asset("kitchen", "stew_bowl", Vector3(1.75, 2.08, -1.5), 1.15, 0.0)
-    _asset("kitchen", "food_dinner", Vector3(2.30, 2.08, -1.7), 1.15, 0.4)
-    _asset("kitchen", "plate", Vector3(2.0, 2.08, -1.15), 1.1, 0.0)
-    for p in [Vector2(0.05, -1.6), Vector2(3.95, -1.6), Vector2(2.0, -3.55)]:
-        _asset("kitchen", "chair_stool", Vector3(p.x, 1.18, p.y), 1.1, 0.0)
-    # Animated Ut Sen walking between kitchen B1 and table T1 + seated/walking customers (no T-pose, no clipping!)
-    var ut_sen := _asset("characters", "ut_sen_girl", Vector3(-3.0, 1.18, 2.0), 0.30, 0.0)
-    if ut_sen != null:
-        _add_walker(ut_sen, [Vector3(-3.0, 1.18, 2.0), Vector3(-1.2, 1.18, -1.2), Vector3(-0.35, 1.18, -1.6)], 2.2, 1.6)
-    var guest_sit := _asset("characters", "customer_girl", Vector3(-0.08, 1.18, -1.6), 0.34, 1.57)
-    if guest_sit != null:
-        _play_anim(guest_sit, "Female_Sitting")
-    var guest_walk := _asset("characters", "customer_girl", Vector3(5.6, 1.18, 2.0), 0.34, 3.14)
-    if guest_walk != null:
-        _add_walker(guest_walk, [Vector3(5.6, 1.18, 2.2), Vector3(5.6, 1.18, -2.8)], 1.5, 1.8)
     # Wooden lantern beam with clean round paper lanterns hanging underneath.
     _box(Vector3(0.0,5.5,-3.85),Vector3(15.3,.10,.10),WOOD)
     for i in range(9):
@@ -369,6 +355,30 @@ func _restaurant_scene() -> void:
     for p in [Vector2(6.0, -4.0), Vector2(-6.0, -4.0), Vector2(0.0, 4.0)]:
         _asset("river_delta", "fruit_baskets", Vector3(p.x, 1.28, p.y), .7)
         _asset("river_delta", "fish_traps", Vector3(p.x, 1.28, p.y + 1.0), .4)
+
+    if link == null:
+        _build_restaurant_preview()
+
+func _build_restaurant_preview() -> void:
+    _asset("kitchen", "stove_single", Vector3(-4.9, 1.18, 2.9), 1.15, 3.14)
+    _asset("kitchen", "pot_A_stew", Vector3(-5.15, 2.15, 2.85), 1.1, 0.4)
+    _asset("kitchen", "pan_A", Vector3(-4.6, 2.15, 2.95), 1.05, -0.5)
+    _asset("kitchen", "table_round_A", Vector3(2.0, 1.18, -1.6), 1.15, 0.0)
+    _asset("kitchen", "stew_bowl", Vector3(1.75, 2.08, -1.5), 1.15, 0.0)
+    _asset("kitchen", "food_dinner", Vector3(2.30, 2.08, -1.7), 1.15, 0.4)
+    _asset("kitchen", "plate", Vector3(2.0, 2.08, -1.15), 1.1, 0.0)
+    for p in [Vector2(0.05, -1.6), Vector2(3.95, -1.6), Vector2(2.0, -3.55)]:
+        _asset("kitchen", "chair_stool", Vector3(p.x, 1.18, p.y), 1.1, 0.0)
+    # Animated Ut Sen walking between kitchen B1 and table T1 + seated/walking customers (no T-pose, no clipping!)
+    var ut_sen := _asset("characters", "ut_sen_girl", Vector3(-3.0, 1.18, 2.0), 0.30, 0.0)
+    if ut_sen != null:
+        _add_walker(ut_sen, [Vector3(-3.0, 1.18, 2.0), Vector3(-1.2, 1.18, -1.2), Vector3(-0.35, 1.18, -1.6)], 2.2, 1.6)
+    var guest_sit := _asset("characters", "customer_girl", Vector3(-0.08, 1.18, -1.6), 0.34, 1.57)
+    if guest_sit != null:
+        _play_anim(guest_sit, "Female_Sitting")
+    var guest_walk := _asset("characters", "customer_girl", Vector3(5.6, 1.18, 2.0), 0.34, 3.14)
+    if guest_walk != null:
+        _add_walker(guest_walk, [Vector3(5.6, 1.18, 2.2), Vector3(5.6, 1.18, -2.8)], 1.5, 1.8)
 
 func _play_anim(node: Node3D, preferred: String) -> AnimationPlayer:
     var ap := node.find_child("AnimationPlayer", true, false)
@@ -399,6 +409,10 @@ func _add_walker(node: Node3D, waypoints: Array, speed: float, pause_s: float) -
     })
 
 func _process(delta: float) -> void:
+    _update_walkers(delta)
+    _update_live_restaurant(delta)
+
+func _update_walkers(delta: float) -> void:
     for w in walkers:
         var n: Node3D = w["node"]
         if not is_instance_valid(n):
@@ -446,6 +460,8 @@ func _camera_update() -> void:
     cam.look_at(focus)
 
 func _overlay() -> void:
+    if link != null:
+        return  # HUD do game.gd vẽ
     var canvas := CanvasLayer.new()
     add_child(canvas)
     var hint := Label.new()
@@ -462,6 +478,8 @@ func _overlay() -> void:
         canvas.add_child(missing)
 
 func _unhandled_input(ev: InputEvent) -> void:
+    if link != null and ev is InputEventKey:
+        return  # trong game: phím do SimLink gửi lên logic
     if ev is InputEventKey and ev.pressed and not ev.echo:
         if ev.keycode == KEY_F1: get_tree().change_scene_to_file("res://scenes/GatherRiver.tscn")
         if ev.keycode == KEY_F2: get_tree().change_scene_to_file("res://scenes/RestaurantNight.tscn")
@@ -479,3 +497,72 @@ func _unhandled_input(ev: InputEvent) -> void:
         azimuth -= ev.relative.x*.006
         elevation = clamp(elevation + ev.relative.y*.004, .12, 1.38)
         _camera_update()
+
+
+# --- Nối logic (game.gd gán `link`) -------------------------------------------------
+const FLOOR_Y := 1.18
+
+func _q2w(pos) -> Vector3:
+    # quán [x, z] với x ∈ [0,16], z ∈ [0,10] -> sàn bè 16 x 10 m đặt giữa gốc tọa độ
+    return Vector3(float(pos[0]) - 8.0, FLOOR_Y, float(pos[1]) - 5.0)
+
+func _live_node(key: String, family: String, id: String, at: Vector3, sc: float, yaw := 0.0, animation := "") -> Node3D:
+    if live.has(key):
+        return live[key]
+    var n := _asset(family, id, at, sc, yaw)
+    if n != null:
+        live[key] = n
+        if not animation.is_empty():
+            _play_anim(n, animation)
+    return n
+
+func _update_live_restaurant(delta: float) -> void:
+    if link == null or stage != "quan" or not link.connected:
+        return
+    var s: Dictionary = link.state
+    if not s.has("stoves"):
+        return
+    for st in s.get("stoves", []):
+        var at := _q2w(st.get("pos", [2, 8]))
+        _live_node("stove_" + str(st["id"]), "kitchen", "stove_single", at, 1.15, PI)
+        var pot := _live_node("pot_" + str(st["id"]), "kitchen", "pot_A_stew", at + Vector3(0, 0.97, 0), 1.1)
+        if pot != null:
+            pot.visible = str(st.get("state", "idle")) != "idle"
+    var seated := {}
+    for c in s.get("customers", []):
+        seated[str(c.get("table_id", ""))] = c
+    for tb in s.get("tables", []):
+        var tid := str(tb["id"])
+        var at := _q2w(tb.get("pos", [9, 2]))
+        _live_node("table_" + tid, "kitchen", "table_round_A", at, 1.15)
+        _live_node("stool_" + tid, "kitchen", "chair_stool", at + Vector3(-1.95, 0, 0), 1.1)
+        var guest := _live_node("guest_" + tid, "characters", "customer_girl", at + Vector3(-2.08, 0, 0), 0.34, PI * 0.5, "Female_Sitting")
+        var food := _live_node("food_" + tid, "kitchen", "food_dinner", at + Vector3(0, 0.9, 0), 1.15)
+        var c = seated.get(tid)
+        if guest != null:
+            guest.visible = c != null
+        if food != null:
+            food.visible = c != null and str(c.get("state", "")) == "eating"
+    var p: Dictionary = s.get("player", {})
+    if p.has("pos"):
+        var target := _q2w(p["pos"])
+        if player_node == null:
+            player_node = _live_node("player", "characters", "ut_sen_girl", target, 0.42)
+            player_world = target
+            if player_node != null:
+                player_animation = _play_anim(player_node, "Female_Idle")
+        var moved := target - player_world
+        player_world = player_world.lerp(target, minf(1.0, delta * 15.0))
+        if player_node != null:
+            player_node.position = player_world
+            var moving := Vector2(moved.x, moved.z).length() > 0.01
+            if moving:
+                player_node.rotation.y = atan2(moved.x, moved.z)
+            var animation := "Female_Walk" if moving else "Female_Idle"
+            if player_animation != null and player_animation.has_animation(animation) and player_animation.current_animation != animation:
+                player_animation.play(animation, 0.2)
+        # góc nhìn thứ 3: camera sau lưng, hơi cao, nhìn về phía bếp
+        if is_instance_valid(cam):
+            var want := player_world + Vector3(0.0, 5.5, 7.5)
+            cam.position = cam.position.lerp(want, minf(1.0, delta * 5.0))
+            cam.look_at(player_world + Vector3(0.0, 1.0, -1.5))

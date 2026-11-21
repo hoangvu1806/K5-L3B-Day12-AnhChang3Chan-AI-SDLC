@@ -11,6 +11,17 @@
 | Trần Gia Bảo | `Jay-Gabriel` | `client/godot` (Asset, đồ họa 2D/3D trên Godot) | Member | Hoàng Vũ (UI/tích hợp) |
 | Nhật Nguyên | `double-n-021` | `qa` (Tester — test case, headless contract, verification & proof) | QA lead / PO | Tất cả các lát khi cần rà lỗi |
 
+## Phân công theo phase (chi tiết trong `docs/plan/phase-n.md`)
+
+| Thành viên | Phase 2 (v1.1) | Phase 3 (v1.2) |
+|---|---|---|
+| Nguyễn An (`AnK17-UIT`) | Số chuẩn gather, cá bơi/sinh, N5/N6 | Hao tươi giỏ, `spoiled`, cấp id cá thể · mở rộng `current` |
+| Từ Huy Bảo (`thbao4545`) | Cá Sấu, Máu/ngất do quái · mở rộng `snake` | LIFO cá thể khi mất hàng, ghi kho cá thể khi `gather_end` |
+| Hoàng Vũ (`hoangvu1806`) | `--mode day`, Shop, pause; khách quán theo lịch mới; gắn tag | Adapter kho cá thể, giữ chỗ theo id, bàn giao trong `day`; gắn tag · mở rộng `reservations` (cùng Hà Anh) |
+| Hà Anh (`hnha02`) | 2 bếp/4 bàn, 6 món, đóng ca · mở rộng `burn` | Hao tươi kho quán, giá theo tươi, boa · mở rộng `reservations` |
+| Trần Gia Bảo (`Jay-Gabriel`) | Menu, màn chuyển pha, pause, HUD sáng/quán | HUD độ tươi / hàng ươn |
+| Nhật Nguyên (`double-n-021`) | Manifest v1.1, test, smoke, verification P2 | Test ngưỡng/bàn giao, regression, `CHANGELOG.md`, verification P3 |
+
 **Vai quy trình:** PO (đầu mối hỏi giảng viên, giữ `docs/clarify.md`) · Integrator (giữ `docs/contracts/`, gắn tag) · QA lead · Scrum/Release.
 
 ## Thỏa thuận làm việc nhóm

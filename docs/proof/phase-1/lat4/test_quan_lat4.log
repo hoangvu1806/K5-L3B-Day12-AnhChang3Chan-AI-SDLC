@@ -1,0 +1,19 @@
+test_bad_scenario_exit_2 (test_quan_lat4.Lat4.test_bad_scenario_exit_2) ... ok
+test_carry_limit_hand_full (test_quan_lat4.Lat4.test_carry_limit_hand_full) ... ok
+test_cook_started_then_dish_ready (test_quan_lat4.Lat4.test_cook_started_then_dish_ready) ... ok
+test_full_loop_deterministic (test_quan_lat4.Lat4.test_full_loop_deterministic) ... ok
+test_no_cook_without_stock_or_customer (test_quan_lat4.Lat4.test_no_cook_without_stock_or_customer) ... ok
+test_no_tip_when_patience_low (test_quan_lat4.Lat4.test_no_tip_when_patience_low) ... ok
+test_one_dish_per_waiting_customer (test_quan_lat4.Lat4.test_one_dish_per_waiting_customer) ... ok
+test_pick_up_ready_dish (test_quan_lat4.Lat4.test_pick_up_ready_dish) ... ok
+test_reputation_clamped_at_max (test_quan_lat4.Lat4.test_reputation_clamped_at_max) ... ok
+test_serve_then_paid_with_tip (test_quan_lat4.Lat4.test_serve_then_paid_with_tip) ... ok
+test_wrong_dish_not_served (test_quan_lat4.Lat4.test_wrong_dish_not_served) ... ok
+
+----------------------------------------------------------------------
+Ran 11 tests in 1.916s
+
+OK
+Ran 62 tests in 8.976s
+
+OK
