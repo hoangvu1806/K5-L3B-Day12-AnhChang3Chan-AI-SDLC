@@ -308,8 +308,16 @@ func _unhandled_input(ev: InputEvent) -> void:
 			link.buy("oxygen")
 		elif ev.keycode == KEY_2 and link.phase() == "shop":
 			link.buy("hp")
-		elif ev.keycode == KEY_R and bool(link.state.get("finished", false)):
+		elif ev.keycode == KEY_R and _can_restart():
 			link.restart()
+
+
+func _can_restart() -> bool:
+	# Chơi lại: khi đã kết thúc, hoặc đang tạm dừng (Esc/P rồi R) để tránh bấm nhầm giữa lượt.
+	if not link.connected:
+		return false
+	var s: Dictionary = link.state
+	return bool(s.get("finished", false)) or str(s.get("state", "")) == "paused"
 
 
 func _clear_left_card() -> void:
@@ -396,7 +404,7 @@ func _on_state(s: Dictionary) -> void:
 			str(s.get("reason", "")), score_i, money_i]
 		center_panel.visible = true
 	elif paused:
-		center_label.text = "TẠM DỪNG\nEsc / P: Tiếp tục   ·   H: Tương phản cao"
+		center_label.text = "TẠM DỪNG\nEsc / P: Tiếp tục   ·   R: Chơi lại từ đầu   ·   H: Tương phản cao"
 		center_panel.visible = true
 	else:
 		center_panel.visible = false
